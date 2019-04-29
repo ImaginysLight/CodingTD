@@ -9,13 +9,28 @@ using namespace std;
 // Thể hiện đối tượng bất kỳ thuộc về 1 người chơi trong game scene
 class BaseObjectClass {
 public:
+	//Các thứ static
+	static vector<BaseObjectClass*> player1_Object;
+	static vector<BaseObjectClass*> player2_Object;
+	static bool SortByHealth(BaseObjectClass* object1, BaseObjectClass* object2);
+	static BaseObjectClass* GetObjectById(int id);
+
+
 	struct DamageReceive {
 		int healthLose = 0;
 		float triggerTime = 0;
 		string animateName = "";
-		DamageReceive(int healthLose, float triggerTime, string animateName);
+		int sourceId = 0;
+		DamageReceive(int healthLose, float triggerTime, string animateName, int sourceId);
 	};
 
+	struct StatusReceive {
+		int sourceId = 0;
+		string statusName = "";
+		float endTime = 0;
+		StatusReceive(int sourceId, string statusName, float endTime);
+
+	};
 	// thông số cơ bản
 	string objectName = "";
 	int levelRequired = 1;
@@ -23,7 +38,7 @@ public:
 	int cost = 0;
 	int maxHealth = 0;
 	int currentHealth = maxHealth;
-	int attack = 0;
+	float attack = 0;
 	int defense = 0;
 	int speed = 0;
 	float attackRate = 1.0;
@@ -37,6 +52,7 @@ public:
 	int upgradeLevelRequired = 1;
 
 	// thông tin trong game
+	int id = 0;
 	float spawnTime = Tool::currentIngameTime;
 	float nextRegeneration = spawnTime + 1;
 	string animateName = "";
@@ -55,16 +71,18 @@ public:
 	void CreateHealthBar();
 
 	vector<DamageReceive> damageReceive;
-	static bool SortByHealth(BaseObjectClass* object1, BaseObjectClass* object2);
+	vector<StatusReceive> statusReceive;
+	void RemoveStatus(string statusName);
 	virtual vector<BaseObjectClass*> FindTargets(vector<BaseObjectClass*>& targets);
 	virtual void ExcuteDamageReceive(DamageReceive dmg);
+	virtual void CheckStatusEnd();
 	virtual void Regeneration();
 	virtual void UpdateAction(vector<BaseObjectClass*>& vec);
 	virtual void StopMove();
 	virtual void Move();
 	virtual void Attack(BaseObjectClass* &target);
 	virtual void Die();
-
+	
 
 	BaseObjectClass();
 	~BaseObjectClass();

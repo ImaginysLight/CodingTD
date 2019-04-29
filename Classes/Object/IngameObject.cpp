@@ -11,7 +11,7 @@ void IngameObject::loadIngameObjectStaticVariables() {
 	IngameObject::elementColor.insert({ "Poison",Color3B(100,240,70) });
 	IngameObject::elementColor.insert({ "Dark",Color3B(60,0,60) });
 
-	IngameObject::spawnPoint.insert({ "1_1",Vec2(200,50) }); // team1 _ line1
+	IngameObject::spawnPoint.insert({ "1_1",Vec2(1000,50) }); // team1 _ line1
 	IngameObject::spawnPoint.insert({ "1_2",Vec2(200,100) });
 	IngameObject::spawnPoint.insert({ "1_3",Vec2(200,150) });
 
@@ -73,3 +73,5 @@ pair<string, Animate*> IngameObject::CreateAnimateWithKey(string characterName, 
 	result.second = IngameObject::CreateAnimate("Sprites/" + characterName + "/" + action + "/" + action + " (", ").png", numBegin, numEnd, 0.1f);
 	return result;
 }
+
+

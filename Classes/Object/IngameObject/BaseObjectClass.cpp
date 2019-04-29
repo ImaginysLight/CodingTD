@@ -1,6 +1,10 @@
 ﻿#include "BaseObjectClass.h"
 using namespace std;
 
+
+vector<BaseObjectClass*> BaseObjectClass::player1_Object;
+vector<BaseObjectClass*> BaseObjectClass::player2_Object;
+
 void BaseObjectClass::UpdateIngameInfo(string spriteName, bool isStand)
 {
 	root = Node::create();
@@ -28,6 +32,9 @@ void BaseObjectClass::UpdateAction(vector<BaseObjectClass*>& vec)
 		delete this;
 		goto End;
 	}
+
+	//Kiểm tra trạng thái
+	if (this->statusReceive.size() > 0) this->CheckStatusEnd();
 
 	//Hồi máu
 	if (nextRegeneration < Tool::currentIngameTime) {
@@ -88,6 +95,7 @@ void BaseObjectClass::Die() {
 	))->setFlags(3);
 }
 
+
 void BaseObjectClass::Move()
 {
 	this->action = "Move";
@@ -117,7 +125,7 @@ void BaseObjectClass::Attack(BaseObjectClass *& target)
 	//string animateName = this->animateName + "_explosion";
 	string animateName = "_explosion"; // Không có sprite nên ai bắn cũng nổ như nhau
 	float triggerTime = Tool::currentIngameTime + this->attackRate / 2;
-	target->damageReceive.push_back(DamageReceive(healthLose, triggerTime, animateName));
+	target->damageReceive.push_back(DamageReceive(healthLose, triggerTime, animateName, this->id));
 }
 
 void BaseObjectClass::Regeneration()
@@ -134,6 +142,7 @@ void BaseObjectClass::Regeneration()
 }
 
 void BaseObjectClass::ExcuteDamageReceive(DamageReceive dmg) {
+	
 	this->currentHealth -= dmg.healthLose;
 	if (this->currentHealth > this->maxHealth) this->currentHealth = this->maxHealth;
 	Label* lbl_HealthLose;
@@ -165,6 +174,7 @@ void BaseObjectClass::ExcuteDamageReceive(DamageReceive dmg) {
 		sp_Animation->runAction(Sequence::create(animate, RemoveSelf::create(), nullptr));
 	}
 }
+
 
 void BaseObjectClass::UpdateHealthBar()
 {
@@ -199,7 +209,7 @@ vector<BaseObjectClass*> BaseObjectClass::FindTargets(vector<BaseObjectClass*>& 
 		//Xem target còn sống không
 		if (target->currentHealth > 0 && target->action != "Die") {
 			//Tìm xem có cùng hàng không || là maintower
-			if (this->line == target->line || target->isStand) {
+			if (this->line == target->line || target->description == "Main tower") {
 				//Nếu cùng hàng thì tim xem có trong range không
 				if (abs(target->root->getPositionX() - this->root->getPositionX()) < this->range) {
 					shotableTargets.push_back(target);
@@ -216,6 +226,28 @@ vector<BaseObjectClass*> BaseObjectClass::FindTargets(vector<BaseObjectClass*>& 
 
 }
 
+void BaseObjectClass::CheckStatusEnd()
+{
+	for (int i = 0; i < statusReceive.size(); i++) {
+		if (statusReceive[i].endTime < Tool::currentIngameTime) {
+			this->RemoveStatus(statusReceive[i].statusName);
+			statusReceive.erase(statusReceive.begin() + i);
+		}
+	}
+	
+}
+void BaseObjectClass::RemoveStatus(string statusName) {
+	if (statusName == "CursedAura") {
+		//Cursed Kingdom: Whoever entered this tower range will be rotted, decrease 25% Attack.
+		this->attack /= 0.75; return;
+	}
+	if (statusName == "FrozenAura") {
+		//Frozen Aura: Whoever entered this tower range will be cold, decrease Attack Rate by 25%
+		this->attackRate *= 0.75; return;
+	}
+}
+
+
 
 BaseObjectClass::BaseObjectClass()
 {
@@ -225,10 +257,28 @@ BaseObjectClass::~BaseObjectClass()
 {
 }
 
-BaseObjectClass::DamageReceive::DamageReceive(int healthLose, float triggerTime, string animateName)
+BaseObjectClass::DamageReceive::DamageReceive(int healthLose, float triggerTime, string animateName, int sourceId)
 {
 	this->healthLose = healthLose;
 	this->triggerTime = triggerTime;
 	this->animateName = animateName;
+	this->sourceId = sourceId;
 }
 
+BaseObjectClass::StatusReceive::StatusReceive(int sourceId, string statusName, float endTime)
+{
+	this->sourceId = sourceId;
+	this->statusName = statusName;
+	this->endTime = endTime;
+}
+
+BaseObjectClass* BaseObjectClass::GetObjectById(int id)
+{
+	for (auto object : BaseObjectClass::player1_Object) {
+		if (object->id == id) return object;
+	}
+	for (auto object : BaseObjectClass::player2_Object) {
+		if (object->id == id) return object;
+	}
+	return nullptr;
+}

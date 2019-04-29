@@ -29,7 +29,7 @@ bool GameScene::init()
 	Tool::currentPlayer->elementName = "Ice";
 
 	//Random question trước cho chắc
-	GameScene::Request_RandomQuestion(nextQuestionLevel);
+	//GameScene::Request_RandomQuestion(nextQuestionLevel);
 
 	GameScene::SetupCamera();
 
@@ -43,15 +43,15 @@ bool GameScene::init()
 
 
 	{
-		/*GameScene::InitializeIngameObject("MainTower1", 2, true);
-		GameScene::InitializeIngameObject("MainTower2", 2, false);*/
-		GameScene::InitializeIngameObject("Robot2_3", 1, true);
+		GameScene::InitializeIngameObject("RottedKingdom", 2, true);
+		GameScene::InitializeIngameObject("RottedKingdom", 2, false);
+		GameScene::InitializeIngameObject("Robot7_2", 1, true);
 		
 		//GameScene::InitializeIngameObject("Robot5", 1, true);
 		/*GameScene::InitializeIngameObject("Robot5", 1, false);
 		GameScene::InitializeIngameObject("Robot2", 1, false);*/
-		GameScene::InitializeIngameObject("Robot10_2", 1, false);
-		GameScene::InitializeIngameObject("Robot10_2", 3, false);
+		GameScene::InitializeIngameObject("Robot2_2", 1, false);
+		GameScene::InitializeIngameObject("Robot5_2", 1, false);
 		
 	}
 
@@ -70,29 +70,32 @@ void GameScene::update(float time) {
 }
 
 void GameScene::UpdateIngameObject(float time) {
-	for (int i = 0; i < vectorPlayer1.size(); i++) {
-		if (vectorPlayer1[i]->isAlive == false) {
-			vectorPlayer1.erase(vectorPlayer1.begin() + i);
+	for (int i = 0; i < BaseObjectClass::player1_Object.size(); i++) {
+		if (BaseObjectClass::player1_Object[i]->isAlive == false) {
+			BaseObjectClass::player1_Object.erase(BaseObjectClass::player1_Object.begin() + i);
 			continue;
 		}
-		vectorPlayer1[i]->UpdateAction(vectorPlayer2);
+		BaseObjectClass::player1_Object[i]->UpdateAction(BaseObjectClass::player2_Object);
 	}
 
-	for (int i = 0; i < vectorPlayer2.size(); i++) {
-		if (vectorPlayer2[i]->isAlive == false) {
-			vectorPlayer2.erase(vectorPlayer2.begin() + i);
+	for (int i = 0; i < BaseObjectClass::player2_Object.size(); i++) {
+		if (BaseObjectClass::player2_Object[i]->isAlive == false) {
+			BaseObjectClass::player2_Object.erase(BaseObjectClass::player2_Object.begin() + i);
 			continue;
 		}
-		vectorPlayer2[i]->UpdateAction(vectorPlayer1);
+		BaseObjectClass::player2_Object[i]->UpdateAction(BaseObjectClass::player1_Object);
 	}
 
 }
 
 void GameScene::UpdateQuestionInfo(float time) {
-	if ((int)(destinationTime - Tool::currentIngameTime) == 0){
+	if (destinationTime < Tool::currentIngameTime){
 		questionAvailable = !questionAvailable;
 		GameScene::ChangeQuestionTableState(questionAvailable);
 		if (questionAvailable) {
+			//Nếu có câu hỏi thì kiểm tra xem questionContent == "", tức là chưa chọn độ khó
+			if (questionContent == ""); //random câu hỏi độ khó mặc định
+			destinationTime += currentQuestionLevel * 10;
 			GameScene::Request_RandomQuestion(nextQuestionLevel);
 			GameScene::Request_ReadQuestion();
 		}
@@ -127,6 +130,10 @@ void GameScene::ChangeQuestionTableState(bool questionAvailable) {
 		btn_Level2->runAction(FadeOut::create(0.5));
 		btn_Level3->runAction(FadeOut::create(0.5));
 
+		btn_Level1->setEnabled(false);
+		btn_Level2->setEnabled(false);
+		btn_Level3->setEnabled(false);
+
 		btn_Level1->setLocalZOrder(0);
 		btn_Level2->setLocalZOrder(0);
 		btn_Level3->setLocalZOrder(0);
@@ -135,37 +142,45 @@ void GameScene::ChangeQuestionTableState(bool questionAvailable) {
 	else {
 		nextQuestionLevel = "";
 		lbl_Level->setString(Tool::ConvertUTF16ToString(L"Đoán xem?"));
-		txt_Question->setString("Choose difficulty for the next question or it will be random");
+		if (isAllowedToChooseQuestion) {
+			btn_Level1->setTitleColor(Color3B::WHITE);
+			btn_Level2->setTitleColor(Color3B::WHITE);
+			btn_Level3->setTitleColor(Color3B::WHITE);
+
+			btn_Level1->setEnabled(true);
+			btn_Level2->setEnabled(true);
+			btn_Level3->setEnabled(true);
+
+			btn_Level1->runAction(FadeIn::create(0.5));
+			btn_Level2->runAction(FadeIn::create(0.5));
+			btn_Level3->runAction(FadeIn::create(0.5));
+
+			btn_Level1->setLocalZOrder(2);
+			btn_Level2->setLocalZOrder(2);
+			btn_Level3->setLocalZOrder(2);
+			txt_Question->setString("Choose difficulty for the next question or it will be random");
+		}
+		else
+			txt_Question->setString("Wait your opponent choose difficulty for the next question");
 		lv_QuestionContent->requestDoLayout();
-
-		btn_Level1->setTitleColor(Color3B::WHITE);
-		btn_Level2->setTitleColor(Color3B::WHITE);
-		btn_Level3->setTitleColor(Color3B::WHITE);
-
-		btn_Level1->setEnabled(true);
-		btn_Level2->setEnabled(true);
-		btn_Level3->setEnabled(true);
+		btn_Answer1->setEnabled(false);
+		btn_Answer2->setEnabled(false);
+		btn_Answer3->setEnabled(false);
+		btn_Answer4->setEnabled(false);
 
 		btn_Answer1->runAction(FadeOut::create(0.5));
 		btn_Answer2->runAction(FadeOut::create(0.5));
 		btn_Answer3->runAction(FadeOut::create(0.5));
 		btn_Answer4->runAction(FadeOut::create(0.5));
-
-		btn_Level1->runAction(FadeIn::create(0.5));
-		btn_Level2->runAction(FadeIn::create(0.5));
-		btn_Level3->runAction(FadeIn::create(0.5));
-
-		btn_Level1->setLocalZOrder(2);
-		btn_Level2->setLocalZOrder(2);
-		btn_Level3->setLocalZOrder(2);
+		
 	}
 }
 
 void GameScene::InitializeIngameObject(string objectName, int line, bool isLeft)
 {
-	BaseObjectClass* object = ObjectConstructor::InitializeObject(objectName, line, isLeft);
-	if (object->isLeft) vectorPlayer1.push_back(object);
-	else vectorPlayer2.push_back(object);
+	BaseObjectClass* object = ObjectConstructor::InitializeObject(objectName, line, isLeft, objectId++);
+	if (object->isLeft) BaseObjectClass::player1_Object.push_back(object);
+	else BaseObjectClass::player2_Object.push_back(object);
 	this->addChild(object->root, 4 - object->line);
 }
 
@@ -206,12 +221,15 @@ void GameScene::btn_Click(Ref * pSender, cocos2d::ui::Button::Widget::TouchEvent
 			}
 		}
 		else if (name == "btn_Level1" || name == "btn_Level2" || name == "btn_Level3") {
-			nextQuestionLevel = name.substr(name.size() - 1, 1);
-			btn_Level1->setEnabled(false);
-			btn_Level2->setEnabled(false);
-			btn_Level3->setEnabled(false);
+			if (isAllowedToChooseQuestion) {
+				nextQuestionLevel = name.substr(name.size() - 1, 1);
+				btn_Level1->setEnabled(false);
+				btn_Level2->setEnabled(false);
+				btn_Level3->setEnabled(false);
 
-			((Button*)pSender)->setTitleColor(Color3B::GREEN);
+				((Button*)pSender)->setTitleColor(Color3B::GREEN);
+				destinationTime = Tool::currentIngameTime;
+			}
 		}
 	}
 }
@@ -220,7 +238,7 @@ void GameScene::btn_BuyObjectClick(Ref *pSender, cocos2d::ui::Button::Widget::To
 	string name = ((Node*)pSender)->getName();
 	if (type == Widget::TouchEventType::ENDED) {
 		//Lấy thông tin lính đang mua
-		auto object = ObjectConstructor::InitializeObject(name, 0, 0);
+		auto object = ObjectConstructor::InitializeObject(name, 0, 0, 0);
 		//Kiểm tra cấp nhà chính
 		if (GameScene::ingamePlayerInfo.mainTowerLevel < object->levelRequired) { 
 			RunActionNotify("Require main tower level " + to_string(object->levelRequired));
@@ -248,7 +266,7 @@ void GameScene::btn_UpgradeObjectClick(Ref * pSender, cocos2d::ui::Button::Widge
 	if (type == Widget::TouchEventType::ENDED) {
 		//Lấy thông tin robot upgrade
 		string name = ((Button*)pSender)->getName();
-		auto object = ObjectConstructor::InitializeObject(name, 0, 0);
+		auto object = ObjectConstructor::InitializeObject(name, 0, 0, 0);
 
 		//Kiểm tra cấp nhà chính
 		if (GameScene::ingamePlayerInfo.mainTowerLevel < object->upgradeLevelRequired) {
@@ -284,46 +302,6 @@ void GameScene::btn_UpgradeObjectClick(Ref * pSender, cocos2d::ui::Button::Widge
 				RunActionNotify("Upgrade to " + object->upgradeTo + " successful");
 			}
 		}
-		//if (name == "Not Available") return;
-		//
-		//string objectName = basicStats[name].objectName;
-		////Tìm robot2_1 trong list buy đổi thành robot2_2
-		//for (int i = 0; i < List_BuyableObject.size(); i++) {
-		//	if (basicStats[List_BuyableObject[i].btn_Icon->getName()].objectName == objectName) {
-		//		auto oldItemInfo = List_BuyableObject[i];
-		//		List_BuyableObject[i] = Item_BuyableObject(basicStats[name].price, name, basicStats);
-
-		//		List_BuyableObject[i].btn_Icon->setPosition(oldItemInfo.btn_Icon->getPosition());
-		//		List_BuyableObject[i].btn_Upgrade->setPosition(oldItemInfo.btn_Upgrade->getPosition());
-		//		List_BuyableObject[i].lbl_Price->setPosition(oldItemInfo.lbl_Price->getPosition());
-
-		//		List_BuyableObject[i].btn_Icon->addTouchEventListener(CC_CALLBACK_2(GameScene::btn_BuyObjectClick, this));
-		//		List_BuyableObject[i].btn_Upgrade->addTouchEventListener(CC_CALLBACK_2(GameScene::btn_UpgradeObjectClick, this));
-
-		//		buyingBar->removeChildByName(oldItemInfo.item->getName());
-		//		buyingBar->addChild(List_BuyableObject[i].item);
-		//		RunActionNotify("Upgrade to " + name + " successful");
-		//		return;
-		//	}
-		//}
-		/*for (auto item : List_BuyableObject) {
-			if (basicStats[item.btn_Icon->getName()].objectName == objectName) {				
-				auto oldItemInfo = item;
-				item = Item_BuyableObject(basicStats[name].price, name, basicStats);
-
-				item.btn_Icon->setPosition(oldItemInfo.btn_Icon->getPosition());
-				item.btn_Upgrade->setPosition(oldItemInfo.btn_Upgrade->getPosition());
-				item.lbl_Price->setPosition(oldItemInfo.lbl_Price->getPosition());
-
-				item.btn_Icon->addTouchEventListener(CC_CALLBACK_2(GameScene::btn_BuyObjectClick, this));
-				item.btn_Upgrade->addTouchEventListener(CC_CALLBACK_2(GameScene::btn_UpgradeObjectClick, this));
-
-				buyingBar->removeChildByName(oldItemInfo.item->getName());
-				buyingBar->addChild(item.item);
-				RunActionNotify("Upgrade to " + name + " successful");
-				return;
-			}
-		}*/
 	}
 }
 
@@ -340,7 +318,6 @@ void GameScene::btn_AnswerClick(Ref *pSender, cocos2d::ui::Button::Widget::Touch
 		else {
 			((Button*)pSender)->setTitleColor(Color3B::RED);
 		}
-		destinationTime = Tool::currentIngameTime + 1;
 	}
 }
 
@@ -355,13 +332,13 @@ void GameScene::menuCloseCallback(Ref* pSender)
 
 bool GameScene::onTouchBegan(Touch* touch, Event* event) {
 	Camera::getDefaultCamera()->setAnchorPoint(Vec2(0, 0.5));
-	for (auto object : vectorPlayer1) {
+	for (auto object : BaseObjectClass::player1_Object) {
 		if (object->sprite->getBoundingBox().containsPoint(staticUI->getPosition() + touch->getLocation() - object->root->getPosition())){
 			GameScene::ShowObjectDetails(*object, Vec2(visibleSize.width*0.85, visibleSize.height*0.95));
 			return true;
 		}
 	}
-	for (auto object : vectorPlayer2) {
+	for (auto object : BaseObjectClass::player2_Object) {
 		if (object->sprite->getBoundingBox().containsPoint(staticUI->getPosition() + touch->getLocation() - object->root->getPosition())) {
 			GameScene::ShowObjectDetails(*object, Vec2(visibleSize.width*0.85, visibleSize.height*0.95));
 			return true;
@@ -676,7 +653,7 @@ void GameScene::CreateBuyingBar() {
 }
 GameScene::Item_BuyableObject::Item_BuyableObject(string name)
 {
-	BaseObjectClass* basicStats = ObjectConstructor::InitializeObject(name, 0, 0);
+	BaseObjectClass* basicStats = ObjectConstructor::InitializeObject(name, 0, 0, 0);
 	this->item = Node::create();
 	item->setName(name);
 	this->lbl_Cost = Tool::CreateLabel(to_string(basicStats->cost), Tool::defaultTextSize, Color4B::YELLOW);
@@ -779,23 +756,23 @@ void GameScene::ShowObjectDetails(BaseObjectClass object, Vec2 position)
 
 void GameScene::Request_RandomQuestion(string level)
 {
-	/*string dataToSend = "level=" + level;
+	string dataToSend = "level=" + level;
 	cocos2d::network::HttpRequest *request = new cocos2d::network::HttpRequest();
 	request->setUrl("http://localhost/Back_End_Game/GameScene/Random_Question.php");
 	request->setRequestType(cocos2d::network::HttpRequest::Type::POST);
 	request->setRequestData(dataToSend.c_str(), dataToSend.size());
 	cocos2d::network::HttpClient::getInstance()->send(request);
-	request->release();*/
+	request->release();
 }
 
 void GameScene::Request_ReadQuestion()
 {
-	/*cocos2d::network::HttpRequest *request = new cocos2d::network::HttpRequest();
+	cocos2d::network::HttpRequest *request = new cocos2d::network::HttpRequest();
 	request->setUrl("http://localhost/Back_End_Game/GameScene/Read_Question.php");
 	request->setRequestType(cocos2d::network::HttpRequest::Type::POST);
 	request->setResponseCallback(CC_CALLBACK_2(GameScene::Respone_ReadQuestion, this));
 	cocos2d::network::HttpClient::getInstance()->send(request);
-	request->release();*/
+	request->release();
 }
 
 GameScene::ObjectDetails::ObjectDetails(BaseObjectClass object, Vec2 position)

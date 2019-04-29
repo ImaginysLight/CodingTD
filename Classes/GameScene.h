@@ -35,23 +35,22 @@ public:
 		*btn_Level1, *btn_Level2, *btn_Level3;
 	ListView* lv_QuestionContent;
 	Text* txt_Question;
+	string questionContent = "";
 	Label* lbl_Level;
 	string answer;
 	string nextQuestionLevel = "";
 	int currentQuestionLevel;
-	float destinationTime = 10;
-	bool questionAvailable = false;
+	float destinationTime = 0;
+	bool questionAvailable = true;
 	void CorrectAnswer();
 	void WrongAnswer();
 	void btn_AnswerClick(Ref *pSender, cocos2d::ui::Button::Widget::TouchEventType type);
 	void ChangeQuestionTableState(bool questionAvailable);
+	bool isAllowedToChooseQuestion = false;
 
-	//Lính, spawnPoint và basicStats
-	vector<BaseObjectClass*> vectorPlayer1;
-	vector<BaseObjectClass*> vectorPlayer2;
-	
 	int choosingLine = 1;
 	Button *btn_ChooseLine1, *btn_ChooseLine2, *btn_ChooseLine3;
+	int objectId = 1;
 	void InitializeIngameObject(string objectName, int line, bool isLeft);
 
 	//Thanh mua linh
