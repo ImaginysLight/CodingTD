@@ -1,16 +1,18 @@
 ﻿#pragma once
 #include "cocos2d.h"
-#include"Object/Tool.h"
+#include"Global Class/Tool.h"
 #include"network/HttpClient.h"
-#include"Object/IngameObject.h"
-#include"Object/IngameObject/ObjectConstructor.h"
+#include"Ingame Object/IngameObject.h"
+#include"Ingame Object/Unit/BaseUnitClass.h"
+#include"Ingame Object/ObjectConstructor.h"
+#include"Ingame Object/Skill/BaseSkillClass.h"
 USING_NS_CC;
 class GameScene : public cocos2d::Scene
 {
 public:
 	
 	Size visibleSize;
-	Node* staticUI, *questionTable, *buyingBar, *objectDetails;
+	Node* staticUI, *questionTable, *buyingBar, *unitDetails;
 	Label* lbl_Notify;
 	void RunActionNotify(string content);
 
@@ -48,10 +50,26 @@ public:
 	void ChangeQuestionTableState(bool questionAvailable);
 	bool isAllowedToChooseQuestion = false;
 
+	//Chọn line để thả
 	int choosingLine = 1;
 	Button *btn_ChooseLine1, *btn_ChooseLine2, *btn_ChooseLine3;
-	int objectId = 1;
-	void InitializeIngameObject(string objectName, int line, bool isLeft);
+	
+	//Khởi tạo object
+	void InitializeIngameObject(string objectName, int line, int playerId);
+
+	//Xem thông tin unit khi click
+	BaseUnitClass* choosingUnit = new BaseUnitClass();
+	struct UnitDetails {
+		Node* details;
+		Label* lbl_Name;
+		Label* lbl_Health;
+		Label* lbl_Attack;
+		Label* lbl_Defense;
+		Label* lbl_AttackRate;
+		Label* lbl_Speed;
+		UnitDetails(BaseUnitClass object, Vec2 position);
+	};
+	void ShowUnitDetails();
 
 	//Thanh mua linh
 	Button* btn_SwitchBuyingBar;
@@ -71,19 +89,7 @@ public:
 	void btn_UpgradeObjectClick(Ref *pSender, cocos2d::ui::Button::Widget::TouchEventType type);
 	void RunActionButtonBuyingBack();
 	void RunActionButtonBuyingNext();
-
-	//Bảng thông tin chi tiết của object click vào
-	struct ObjectDetails {
-		Node* details;
-		Label* lbl_Name;
-		Label* lbl_Health;
-		Label* lbl_Attack;
-		Label* lbl_Defense;
-		Label* lbl_AttackRate;
-		Label* lbl_Speed;
-		ObjectDetails(BaseObjectClass object, Vec2 position);
-	};
-	void ShowObjectDetails(BaseObjectClass object, Vec2 position);
+	
 	//Các vấn đề server
 	void Request_RandomQuestion(string level);
 	void Respone_ReadQuestion(cocos2d::network::HttpClient * sender, cocos2d::network::HttpResponse * response);

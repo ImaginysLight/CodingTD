@@ -1,4 +1,5 @@
 #include"LoginScene.h"
+
 USING_NS_CC;
 
 Scene* LoginScene::createScene()
@@ -8,6 +9,8 @@ Scene* LoginScene::createScene()
 
 bool LoginScene::init()
 {
+	
+
 	visibleSize = Director::getInstance()->getVisibleSize();
 
 	SetupGUI();

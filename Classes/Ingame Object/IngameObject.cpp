@@ -1,0 +1,116 @@
+﻿#include "IngameObject.h"
+
+unordered_map<string, Color3B> IngameObject::elementColor;
+unordered_map<string, Vec2> IngameObject::spawnPoint;
+unordered_map<string, Animate*> IngameObject::animate;
+
+
+void IngameObject::loadIngameObjectStaticVariables() {
+	IngameObject::elementColor.insert({ "Ice",Color3B(175,225,250) });
+	IngameObject::elementColor.insert({ "Fire",Color3B(255,0,0) });
+	IngameObject::elementColor.insert({ "Poison",Color3B(100,240,70) });
+	IngameObject::elementColor.insert({ "Dark",Color3B(60,0,60) });
+
+	//Map dài 3000, mỗi 1 speed là 10pixel / s => trung bình = 10 speed cần 30s để đi tới nhà team kia
+	IngameObject::spawnPoint.insert({ "1_1",Vec2(0,50) });
+	IngameObject::spawnPoint.insert({ "1_2",Vec2(0,100) });
+	IngameObject::spawnPoint.insert({ "1_3",Vec2(0,150) });
+
+	IngameObject::spawnPoint.insert({ "2_1",Vec2(3000,50) });
+	IngameObject::spawnPoint.insert({ "2_2",Vec2(3000,100) });
+	IngameObject::spawnPoint.insert({ "2_3",Vec2(3000,150) });
+
+}
+
+void IngameObject::loadAnimate() {
+	IngameObject::animate.insert(CreateAnimateWithKey("", "explosion", 1, 20));
+
+	IngameObject::animate.insert(CreateAnimateWithKey("Main Tower 1", "die", 1, 9));
+	IngameObject::animate.insert(CreateAnimateWithKey("Main Tower 1", "attack", 1, 11));
+
+	IngameObject::animate.insert(CreateAnimateWithKey("Main Tower 2", "die", 1, 9));
+	IngameObject::animate.insert(CreateAnimateWithKey("Main Tower 2", "attack", 1, 11));
+
+
+
+	IngameObject::animate.insert(CreateAnimateWithKey("Crazy Wolf", "attack", 1, 11));
+	IngameObject::animate.insert(CreateAnimateWithKey("Crazy Wolf", "die", 1, 11));
+	IngameObject::animate.insert(CreateAnimateWithKey("Crazy Wolf", "move", 1, 16));
+	
+	IngameObject::animate.insert(CreateAnimateWithKey("Dead Walker", "attack", 1, 11));
+	IngameObject::animate.insert(CreateAnimateWithKey("Dead Walker", "die", 1, 13));
+	IngameObject::animate.insert(CreateAnimateWithKey("Dead Walker", "move", 1, 24));
+
+	IngameObject::animate.insert(CreateAnimateWithKey("Elemental Alien", "attack", 1, 20));
+	IngameObject::animate.insert(CreateAnimateWithKey("Elemental Alien", "die", 1, 21));
+	IngameObject::animate.insert(CreateAnimateWithKey("Elemental Alien", "move", 1, 50));
+
+	IngameObject::animate.insert(CreateAnimateWithKey("Enraged Ursa", "attack", 1, 13));
+	IngameObject::animate.insert(CreateAnimateWithKey("Enraged Ursa", "die", 1, 18));
+	IngameObject::animate.insert(CreateAnimateWithKey("Enraged Ursa", "move", 1, 33));
+
+	IngameObject::animate.insert(CreateAnimateWithKey("Frost Wyvern", "attack", 1, 20));
+	IngameObject::animate.insert(CreateAnimateWithKey("Frost Wyvern", "die", 1, 22));
+	IngameObject::animate.insert(CreateAnimateWithKey("Frost Wyvern", "move", 1, 24));
+
+	IngameObject::animate.insert(CreateAnimateWithKey("Helicopter", "attack", 1, 13));
+	IngameObject::animate.insert(CreateAnimateWithKey("Helicopter", "die", 1, 19));
+	IngameObject::animate.insert(CreateAnimateWithKey("Helicopter", "move", 1, 17));
+
+	IngameObject::animate.insert(CreateAnimateWithKey("Hotheaded Gunner", "attack", 1, 11));
+	IngameObject::animate.insert(CreateAnimateWithKey("Hotheaded Gunner", "die", 1, 13));
+	IngameObject::animate.insert(CreateAnimateWithKey("Hotheaded Gunner", "move", 1, 16));
+
+	IngameObject::animate.insert(CreateAnimateWithKey("Liquid Assassin", "attack", 1, 13));
+	IngameObject::animate.insert(CreateAnimateWithKey("Liquid Assassin", "die", 1, 13));
+	IngameObject::animate.insert(CreateAnimateWithKey("Liquid Assassin", "move", 1, 20));
+
+	//IngameObject::animate.insert(CreateAnimateWithKey("Poisonous Butterfly", "attack", 1, 18));
+	//IngameObject::animate.insert(CreateAnimateWithKey("Poisonous Butterfly", "die", 1, 24));
+	//IngameObject::animate.insert(CreateAnimateWithKey("Poisonous Butterfly", "move", 1, 18));
+
+	IngameObject::animate.insert(CreateAnimateWithKey("Polar Bear", "attack", 1, 18));
+	IngameObject::animate.insert(CreateAnimateWithKey("Polar Bear", "die", 1, 24));
+	IngameObject::animate.insert(CreateAnimateWithKey("Polar Bear", "move", 1, 16));
+
+	IngameObject::animate.insert(CreateAnimateWithKey("UFO Driver", "attack", 1, 11));
+	IngameObject::animate.insert(CreateAnimateWithKey("UFO Driver", "die", 1, 17));
+	IngameObject::animate.insert(CreateAnimateWithKey("UFO Driver", "move", 1, 15));
+
+	//IngameObject::animate.insert(CreateAnimateWithKey("Vampire Dragon", "attack", 1, 18));
+	//IngameObject::animate.insert(CreateAnimateWithKey("Vampire Dragon", "die", 1, 24));
+	//IngameObject::animate.insert(CreateAnimateWithKey("Vampire Dragon", "move", 1, 18));
+
+	IngameObject::animate.insert(CreateAnimateWithKey("Volcarona", "attack", 1, 9));
+	IngameObject::animate.insert(CreateAnimateWithKey("Volcarona", "die", 1, 13));
+	IngameObject::animate.insert(CreateAnimateWithKey("Volcarona", "move", 1, 7));
+
+	IngameObject::animate.insert(CreateAnimateWithKey("Winged Orc", "attack", 1, 13));
+	IngameObject::animate.insert(CreateAnimateWithKey("Winged Orc", "die", 1, 15));
+	IngameObject::animate.insert(CreateAnimateWithKey("Winged Orc", "move", 1, 9));
+
+
+
+}
+
+Animate* IngameObject::CreateAnimate(string prefix, string suffix, int numBegin, int numEnd, float delay) {
+	auto animation = Animation::create();
+	for (int i = numBegin; i <= numEnd; i++)
+	{
+		string name = prefix + to_string(i) + suffix;
+		animation->addSpriteFrameWithFileName(name);
+	}
+	animation->setDelayPerUnit(delay);
+	auto animate = Animate::create(animation);
+	animate->retain();
+	return animate;
+}
+
+pair<string, Animate*> IngameObject::CreateAnimateWithKey(string characterName, string action, int numBegin, int numEnd) {
+	pair<string, Animate*> result;
+	result.first = characterName + "_" + action;
+	result.second = IngameObject::CreateAnimate("Sprites/" + characterName + "/" + action + "/" + action + " (", ").png", numBegin, numEnd, 0.1f);
+	return result;
+}
+
+

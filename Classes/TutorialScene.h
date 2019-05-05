@@ -5,8 +5,7 @@
 #include "extensions/cocos-ext.h"
 #include "ui\CocosGUI.h"
 #include <vector>
-#include "Object/Player.h"
-#include "Object/Tool.h"
+#include "Global Class/Tool.h"
 
 USING_NS_CC;
 

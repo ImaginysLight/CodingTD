@@ -1,6 +1,6 @@
 #pragma once
 #include "cocos2d.h"
-#include"Object/Tool.h"
+#include"Global Class/Tool.h"
 #include"LobbyScene.h"
 USING_NS_CC;
 class LoginScene : public cocos2d::Scene

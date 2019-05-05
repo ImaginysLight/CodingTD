@@ -8,7 +8,7 @@ this
 	staticUI
 		buyingBar
 		questionTable
-		objectInfo
+		unitDetails
 */
 Scene* GameScene::createScene()
 {
@@ -25,7 +25,10 @@ bool GameScene::init()
 
 	visibleSize = Director::getInstance()->getVisibleSize();
 
+	Tool::opponentPlayer->id = 8;
 	Tool::opponentPlayer->elementName = "Fire";
+
+	Tool::currentPlayer->id = 5;
 	Tool::currentPlayer->elementName = "Ice";
 
 	//Random question trước cho chắc
@@ -43,16 +46,10 @@ bool GameScene::init()
 
 
 	{
-		GameScene::InitializeIngameObject("RottedKingdom", 2, true);
-		GameScene::InitializeIngameObject("RottedKingdom", 2, false);
-		GameScene::InitializeIngameObject("Robot7_2", 1, true);
-		
-		//GameScene::InitializeIngameObject("Robot5", 1, true);
-		/*GameScene::InitializeIngameObject("Robot5", 1, false);
-		GameScene::InitializeIngameObject("Robot2", 1, false);*/
-		GameScene::InitializeIngameObject("Robot2_2", 1, false);
-		GameScene::InitializeIngameObject("Robot5_2", 1, false);
-		
+		GameScene::InitializeIngameObject("Crazy Wolf", 1, 8);
+		GameScene::InitializeIngameObject("Crazy Wolf", 3, 8);
+	
+		GameScene::InitializeIngameObject("Helicopter", 2, 5);
 	}
 
 
@@ -70,22 +67,33 @@ void GameScene::update(float time) {
 }
 
 void GameScene::UpdateIngameObject(float time) {
-	for (int i = 0; i < BaseObjectClass::player1_Object.size(); i++) {
-		if (BaseObjectClass::player1_Object[i]->isAlive == false) {
-			BaseObjectClass::player1_Object.erase(BaseObjectClass::player1_Object.begin() + i);
+	//Update thông tin unit đang chọn
+	if (choosingUnit->currentHealth > 0)
+		GameScene::ShowUnitDetails();
+	else
+		GameScene::unitDetails->removeAllChildrenWithCleanup(true);
+
+	//Update Unit
+	for (int i = 0; i < BaseUnitClass::AllIngameUnit_Vector.size(); i++) {
+		if (!BaseUnitClass::AllIngameUnit_Vector[i]->isAlive) {
+			BaseUnitClass::AllIngameUnit_Vector.erase(BaseUnitClass::AllIngameUnit_Vector.begin() + i);
 			continue;
 		}
-		BaseObjectClass::player1_Object[i]->UpdateAction(BaseObjectClass::player2_Object);
+		BaseUnitClass::AllIngameUnit_Vector[i]->Update();
 	}
 
-	for (int i = 0; i < BaseObjectClass::player2_Object.size(); i++) {
-		if (BaseObjectClass::player2_Object[i]->isAlive == false) {
-			BaseObjectClass::player2_Object.erase(BaseObjectClass::player2_Object.begin() + i);
+	//Update Skill
+	for (int i = 0; i < BaseSkillClass::AllIngameSkill_Vector.size(); i++) {
+		if (BaseSkillClass::AllIngameSkill_Vector[i]->isReleased) {
+			BaseSkillClass::AllIngameSkill_Vector.erase(BaseSkillClass::AllIngameSkill_Vector.begin() + i);
 			continue;
 		}
-		BaseObjectClass::player2_Object[i]->UpdateAction(BaseObjectClass::player1_Object);
+		if (!BaseSkillClass::AllIngameSkill_Vector[i]->isAddedChild) {
+			this->addChild(BaseSkillClass::AllIngameSkill_Vector[i]->root, 5);
+			BaseSkillClass::AllIngameSkill_Vector[i]->isAddedChild = true;
+		}
+		BaseSkillClass::AllIngameSkill_Vector[i]->Update();
 	}
-
 }
 
 void GameScene::UpdateQuestionInfo(float time) {
@@ -176,11 +184,11 @@ void GameScene::ChangeQuestionTableState(bool questionAvailable) {
 	}
 }
 
-void GameScene::InitializeIngameObject(string objectName, int line, bool isLeft)
+void GameScene::InitializeIngameObject(string objectName, int line, int playerId)
 {
-	BaseObjectClass* object = ObjectConstructor::InitializeObject(objectName, line, isLeft, objectId++);
-	if (object->isLeft) BaseObjectClass::player1_Object.push_back(object);
-	else BaseObjectClass::player2_Object.push_back(object);
+	bool isOwned = playerId == Tool::currentPlayer->id ? true : false;
+	BaseUnitClass* object = ObjectConstructor::InitializeObject(objectName, line, isOwned, playerId);
+	BaseUnitClass::AllIngameUnit_Vector.push_back(object);
 	this->addChild(object->root, 4 - object->line);
 }
 
@@ -237,71 +245,71 @@ void GameScene::btn_Click(Ref * pSender, cocos2d::ui::Button::Widget::TouchEvent
 void GameScene::btn_BuyObjectClick(Ref *pSender, cocos2d::ui::Button::Widget::TouchEventType type) {
 	string name = ((Node*)pSender)->getName();
 	if (type == Widget::TouchEventType::ENDED) {
-		//Lấy thông tin lính đang mua
-		auto object = ObjectConstructor::InitializeObject(name, 0, 0, 0);
-		//Kiểm tra cấp nhà chính
-		if (GameScene::ingamePlayerInfo.mainTowerLevel < object->levelRequired) { 
-			RunActionNotify("Require main tower level " + to_string(object->levelRequired));
-			return;
-		}
-		//Nếu không đủ tiền thì thông báo và break
-		if (object->cost > ingamePlayerInfo.gold) {
-			RunActionNotify("Not enough resources!");
-			return;
-		}
-		//Trừ tiền
-		ingamePlayerInfo.gold -= object->cost;
-		ingamePlayerInfo.lbl_Gold->setString("Gold: " + to_string(ingamePlayerInfo.gold));
+		////Lấy thông tin lính đang mua
+		//auto object = ObjectConstructor::InitializeObject(name, 0, 0, 0);
+		////Kiểm tra cấp nhà chính
+		//if (GameScene::ingamePlayerInfo.mainTowerLevel < object->levelRequired) { 
+		//	RunActionNotify("Require main tower level " + to_string(object->levelRequired));
+		//	return;
+		//}
+		////Nếu không đủ tiền thì thông báo và break
+		//if (object->cost > ingamePlayerInfo.gold) {
+		//	RunActionNotify("Not enough resources!");
+		//	return;
+		//}
+		////Trừ tiền
+		//ingamePlayerInfo.gold -= object->cost;
+		//ingamePlayerInfo.lbl_Gold->setString("Gold: " + to_string(ingamePlayerInfo.gold));
 
-		//Send thông tin lên server
+		////Send thông tin lên server
 
 
-		//Tạo lính
-		GameScene::InitializeIngameObject(name, choosingLine, true);
+		////Tạo lính
+		//GameScene::InitializeIngameObject(name, choosingLine, true);
 	}
 }
 
 void GameScene::btn_UpgradeObjectClick(Ref * pSender, cocos2d::ui::Button::Widget::TouchEventType type)
 {
 	if (type == Widget::TouchEventType::ENDED) {
-		//Lấy thông tin robot upgrade
-		string name = ((Button*)pSender)->getName();
-		auto object = ObjectConstructor::InitializeObject(name, 0, 0, 0);
+		////Lấy thông tin robot upgrade
+		//string name = ((Button*)pSender)->getName();
+		//auto object = ObjectConstructor::InitializeObject(name, 0, 0, 0);
 
-		//Kiểm tra cấp nhà chính
-		if (GameScene::ingamePlayerInfo.mainTowerLevel < object->upgradeLevelRequired) {
-			RunActionNotify("Require main tower level " + to_string(object->upgradeLevelRequired));
-			return;
-		}
-		
-		//Kiểm tra gold và energy
-		if (object->upgradeGold > ingamePlayerInfo.gold || object->upgradeEnergy > ingamePlayerInfo.energy) {
-			RunActionNotify("Not enough resources!");
-			return;
-		}
+		////Kiểm tra cấp nhà chính
+		//if (GameScene::ingamePlayerInfo.mainTowerLevel < object->upgradeLevelRequired) {
+		//	RunActionNotify("Require main tower level " + to_string(object->upgradeLevelRequired));
+		//	return;
+		//}
+		//
+		////Kiểm tra gold và energy
+		//if (object->upgradeGold > ingamePlayerInfo.gold || object->upgradeEnergy > ingamePlayerInfo.energy) {
+		//	RunActionNotify("Not enough resources!");
+		//	return;
+		//}
 
-		//Trừ tiền
-		ingamePlayerInfo.gold -= object->upgradeGold;
-		ingamePlayerInfo.lbl_Gold->setString("Gold: " + to_string(ingamePlayerInfo.gold));
-		ingamePlayerInfo.energy -= object->upgradeEnergy;
-		ingamePlayerInfo.lbl_Energy->setString("Energy: " + to_string(ingamePlayerInfo.energy));
+		////Trừ tiền
+		//ingamePlayerInfo.gold -= object->upgradeGold;
+		//ingamePlayerInfo.lbl_Gold->setString("Gold: " + to_string(ingamePlayerInfo.gold));
+		//ingamePlayerInfo.energy -= object->upgradeEnergy;
+		//ingamePlayerInfo.lbl_Energy->setString("Energy: " + to_string(ingamePlayerInfo.energy));
 
-		//Cập nhật danh sách mua
-		for (int i = 0; i < List_BuyableObject.size(); i++) {
-			if (List_BuyableObject[i].btn_Icon->getName() == name) {
-				auto  oldItemInfo = List_BuyableObject[i];
-				List_BuyableObject[i] = Item_BuyableObject(object->upgradeTo);
-				List_BuyableObject[i].btn_Icon->setPosition(oldItemInfo.btn_Icon->getPosition());
-				List_BuyableObject[i].btn_Upgrade->setPosition(oldItemInfo.btn_Upgrade->getPosition());
-				List_BuyableObject[i].lbl_Cost->setPosition(oldItemInfo.lbl_Cost->getPosition());
-				List_BuyableObject[i].btn_Icon->addTouchEventListener(CC_CALLBACK_2(GameScene::btn_BuyObjectClick, this));
-				List_BuyableObject[i].btn_Upgrade->addTouchEventListener(CC_CALLBACK_2(GameScene::btn_UpgradeObjectClick, this));
+		////Cập nhật danh sách mua
+		//for (int i = 0; i < List_BuyableObject.size(); i++) {
+		//	if (List_BuyableObject[i].btn_Icon->getName() == name) {
+		//		auto  oldItemInfo = List_BuyableObject[i];
+		//		List_BuyableObject[i] = Item_BuyableObject(object->upgradeTo);
+		//		List_BuyableObject[i].btn_Icon->setPosition(oldItemInfo.btn_Icon->getPosition());
+		//		List_BuyableObject[i].btn_Upgrade->setPosition(oldItemInfo.btn_Upgrade->getPosition());
+		//		List_BuyableObject[i].lbl_Cost->setPosition(oldItemInfo.lbl_Cost->getPosition());
+		//		List_BuyableObject[i].btn_Icon->addTouchEventListener(CC_CALLBACK_2(GameScene::btn_BuyObjectClick, this));
+		//		List_BuyableObject[i].btn_Upgrade->addTouchEventListener(CC_CALLBACK_2(GameScene::btn_UpgradeObjectClick, this));
 
-				oldItemInfo.item->runAction(RemoveSelf::create());
-				buyingBar->addChild(List_BuyableObject[i].item);
-				RunActionNotify("Upgrade to " + object->upgradeTo + " successful");
-			}
-		}
+		//		oldItemInfo.item->runAction(RemoveSelf::create());
+		//		buyingBar->addChild(List_BuyableObject[i].item);
+		//		RunActionNotify("Upgrade to " + object->upgradeTo + " successful");
+		//	}
+		//}
 	}
 }
 
@@ -332,15 +340,9 @@ void GameScene::menuCloseCallback(Ref* pSender)
 
 bool GameScene::onTouchBegan(Touch* touch, Event* event) {
 	Camera::getDefaultCamera()->setAnchorPoint(Vec2(0, 0.5));
-	for (auto object : BaseObjectClass::player1_Object) {
-		if (object->sprite->getBoundingBox().containsPoint(staticUI->getPosition() + touch->getLocation() - object->root->getPosition())){
-			GameScene::ShowObjectDetails(*object, Vec2(visibleSize.width*0.85, visibleSize.height*0.95));
-			return true;
-		}
-	}
-	for (auto object : BaseObjectClass::player2_Object) {
-		if (object->sprite->getBoundingBox().containsPoint(staticUI->getPosition() + touch->getLocation() - object->root->getPosition())) {
-			GameScene::ShowObjectDetails(*object, Vec2(visibleSize.width*0.85, visibleSize.height*0.95));
+	for (auto unit : BaseUnitClass::AllIngameUnit_Vector) {
+		if (unit->sprite->getBoundingBox().containsPoint(staticUI->getPosition() + touch->getLocation() - unit->root->getPosition())) {
+			GameScene::choosingUnit = unit;
 			return true;
 		}
 	}
@@ -367,8 +369,8 @@ void GameScene::SetupGUI() {
 	staticUI = Node::create();
 	this->addChild(staticUI,4);
 
-	objectDetails = Node::create();
-	staticUI->addChild(objectDetails);
+	unitDetails = Node::create();
+	staticUI->addChild(unitDetails);
 
 	ingamePlayerInfo.lbl_MainTowerLevel->setPosition(Vec2(visibleSize.width*0.02, visibleSize.height*0.95));
 	staticUI->addChild(ingamePlayerInfo.lbl_MainTowerLevel);
@@ -407,7 +409,7 @@ void GameScene::SetupGUI() {
 
 	
 
-	GameScene::CreateBuyingBar();
+	//GameScene::CreateBuyingBar();
 
 	//button chọn line để thả
 	{
@@ -653,7 +655,7 @@ void GameScene::CreateBuyingBar() {
 }
 GameScene::Item_BuyableObject::Item_BuyableObject(string name)
 {
-	BaseObjectClass* basicStats = ObjectConstructor::InitializeObject(name, 0, 0, 0);
+	/*BaseObjectClass* basicStats = ObjectConstructor::InitializeObject(name, 0, 0, 0);
 	this->item = Node::create();
 	item->setName(name);
 	this->lbl_Cost = Tool::CreateLabel(to_string(basicStats->cost), Tool::defaultTextSize, Color4B::YELLOW);
@@ -672,7 +674,7 @@ GameScene::Item_BuyableObject::Item_BuyableObject(string name)
 	}
 	item->addChild(this->lbl_Cost);
 	item->addChild(this->btn_Icon);
-	item->addChild(this->btn_Upgrade);
+	item->addChild(this->btn_Upgrade);*/
 }
 
 GameScene::IngamePlayer::IngamePlayer()
@@ -747,11 +749,11 @@ void GameScene::WrongAnswer()
 {
 }
 
-void GameScene::ShowObjectDetails(BaseObjectClass object, Vec2 position)
+void GameScene::ShowUnitDetails()
 {
-	auto details = ObjectDetails(object, position);
-	GameScene::objectDetails->removeAllChildrenWithCleanup(true);
-	GameScene::objectDetails->addChild(details.details);
+	auto details = UnitDetails(*GameScene::choosingUnit, Vec2(visibleSize.width*0.8, visibleSize.height*0.95));
+	GameScene::unitDetails->removeAllChildrenWithCleanup(true);
+	GameScene::unitDetails->addChild(details.details);
 }
 
 void GameScene::Request_RandomQuestion(string level)
@@ -775,11 +777,11 @@ void GameScene::Request_ReadQuestion()
 	request->release();
 }
 
-GameScene::ObjectDetails::ObjectDetails(BaseObjectClass object, Vec2 position)
+GameScene::UnitDetails::UnitDetails(BaseUnitClass object, Vec2 position)
 {
 	this->details = Node::create();
 
-	this->lbl_Name = Tool::CreateLabel("Name " + object.objectName);
+	this->lbl_Name = Tool::CreateLabel("Name " + object.name);
 	lbl_Name->setPosition(position);
 	details->addChild(lbl_Name);
 
@@ -795,11 +797,11 @@ GameScene::ObjectDetails::ObjectDetails(BaseObjectClass object, Vec2 position)
 	lbl_Defense->setPosition(position + Vec2(0, -60));
 	details->addChild(lbl_Defense);
 
-	this->lbl_Speed = Tool::CreateLabel("Speed " + to_string(object.speed));
+	this->lbl_Speed = Tool::CreateLabel("Speed " + to_string(object.moveSpeed));
 	lbl_Speed->setPosition(position + Vec2(0, -80));
 	details->addChild(lbl_Speed);
 
-	this->lbl_AttackRate = Tool::CreateLabel("Attack Rate " + to_string(object.attackRate));
+	this->lbl_AttackRate = Tool::CreateLabel("Attack Speed " + to_string(object.attackSpeed));
 	lbl_AttackRate->setPosition(position + Vec2(0, -100));
 	details->addChild(lbl_AttackRate);
 
