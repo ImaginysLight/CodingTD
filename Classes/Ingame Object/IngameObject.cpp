@@ -6,10 +6,9 @@ unordered_map<string, Animate*> IngameObject::animate;
 
 
 void IngameObject::loadIngameObjectStaticVariables() {
-	IngameObject::elementColor.insert({ "Ice",Color3B(175,225,250) });
-	IngameObject::elementColor.insert({ "Fire",Color3B(255,0,0) });
-	IngameObject::elementColor.insert({ "Poison",Color3B(100,240,70) });
-	IngameObject::elementColor.insert({ "Dark",Color3B(60,0,60) });
+	IngameObject::elementColor.insert({ "Ice",Color3B(100,200,250) });
+	IngameObject::elementColor.insert({ "Fire",Color3B(200,0,0) });
+	IngameObject::elementColor.insert({ "Nature",Color3B(0,200,100) });
 
 	//Map dài 3000, mỗi 1 speed là 10pixel / s => trung bình = 10 speed cần 30s để đi tới nhà team kia
 	IngameObject::spawnPoint.insert({ "1_1",Vec2(0,50) });
@@ -25,11 +24,11 @@ void IngameObject::loadIngameObjectStaticVariables() {
 void IngameObject::loadAnimate() {
 	IngameObject::animate.insert(CreateAnimateWithKey("", "explosion", 1, 20));
 
-	IngameObject::animate.insert(CreateAnimateWithKey("Main Tower 1", "die", 1, 9));
+	/*IngameObject::animate.insert(CreateAnimateWithKey("Main Tower 1", "die", 1, 9));
 	IngameObject::animate.insert(CreateAnimateWithKey("Main Tower 1", "attack", 1, 11));
 
 	IngameObject::animate.insert(CreateAnimateWithKey("Main Tower 2", "die", 1, 9));
-	IngameObject::animate.insert(CreateAnimateWithKey("Main Tower 2", "attack", 1, 11));
+	IngameObject::animate.insert(CreateAnimateWithKey("Main Tower 2", "attack", 1, 11));*/
 
 
 
@@ -43,11 +42,11 @@ void IngameObject::loadAnimate() {
 
 	IngameObject::animate.insert(CreateAnimateWithKey("Elemental Alien", "attack", 1, 20));
 	IngameObject::animate.insert(CreateAnimateWithKey("Elemental Alien", "die", 1, 21));
-	IngameObject::animate.insert(CreateAnimateWithKey("Elemental Alien", "move", 1, 50));
+	IngameObject::animate.insert(CreateAnimateWithKey("Elemental Alien", "move", 1, 49));
 
 	IngameObject::animate.insert(CreateAnimateWithKey("Enraged Ursa", "attack", 1, 13));
 	IngameObject::animate.insert(CreateAnimateWithKey("Enraged Ursa", "die", 1, 18));
-	IngameObject::animate.insert(CreateAnimateWithKey("Enraged Ursa", "move", 1, 33));
+	IngameObject::animate.insert(CreateAnimateWithKey("Enraged Ursa", "move", 1, 32));
 
 	IngameObject::animate.insert(CreateAnimateWithKey("Frost Wyvern", "attack", 1, 20));
 	IngameObject::animate.insert(CreateAnimateWithKey("Frost Wyvern", "die", 1, 22));
@@ -63,11 +62,11 @@ void IngameObject::loadAnimate() {
 
 	IngameObject::animate.insert(CreateAnimateWithKey("Liquid Assassin", "attack", 1, 13));
 	IngameObject::animate.insert(CreateAnimateWithKey("Liquid Assassin", "die", 1, 13));
-	IngameObject::animate.insert(CreateAnimateWithKey("Liquid Assassin", "move", 1, 20));
-
-	//IngameObject::animate.insert(CreateAnimateWithKey("Poisonous Butterfly", "attack", 1, 18));
-	//IngameObject::animate.insert(CreateAnimateWithKey("Poisonous Butterfly", "die", 1, 24));
-	//IngameObject::animate.insert(CreateAnimateWithKey("Poisonous Butterfly", "move", 1, 18));
+	IngameObject::animate.insert(CreateAnimateWithKey("Liquid Assassin", "move", 1, 18));
+	 
+	IngameObject::animate.insert(CreateAnimateWithKey("Poisonous Butterfly", "attack", 1, 22));
+	IngameObject::animate.insert(CreateAnimateWithKey("Poisonous Butterfly", "die", 1, 22));
+	IngameObject::animate.insert(CreateAnimateWithKey("Poisonous Butterfly", "move", 1, 15));
 
 	IngameObject::animate.insert(CreateAnimateWithKey("Polar Bear", "attack", 1, 18));
 	IngameObject::animate.insert(CreateAnimateWithKey("Polar Bear", "die", 1, 24));
@@ -75,11 +74,11 @@ void IngameObject::loadAnimate() {
 
 	IngameObject::animate.insert(CreateAnimateWithKey("UFO Driver", "attack", 1, 11));
 	IngameObject::animate.insert(CreateAnimateWithKey("UFO Driver", "die", 1, 17));
-	IngameObject::animate.insert(CreateAnimateWithKey("UFO Driver", "move", 1, 15));
+	IngameObject::animate.insert(CreateAnimateWithKey("UFO Driver", "move", 1, 14));
 
-	//IngameObject::animate.insert(CreateAnimateWithKey("Vampire Dragon", "attack", 1, 18));
-	//IngameObject::animate.insert(CreateAnimateWithKey("Vampire Dragon", "die", 1, 24));
-	//IngameObject::animate.insert(CreateAnimateWithKey("Vampire Dragon", "move", 1, 18));
+	IngameObject::animate.insert(CreateAnimateWithKey("Vampire Dragon", "attack", 1, 18));
+	IngameObject::animate.insert(CreateAnimateWithKey("Vampire Dragon", "die", 1, 22));
+	IngameObject::animate.insert(CreateAnimateWithKey("Vampire Dragon", "move", 1, 24));
 
 	IngameObject::animate.insert(CreateAnimateWithKey("Volcarona", "attack", 1, 9));
 	IngameObject::animate.insert(CreateAnimateWithKey("Volcarona", "die", 1, 13));
@@ -89,7 +88,7 @@ void IngameObject::loadAnimate() {
 	IngameObject::animate.insert(CreateAnimateWithKey("Winged Orc", "die", 1, 15));
 	IngameObject::animate.insert(CreateAnimateWithKey("Winged Orc", "move", 1, 9));
 
-
+	IngameObject::animate.insert(CreateAnimateWithKey("Healing", "healing", 1, 20));
 
 }
 

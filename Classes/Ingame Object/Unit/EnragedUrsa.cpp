@@ -3,47 +3,55 @@
 EnragedUrsa::EnragedUrsa(int line, bool isOwned, int unitId, int playerId)
 {
 	name = "Enraged Ursa";
-	description = "Lord of Fire";
-	goldCost = 200;
-	energyCost = 1;
-	levelRequired = 3;
-	maxHealth = 1000;
+	description = "A heavy frenzy warrior will burn everything to hell with aoe attack.";
+	goldCost = 230;
+	levelRequired = 2;
+	maxHealth = 920;
 	currentHealth = maxHealth;
-	baseAttack = 140;
-	baseDefense = 50;
-	baseMoveSpeed = 8;
+	baseAttack = 150;
+	baseDefense = 25;
+	baseMoveSpeed = 75;
 	baseAttackSpeed = 30;
-	range = 150;
-	baseRegeneration = 0;
+	range = 0;
+	baseRegeneration = 2;
 
 	upgradeName = "Enraged Ursa 2";
-	upgradeGoldCost = 600;
+	upgradeGoldCost = 950;
 	upgradeEnergyCost = 2;
 	upgradeLevelRequired = 3;
 
 	animationIndexOnTriggerAttack = 8;
 
 	this->UpdateIngameInfo("Sprites/Enraged Ursa/attack/attack (1).png", unitId, playerId, isOwned, "Enraged Ursa", line);
+	this->ApplyStatus(StatusReceive("Demon Heart", "Attack", 1, Tool::currentIngameTime + 100, 2));
 }
 
 EnragedUrsa::~EnragedUrsa()
 {
 }
 
+void EnragedUrsa::Update() {
+	//Demon Heart : increase 1 / 1.5% Attack per 1 % Health lose.
+	for (int i = 0; i < this->statusReceive.size(); i++) {
+		if (this->statusReceive[i].statusName == "Demon Heart") {
+			this->statusReceive.erase(this->statusReceive.begin() + i);
+			float value = 1 + (1.0 - (float)currentHealth / maxHealth * 1.0);
+			this->ApplyStatus(StatusReceive("Demon Heart", "Attack", value, Tool::currentIngameTime + 100, 2));
+			break;
+		}
+	}
+	BaseUnitClass::Update();
+}
 
 void EnragedUrsa::Attack(vector<BaseUnitClass*>& targets)
 {
-	//Demon Heart: increase 2% Attack per 1% Health lose.
-	float currentAttack = this->attack;
-	this->attack *= (1 + (1.0 - ((float)currentHealth / maxHealth)) / 2.0);
-
 	//Normal Attack
 	this->action = "Attack";
 	auto animate = IngameObject::animate[this->animateName + "_attack"]->clone();
-	animate->setDuration(60 / this->attackSpeed - 0.15); //Cho nó đánh xong dừng lại 0.15s trước khi đánh phát tiếp theo
+	animate->setDuration(60 / this->attackSpeed * (1 - this->delayTimeAfterAttack));
 	this->sprite->runAction(Sequence::create(
 		animate,
-		DelayTime::create(0.15),
+		DelayTime::create(delayTimeAfterAttack),
 		CallFunc::create([&]() {	this->action = "Idle"; }),
 		nullptr
 	))->setFlags(1);
@@ -57,9 +65,9 @@ void EnragedUrsa::Attack(vector<BaseUnitClass*>& targets)
 		float triggerTime = Tool::currentIngameTime + delayShootTime + distance * 0.002;
 		target->damageReceive.push_back(DamageReceive(this->unitId, damage, triggerTime, animateName, ""));
 
-		//Lucifer's Indignation: become angry when Health below 50%, improve normal attacks, causing splash damage
-		//equal to 35 % Attack within 400 range around its target.
-		if (currentHealth < maxHealth / 2) {
+	//Lucifer's Indignation: become angry when Health below 75%, improve normal attacks,
+	//causing splash damage equal to 35% Attack within 400 range around its target.
+		if (currentHealth < maxHealth *0.75) {
 			float splashDamage = this->attack * 0.35;
 			for (auto unit : BaseUnitClass::AllIngameUnit_Vector) {
 				if (
@@ -75,8 +83,6 @@ void EnragedUrsa::Attack(vector<BaseUnitClass*>& targets)
 		}
 	}
 
-	
 
-	this->attack = currentAttack;
 }
 

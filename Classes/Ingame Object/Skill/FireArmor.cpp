@@ -6,7 +6,7 @@
 FireArmor::FireArmor(int targetId, int reflectPercent, float expiredTime)
 {
 	this->name = "Fire Armor";
-	this->description = "reflect 10 / 15% pure damage to whoever attacks them.";
+	this->description = "reflect % pure damage to whoever attacks them.";
 	this->targetId = targetId;
 	this->reflectPercent = reflectPercent;
 	this->expiredTime = expiredTime;

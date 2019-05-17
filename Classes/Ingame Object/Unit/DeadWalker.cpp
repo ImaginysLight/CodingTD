@@ -3,21 +3,20 @@
 DeadWalker::DeadWalker(int line, bool isOwned, int unitId, int playerId)
 {
 	name = "Dead Walker";
-	description = "Strong zombie with decay aura";
-	goldCost = 75;
-	energyCost = 0;
+	description = "A pretty zombie with decay aura.";
+	goldCost = 120;
 	levelRequired = 1;
-	maxHealth = 500;
+	maxHealth = 600;
 	currentHealth = maxHealth;
-	baseAttack = 50;
+	baseAttack = 48;
 	baseDefense = 50;
-	baseMoveSpeed = 6;
+	baseMoveSpeed = 65;
 	baseAttackSpeed = 30;
-	range = 100;
-	baseRegeneration = 3;
+	range = 0;
+	baseRegeneration = 2;
 
 	upgradeName = "Dead Walker 2";
-	upgradeGoldCost = 350;
+	upgradeGoldCost = 250;
 	upgradeEnergyCost = 1;
 	upgradeLevelRequired = 1;
 
@@ -29,7 +28,7 @@ DeadWalker::DeadWalker(int line, bool isOwned, int unitId, int playerId)
 DeadWalker::~DeadWalker()
 {
 }
-//Rotten Aura: Decrease enemies Attack and Defense by 5 / 7.5 / 10 % in 5 seconds in 500 range around.
+//Rotten Aura: Decrease enemies Attack and Defense by 5 / 7.5 / 10% in 500 range around in all line. (last 5 seconds)
 void DeadWalker::Regeneration()
 {
 	BaseUnitClass::Regeneration();

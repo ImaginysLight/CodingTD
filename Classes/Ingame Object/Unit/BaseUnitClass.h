@@ -49,7 +49,6 @@ public:
 	string description = "";
 	int goldCost = 0;
 	int levelRequired = 0;
-	int energyCost = 0;
 	int maxHealth = 0;
 	int currentHealth = maxHealth;
 	float baseAttack = 0;
@@ -76,6 +75,7 @@ public:
 	ProgressTimer* healthBar;
 
 	//Các thông số trong game
+	float delayTimeAfterAttack = 0.15; // Dừng lại 0.15s sau khi thực hiện animate attack
 	int animationIndexOnTriggerAttack = 0; //Tức là khi nó thực hiện tới cái sprite attack thứ mấy thì đạn mới bay ra
 	int unitId = 0;
 	int ownerPlayerId = 0;

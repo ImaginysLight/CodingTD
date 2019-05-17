@@ -10,8 +10,10 @@ class CrazyWolf : public BaseUnitClass {
 public:
 	CrazyWolf(int line, bool isOwned, int unitId, int playerId);
 	~CrazyWolf();
-	//Berserker's Blood: double amount of Regeneration when Health below 25 / 35 / 50%.
-	//Tripple amount of Regeneration when Health below 0 / 10 / 25%
+	/*Berserker's Blood:
+	Double amount of Regeneration when Health below 35 / 55 / 75 % .
+	Tripple amount of Regeneration when Health below 0 / 20 / 50 % .
+	Quadruplicate amount of Regeneration when Health below 0 / 10 / 25 % .*/
 	void Regeneration() override;
 	
 };

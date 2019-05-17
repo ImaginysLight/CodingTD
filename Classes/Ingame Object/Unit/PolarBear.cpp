@@ -3,22 +3,21 @@
 PolarBear::PolarBear(int line, bool isOwned, int unitId, int playerId)
 {
 	name = "Polar Bear";
-	description = "Lord of Ice";
-	goldCost = 250;
-	energyCost = 1;
-	levelRequired = 3;
-	maxHealth = 1200;
+	description = "A diehard unit who can slow down attackers and stun on attack.";
+	goldCost = 280;
+	levelRequired = 2;
+	maxHealth = 1456;
 	currentHealth = maxHealth;
-	baseAttack = 120;
+	baseAttack = 60;
 	baseDefense = 75;
-	baseMoveSpeed = 5;
-	baseAttackSpeed = 25;
-	range = 150;
+	baseMoveSpeed = 40;
+	baseAttackSpeed = 20;
+	range = 0;
 	baseRegeneration = 3;
 
 	upgradeName = "Polar Bear 2";
-	upgradeGoldCost = 900;
-	upgradeEnergyCost = 3;
+	upgradeGoldCost = 500;
+	upgradeEnergyCost = 2;
 	upgradeLevelRequired = 3;
 
 	animationIndexOnTriggerAttack = 13;
@@ -36,10 +35,10 @@ void PolarBear::Attack(vector<BaseUnitClass*>& targets)
 
 	this->action = "Attack";
 	auto animate = IngameObject::animate[this->animateName + "_attack"]->clone();
-	animate->setDuration(60 / this->attackSpeed - 0.15); //Cho nó đánh xong dừng lại 0.15s trước khi đánh phát tiếp theo
+	animate->setDuration(60 / this->attackSpeed * (1 - this->delayTimeAfterAttack));
 	this->sprite->runAction(Sequence::create(
 		animate,
-		DelayTime::create(0.15),
+		DelayTime::create(delayTimeAfterAttack),
 		CallFunc::create([&]() {	this->action = "Idle"; }),
 		nullptr
 	))->setFlags(1);
@@ -52,10 +51,10 @@ void PolarBear::Attack(vector<BaseUnitClass*>& targets)
 		string animateName = "_explosion"; // Không có sprite nên ai bắn cũng nổ như nhau
 		float distance = abs(this->root->getPositionX() - target->root->getPositionX());
 		float triggerTime = Tool::currentIngameTime + delayShootTime + distance * 0.002;
-		if (numOfAttack == 4) {
+		if (numOfAttack == 3) {
 			damage += 100;
 			numOfAttack = 0;
-			target->hardEffect.push_back(HardEffect("Stun", triggerTime, triggerTime + 2));
+			target->hardEffect.push_back(HardEffect("Stun", triggerTime, triggerTime + 1));
 		}
 		target->damageReceive.push_back(DamageReceive(this->unitId, damage, triggerTime, animateName, ""));
 	}

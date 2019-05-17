@@ -80,3 +80,18 @@ Button * Tool::CreateButtonWithoutSprite(string name, string titleText, int size
 	return btn_Result;
 }
 
+void Tool::Button_ChangeState(Button *& btn, bool isShow, float fadeTime)
+{
+	if (isShow) {
+		btn->setVisible(true);
+		btn->setEnabled(true);
+		btn->runAction(FadeIn::create(fadeTime));
+	}
+	else {
+		btn->setEnabled(false);
+		btn->runAction(FadeOut::create(fadeTime));
+	}
+}
+
+
+

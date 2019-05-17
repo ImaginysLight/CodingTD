@@ -3,21 +3,20 @@
 HotheadedGunner::HotheadedGunner(int line, bool isOwned, int unitId, int playerId)
 {
 	name = "Hotheaded Gunner";
-	description = "Tanky robot with short range";
+	description = "A cheap robot with high defense.";
 	goldCost = 50;
-	energyCost = 0;
 	levelRequired = 1;
-	maxHealth = 350;
+	maxHealth = 500;
 	currentHealth = maxHealth;
-	baseAttack = 30;
-	baseDefense = 150;
-	baseMoveSpeed = 6;
+	baseAttack = 18;
+	baseDefense = 75;
+	baseMoveSpeed = 45;
 	baseAttackSpeed = 40;
-	range = 250;
+	range = 150;
 	baseRegeneration = 1;
 
 	upgradeName = "Hotheaded Gunner 2";
-	upgradeGoldCost = 250;
+	upgradeGoldCost = 300;
 	upgradeEnergyCost = 1;
 	upgradeLevelRequired = 2;
 

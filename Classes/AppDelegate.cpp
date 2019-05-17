@@ -25,6 +25,7 @@
 #include "AppDelegate.h"
 #include "GameScene.h"
 #include"LoginScene.h"
+#include"RankingScene.h"
 #include"LobbyScene.h"
 
 // #define USE_AUDIO_ENGINE 1

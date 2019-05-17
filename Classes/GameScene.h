@@ -12,24 +12,28 @@ class GameScene : public cocos2d::Scene
 public:
 	
 	Size visibleSize;
-	Node* staticUI, *questionTable, *buyingBar, *unitDetails;
+	Node* staticUI, *questionTable, *buyingBar, *unitDetails, *upgradeTable;
 	Label* lbl_Notify;
 	void RunActionNotify(string content);
 
 	//Thông số trong game của người chơi
 	struct IngamePlayer {
-		int gold = 500;
+		float gold = 500;
+		float mana = 0;
+		float manaCap = 50;
 		int energy = 3;
 		int numOfCorrectQuestion = 0;
 		int numOfWrongQuestion = 0;
-		int mainTowerLevel = 1;
+		int kingdomLevel = 1;
 		Label* lbl_Gold;
 		Label* lbl_Energy;
-		Label* lbl_MainTowerLevel;
+		Label* lbl_Mana;
+		Label* lbl_KingdomLevel;
 		Button* btn_UpgradeMainTower;
 		IngamePlayer();
 	};
 	IngamePlayer ingamePlayerInfo;
+	void UpdateIngamePlayerInfo();
 	
 
 	//Các vấn đề về bảng câu hỏi
@@ -49,10 +53,7 @@ public:
 	void btn_AnswerClick(Ref *pSender, cocos2d::ui::Button::Widget::TouchEventType type);
 	void ChangeQuestionTableState(bool questionAvailable);
 	bool isAllowedToChooseQuestion = false;
-
-	//Chọn line để thả
-	int choosingLine = 1;
-	Button *btn_ChooseLine1, *btn_ChooseLine2, *btn_ChooseLine3;
+	void CreateQuestionTable();
 	
 	//Khởi tạo object
 	void InitializeIngameObject(string objectName, int line, int playerId);
@@ -71,25 +72,35 @@ public:
 	};
 	void ShowUnitDetails();
 
-	//Thanh mua linh
-	Button* btn_SwitchBuyingBar;
-	struct Item_BuyableObject {
-		Node* item;
+	//Mua lính
+	struct Item_BuyableUnit {
+		Node* root;
 		Label* lbl_Cost;
 		Button* btn_Icon;
-		Button* btn_Upgrade;
-		Item_BuyableObject(string name);
+		BaseUnitClass* unitInfo;
+		Item_BuyableUnit(string name);
 	};
-	vector<Item_BuyableObject> List_BuyableObject;
-	void GetBuyableObject();
-	int currentPositionOfBuyingBar = 0, numOfVisibleItem = 4;
-	float distanceBetweenItems = 0.1;
+	vector<string> ChoosedUnit;
+	Item_BuyableUnit* choosingBuyableUnit = nullptr;
+	Node* ghostItem = Node::create();
+	void AddDragAndDropItem(Node*& root);
+	void onCardMoved(Touch* touch, Event* event);
+	Vec2 oldRootPos;
+	vector<Item_BuyableUnit> List_BuyableUnit;
 	void CreateBuyingBar();
-	void btn_BuyObjectClick(Ref *pSender, cocos2d::ui::Button::Widget::TouchEventType type);
-	void btn_UpgradeObjectClick(Ref *pSender, cocos2d::ui::Button::Widget::TouchEventType type);
-	void RunActionButtonBuyingBack();
-	void RunActionButtonBuyingNext();
-	
+	void btn_BuyUnit_Click(Ref *pSender, cocos2d::ui::Button::Widget::TouchEventType type);
+	void BuyUnit(string name, int line);
+
+	//Nâng cấp lính
+	void btn_Upgrade_Click(Ref *pSender, cocos2d::ui::Button::Widget::TouchEventType type);
+	Button* btn_ViewDetail, *btn_CloseViewDetail, *btn_ProcessUpgrade, *btn_CancelUpgrade, *btn_Upgrade;
+	Label* lbl_UpgradeInfo;
+	void CreateUpgradeTable(string name);
+	ui::ScrollView* sc_ViewDetail = nullptr;
+	bool isViewDetail = false;
+	bool isUpgrade = false;
+	void UpgradeUnit(string name);
+
 	//Các vấn đề server
 	void Request_RandomQuestion(string level);
 	void Respone_ReadQuestion(cocos2d::network::HttpClient * sender, cocos2d::network::HttpResponse * response);
@@ -103,12 +114,14 @@ public:
 	void update(float time);
 	void UpdateIngameObject(float time);
 	void UpdateQuestionInfo(float time);
+	void UpdatePlayerResource(float time);
+
 
 	//Các hàm cơ bản
 	void btn_Click(Ref *pSender, cocos2d::ui::Button::Widget::TouchEventType type);
 	bool onTouchBegan(Touch* touch, Event* event);
 	void onTouchMoved(Touch* touch, Event* event);
-
+	void onTouchEnded(Touch* touch, Event* event);
 	static cocos2d::Scene* createScene();
 	virtual bool init();
 	void menuCloseCallback(cocos2d::Ref* pSender);

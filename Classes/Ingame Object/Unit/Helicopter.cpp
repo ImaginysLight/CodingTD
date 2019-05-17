@@ -3,17 +3,16 @@
 Helicopter::Helicopter(int line, bool isOwned, int unitId, int playerId)
 {
 	name = "Helicopter";
-	description = "Multi-target, slow but deal huge damage";
-	goldCost = 125;
-	energyCost = 0;
+	description = "A multi-target helicopter, slow but can attack every line.";
+	goldCost = 120;
 	levelRequired = 2;
-	maxHealth = 250;
+	maxHealth = 300;
 	currentHealth = maxHealth;
-	baseAttack = 160;
+	baseAttack = 100;
 	baseDefense = 50;
-	baseMoveSpeed = 6;
+	baseMoveSpeed = 40;
 	baseAttackSpeed = 15;
-	range = 500;
+	range = 400;
 	baseRegeneration = 1;
 
 	upgradeName = "Helicopter 2";
@@ -33,16 +32,19 @@ Helicopter::~Helicopter()
 //	//Keen Eyes: attack upto 2 targets in all lines.
 vector<BaseUnitClass*> Helicopter::FindTargets()
 {
+
 	vector<BaseUnitClass*> result;
 	vector<BaseUnitClass*> shotableTargets;
 	//Tìm danh sách địch có thể bắn tới
 	for (auto target : BaseUnitClass::AllIngameUnit_Vector) {
 		if (
-			(this->isOwned != target->isOwned)									// Xem có phải đối thủ không
-			&& (target->isAlive && target->action != "Die")						//Xem target còn sống không
-			&& (abs(target->root->getPositionX() - this->root->getPositionX()) < this->range) // Xem có trong range không
-			)
-			shotableTargets.push_back(target);
+			this->isOwned != target->isOwned							// Xem có phải đối thủ không
+			&& target->isAlive && target->action != "Die"				//Xem target còn sống không
+			) {
+			auto frontDistance = (this->isOwned ? 1 : -1)*(target->root->getPositionX() - this->root->getPositionX());
+			if (frontDistance < this->range && frontDistance > -50)
+				shotableTargets.push_back(target);
+		}
 	}
 	//Sắp xếp theo máu tăng dần
 	std::sort(shotableTargets.begin(), shotableTargets.end(), BaseUnitClass::SortByHealth);

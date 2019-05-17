@@ -10,6 +10,8 @@
 #include <ctime>
 #include<algorithm>
 #include<string>
+#include<iostream>
+
 
 
 
@@ -36,6 +38,7 @@ public:
 	//Các hàm tạo node tổng quát
 	static Label* CreateLabel(string content, int size = Tool::defaultTextSize, Color4B color = Color4B::WHITE, CCTextAlignment align = CCTextAlignment::LEFT);
 	static Button* CreateButtonWithoutSprite(string name, string titleText, int size = Tool::defaultTextSize, Color3B color = Color3B::WHITE);
+	static void Button_ChangeState(Button*& btn, bool isShow, float fadeTime);
 
 	//Xử lý size
 	static void setNodeSize(Node* node, int width, int height);

@@ -35,13 +35,15 @@ void BaseUnitClass::UpdateIngameInfo(string spriteName, int unitId, int ownerPla
 	this->line = line;
 	this->animateName = animateName;
 	root = Node::create();
-	sprite = Sprite::create(spriteName);
+	sprite = Sprite::create(spriteName);		
+	sprite->setAnchorPoint(Vec2(0, 0));
+	sprite->setPositionY(sprite->getPositionY() - 50);
 	healthBar = ProgressTimer::create(Sprite::create("Sprites/Health Bar.png"));
 	healthBar->setType(ProgressTimer::Type::BAR);
 	healthBar->setBarChangeRate(Vec2(1, 0));
 	healthBar->setMidpoint(Vec2(0, 0));
 	healthBar->setPercentage(100);
-	healthBar->setPosition(this->sprite->getPosition() + Vec2(0, this->sprite->getBoundingBox().size.height*0.5 + 10));
+	healthBar->setPosition(this->sprite->getPosition() + Vec2(this->sprite->getBoundingBox().size.width*0.5, this->sprite->getBoundingBox().size.height + 5));
 	if (this->isOwned) this->healthBar->setColor(Color3B::GREEN);
 	else  this->healthBar->setColor(Color3B::RED);
 	Tool::setNodeSize(healthBar, sprite->getBoundingBox().size.width*0.35, 8);
@@ -69,6 +71,12 @@ void BaseUnitClass::UpdateIngameInfo(string spriteName, int unitId, int ownerPla
 		root->setRotation3D(Vec3(0, 180, 0));
 		this->healthBar->setMidpoint(Vec2(1, 0));
 	}
+	
+	//Scale theo level
+	this->sprite->setScale(0.9);
+	if (name.find("2") != std::string::npos) this->sprite->setScale(1);
+	else if (name.find("3") != std::string::npos) this->sprite->setScale(1.1);
+	else if (name.find("4") != std::string::npos) this->sprite->setScale(1.2);
 }
 
 void BaseUnitClass::Update()
@@ -133,7 +141,6 @@ void BaseUnitClass::Update()
 			this->Attack(targetList);
 			return;
 		}
-		
 	}
 
 	//Action Move
@@ -160,10 +167,10 @@ void BaseUnitClass::Die() {
 void BaseUnitClass::Attack(vector<BaseUnitClass*>& targets) {
 	this->action = "Attack";
 	auto animate = IngameObject::animate[this->animateName + "_attack"]->clone();
-	animate->setDuration(60 / this->attackSpeed - 0.15); //Cho nó đánh xong dừng lại 0.15s trước khi đánh phát tiếp theo
+	animate->setDuration(60 / this->attackSpeed * (1 - this->delayTimeAfterAttack)); 
 	this->sprite->runAction(Sequence::create(
 		animate,
-		DelayTime::create(0.15),
+		DelayTime::create(delayTimeAfterAttack),
 		CallFunc::create([&]() {	this->action = "Idle"; }),
 		nullptr
 	))->setFlags(1);
@@ -184,13 +191,15 @@ vector<BaseUnitClass*> BaseUnitClass::FindTargets() {
 	vector<BaseUnitClass*> shotableTargets;
 	//Tìm danh sách địch có thể bắn tới
 	for (auto target : BaseUnitClass::AllIngameUnit_Vector) {
-		if(
+		if (
 			(this->isOwned != target->isOwned)									// Xem có phải đối thủ không
 			&& (target->isAlive && target->action != "Die")						//Xem target còn sống không
 			&& (this->line == target->line || target->description == "Kingdom")	//Xem có cùng hàng không || là Kingdom
-			&& (abs(target->root->getPositionX() - this->root->getPositionX()) < this->range) // Xem có trong range không
-		)
-			shotableTargets.push_back(target);
+			) {
+			auto frontDistance = (this->isOwned ? 1 : -1)*(target->root->getPositionX() - this->root->getPositionX());
+			if(frontDistance < this->range && frontDistance > -50)
+				shotableTargets.push_back(target);
+		}
 	}
 	//Sắp xếp theo máu tăng dần
 	std::sort(shotableTargets.begin(), shotableTargets.end(), BaseUnitClass::SortByHealth);
@@ -207,7 +216,7 @@ void BaseUnitClass::Move()
 	auto animate = IngameObject::animate[this->animateName + "_move"]->clone();
 	int direction = this->isOwned ? 1 : -1;
 	this->StotpAction("Move");
-	this->root->runAction(RepeatForever::create(MoveBy::create(1, Vec2(this->moveSpeed * 10 * direction, 0))))->setFlags(2);
+	this->root->runAction(RepeatForever::create(MoveBy::create(1, Vec2(this->moveSpeed * direction, 0))))->setFlags(2);
 	this->sprite->runAction(RepeatForever::create(animate))->setFlags(2);
 }
 
@@ -251,7 +260,13 @@ DamageReceive::DamageReceive(int attackerId, float damage, float triggerTime, st
 }
 
 void BaseUnitClass::onDamageReceive(DamageReceive dmg) {
-	if (dmg.special != "") {
+	//Kiểm tra xem người bắn còn sống không
+	if (dmg.special == "" && dmg.attackerId != 0) {
+		auto attacker = BaseUnitClass::GetUnitById(dmg.attackerId);
+		if (attacker == NULL || !attacker->isAlive || attacker->action == "Die") return;
+	}
+
+	else if (dmg.special != "") {
 		this->ProcessSpecial(this->unitId, dmg);
 		return;
 	}
@@ -344,20 +359,106 @@ void BaseUnitClass::onStatusTrigger(int id, StatusReceive &stt) {
 	else if (stt.statusName == "Rotten Aura - Attack") {
 		thisUnit->attack *= stt.value;
 	}
+	else if (stt.statusName == "Unhealable") {
+		thisUnit->regeneration = 0;
+	}
+	//Frozen Aura: Whoever entered this tower range without permission will be cold, decrease Attack Speed by 10 / 15 / 20%.
+	else if (stt.statusName == "Frozen Aura") {
+		thisUnit->attackSpeed *= stt.value;
+	}
+	//Burning Aura: Whoever entered this tower range without permission will be burned, Regeneration decrease to -8 / -14 / -20 hps.
+	else if (stt.statusName == "Burning Aura") {
+		thisUnit->regeneration = stt.value;
+	}
+	//Blessing Aura: All allies within this tower range will be blessed, restoring 2 / 2.75 / 3.5% hps.
+	else if (stt.statusName == "Blessing Aura") {
+		thisUnit->regeneration += stt.value;
+	}
+	//Demon Heart: increase 2% Attack per 1% Health lose.
+	else if (stt.statusName == "Demon Heart") {
+		thisUnit->attack *= stt.value;
+	}
+	//The Presence of Life: bless all allies on the line, increase Regeneration by 3 / 5 and Attack Speed by 15 / 25%
+	else if (stt.statusName == "The Presence of Life - Regeneration") {
+		thisUnit->regeneration += stt.value;
+	}
+	else if (stt.statusName == "The Presence of Life - Attack Speed") {
+		thisUnit->attackSpeed *= stt.value;
+	}
+	//Agent Orange decrease Defense by 35 / 50% for 1 second.
+	else if (stt.statusName == "Agent Orange") {
+		thisUnit->defense *= stt.value;
+	}
 }
 
 void BaseUnitClass::ProcessSpecial(int id, DamageReceive &dmg) {
 	auto thisUnit = BaseUnitClass::GetUnitById(id);
 	if (thisUnit == nullptr) return;
 
-	//Frost Nova: Launch a snowball toward enemy, dealing 75 / 100 / 150 splash damage in 100 range,
-	//pierce 25 Defense (Cooldown 7 / 6 / 4 seconds)
-	if (dmg.special == "Frost Nova") {
+	//Frost Nova : Launch a snowball toward enemy, dealing 75 / 100 / 150 splash damage in 100 range,
+	//pierce 25 / 35 / 50 Defense(Cooldown 7 / 6 / 4 seconds)
+	//*Note that - 25 is limited to Defense in damage calculation, while 0 is minimum Defense value.
+	if (dmg.special.find("Frost Nova") != std::string::npos) {
 		auto currentDefense = thisUnit->defense;
-		thisUnit->defense -= 25;
+		if (dmg.special == "Frost Nova 1") thisUnit->defense -= 25;
+		else if (dmg.special == "Frost Nova 2") thisUnit->defense -= 35;
+		else if (dmg.special == "Frost Nova 3") thisUnit->defense -= 50;
+		if (thisUnit->defense < -25) thisUnit->defense = -25;
 		dmg.special = "";
 		thisUnit->onDamageReceive(dmg);
 		thisUnit->defense = currentDefense;
+		return;
+	}
+//Agent Orange : improve normal attacks with Agent Orange, dealing bonus damage equal to 2 / 3 % the target's Max Health
+//and decrease target's Defense percent equal to bonus damage for 1 second.
+	if (dmg.special.find("Agent Orange") != std::string::npos) {
+		int bonusDamage;
+		if (dmg.special == "Agent Orange 1") bonusDamage = thisUnit->maxHealth * 0.02;
+		else if (dmg.special == "Agent Orange 2") bonusDamage = thisUnit->maxHealth * 0.03;
+		dmg.damage += bonusDamage;
+		bool isAffected = false;
+		for (int i = 0; i < thisUnit->statusReceive.size(); i++) {
+			if (thisUnit->statusReceive[i].statusName == "Agent Orange") {
+				thisUnit->statusReceive[i].releaseStatusTime = Tool::currentIngameTime + 1;
+				isAffected = true;
+				break;
+			}
+		}
+		if(!isAffected)
+			thisUnit->ApplyStatus(StatusReceive("Agent Orange", "Defense", (100 - bonusDamage) / 100.0, Tool::currentIngameTime + 1, 2));
+		dmg.special = "";
+		thisUnit->onDamageReceive(dmg);
+		return;
+	}
+	//Vampire Touch: Improve normal attacks, restores Current Health by 20 / 35% of damage dealt, and steal 0.3 / 0.5% target's Max Health.
+	if (dmg.special.find("Vampire Touch") != std::string::npos) {
+		auto attacker = BaseUnitClass::GetUnitById(dmg.attackerId);
+		if (attacker == nullptr) return;
+		float healthLose = dmg.damage / (0.5 + thisUnit->defense / 100);
+		float currentHealthRestore;
+		float maxHealthBonus;
+		if (dmg.special == "Vampire Touch 1") {
+			currentHealthRestore = healthLose * 0.2;
+			maxHealthBonus = thisUnit->maxHealth * 0.003;
+		}
+		else if (dmg.special == "Vampire Touch 2") {
+			currentHealthRestore = healthLose * 0.35;
+			maxHealthBonus = thisUnit->maxHealth * 0.005;
+		}
+		maxHealthBonus = (int)(maxHealthBonus > 1 ? maxHealthBonus : 1);
+		attacker->maxHealth += maxHealthBonus;
+		thisUnit->maxHealth -= maxHealthBonus;
+		attacker->currentHealth += currentHealthRestore;
+		if (attacker->currentHealth > attacker->maxHealth) attacker->currentHealth = attacker->maxHealth;
+		/*Animation*/
+		Sprite* sp = Sprite::create("Sprites/Blank Image.png");
+		attacker->sprite->addChild(sp);
+		sp->setAnchorPoint(Vec2(0, 0));
+		IngameObject::animate["Healing_healing"]->setDuration(1);
+		sp->runAction(Sequence::create(IngameObject::animate["Healing_healing"], RemoveSelf::create(), nullptr));
+
+		dmg.special = "";
+		thisUnit->onDamageReceive(dmg);
 		return;
 	}
 	

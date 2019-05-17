@@ -1,14 +1,15 @@
 ﻿#include "FrostNova.h"
 
 
-FrostNova::FrostNova(Vec2 position, int line, float damage, float triggerTime, bool isOwned)
+FrostNova::FrostNova(Vec2 position, int line, float damage, string name, float triggerTime, bool isOwned)
 {
 	this->root = Node::create();
 	this->root->setPosition(position);
 	this->lineOfEffect = line;
 	this->damage = damage;
+	this->name = name;
 	this->nextTriggerTime = triggerTime;
-	this->areaOfEffect = 100;
+	this->areaOfEffect = 150;
 	this->isOwned = isOwned;
 	BaseSkillClass::AllIngameSkill_Vector.push_back(this);
 }
@@ -17,7 +18,9 @@ FrostNova::~FrostNova()
 {
 }
 //Frost Nova : Launch a snowball toward enemy, dealing 75 / 100 / 150 splash damage in 100 range,
-//pierce 25 Defense(Cooldown 7 / 6 / 4 seconds)
+//pierce 25 / 35 / 50 Defense(Cooldown 7 / 6 / 4 seconds)
+//*Note that - 25 is limited to Defense in damage calculation, while 0 is minimum Defense value.
+
 void FrostNova::Update()
 {
 	if (this->isReleased) { delete this; return; }
@@ -26,6 +29,7 @@ void FrostNova::Update()
 
 void FrostNova::onTrigger()
 {
+	
 	//Label cho đẹp
 	auto label = Tool::CreateLabel("Frost Nova !!");
 	this->root->addChild(label);
@@ -38,7 +42,7 @@ void FrostNova::onTrigger()
 			&& (this->lineOfEffect == target->line)			//Xem có cùng hàng không
 			&& (abs(target->root->getPositionX() - this->root->getPositionX()) < this->areaOfEffect) // Xem có trong range không
 			) {
-			target->damageReceive.push_back(DamageReceive(0, this->damage, Tool::currentIngameTime, "","Frost Nova"));
+			target->damageReceive.push_back(DamageReceive(0, this->damage, Tool::currentIngameTime, "",name));
 		}
 	}
 	this->nextTriggerTime += 6969;
