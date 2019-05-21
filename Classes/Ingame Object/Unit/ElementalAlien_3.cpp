@@ -17,7 +17,7 @@ ElementalAlien_3::ElementalAlien_3(int line, bool isOwned, int unitId, int playe
 
 	upgradeName = "Elemental Alien 4";
 	upgradeGoldCost = 425;
-	upgradeEnergyCost = 2;
+	upgradeKnowledgeCost = 2;
 	upgradeLevelRequired = 2;
 
 	animationIndexOnTriggerAttack = 14;

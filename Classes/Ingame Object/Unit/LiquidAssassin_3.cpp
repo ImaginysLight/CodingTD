@@ -25,7 +25,7 @@ LiquidAssassin_3::~LiquidAssassin_3()
 {
 }
 
-//Death Strike : blink toward an enemy on any line and attack, dealt 100 / 175 / 250 bonus damage on attack.
+//Death Scratch : blink toward an enemy on any line and attack, dealt 100 / 175 / 250 bonus damage on attack.
 //This ability has 1 charge and will be restored when an enemy dies within 550 / 650 / 750 range around Assassin, cooldown 5s
 void LiquidAssassin_3::Update()
 {

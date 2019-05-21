@@ -17,7 +17,7 @@ VampireDragon::VampireDragon(int line, bool isOwned, int unitId, int playerId)
 
 	upgradeName = "Vampire Dragon 2";
 	upgradeGoldCost = 950;
-	upgradeEnergyCost = 3;
+	upgradeKnowledgeCost = 3;
 	upgradeLevelRequired = 3;
 
 	animationIndexOnTriggerAttack = 11;

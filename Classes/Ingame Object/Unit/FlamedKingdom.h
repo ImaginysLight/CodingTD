@@ -15,4 +15,7 @@ public:
 	//Special: Burning Aura: Whoever entered this tower range without permission will be burned, Regeneration decrease to -8 / -14 / -20 hps.
 	void Update() override;
 	vector<BaseUnitClass*> FindTargets() override;
+
+	int level = 1;
+	void Upgrade() override;
 };

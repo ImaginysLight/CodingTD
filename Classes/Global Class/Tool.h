@@ -44,5 +44,7 @@ public:
 	static void setNodeSize(Node* node, int width, int height);
 	static void updateScale(Vector<Node*> node, int scaleX, int scaleY);
 	
+	// []
+	static int CreateRandomNumber(int begin, int end);
 	
 };

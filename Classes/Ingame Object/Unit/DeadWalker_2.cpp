@@ -17,7 +17,7 @@ DeadWalker_2::DeadWalker_2(int line, bool isOwned, int unitId, int playerId)
 
 	upgradeName = "Dead Walker 3";
 	upgradeGoldCost = 600;
-	upgradeEnergyCost = 2;
+	upgradeKnowledgeCost = 2;
 	upgradeLevelRequired = 2;
 
 	animationIndexOnTriggerAttack = 6;

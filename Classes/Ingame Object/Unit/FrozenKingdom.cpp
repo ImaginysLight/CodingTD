@@ -14,7 +14,7 @@ FrozenKingdom::FrozenKingdom(int line, bool isOwned, int unitId, int playerId)
 
 	upgradeName = "Frozen Kingdom 2";
 	upgradeGoldCost = 200;
-	upgradeEnergyCost = 3;
+	upgradeKnowledgeCost = 3;
 
 	this->UpdateIngameInfo("Sprites/Frozen Kingdom/default.png", unitId, playerId, isOwned, "Frozen Kingdom", line);
 	if (this->isOwned) this->root->setPosition(Vec2(50, 50));
@@ -140,8 +140,11 @@ vector<BaseUnitClass*> FrozenKingdom::FindTargets()
 				break;
 			}
 		}
+		float slowAttackSpeed = 0.9;
+		if (level == 2) slowAttackSpeed = 0.85;
+		if (level == 3) slowAttackSpeed = 0.8;
 		if (!isAffected) {
-			target->ApplyStatus(StatusReceive("Frozen Aura", "AttackSpeed", 0.9, Tool::currentIngameTime + 5, 2));
+			target->ApplyStatus(StatusReceive("Frozen Aura", "AttackSpeed", slowAttackSpeed, Tool::currentIngameTime + 5, 2));
 		}
 	}
 
@@ -152,3 +155,49 @@ vector<BaseUnitClass*> FrozenKingdom::FindTargets()
 
 
 
+void FrozenKingdom::Upgrade()
+{
+	level++;
+	if (level == 2) {
+		float currentHealthPercent = (float)currentHealth / maxHealth;
+		name = "Frozen Kingdom 2";
+		description = "Kingdom";
+		maxHealth = 1750;
+		currentHealth = maxHealth * currentHealthPercent;
+		baseAttack = 96;
+		baseDefense = 100;
+		baseAttackSpeed = 30;
+		range = 500;
+		baseRegeneration = 2;
+
+		upgradeName = "Frozen Kingdom 3";
+		upgradeGoldCost = 500;
+		upgradeKnowledgeCost = 5;
+		this->root->setScale(1);
+		this->ReprocessAllStatus("Attack");
+		this->ReprocessAllStatus("Defense");
+		this->ReprocessAllStatus("MoveSpeed");
+		this->ReprocessAllStatus("AttackSpeed");
+		this->ReprocessAllStatus("Regeneration");
+	}
+	else if (level == 3) {
+		float currentHealthPercent = (float)currentHealth / maxHealth;
+		name = "Frozen Kingdom 3";
+		description = "Kingdom";
+		maxHealth = 1750;
+		currentHealth = maxHealth * currentHealthPercent;
+		baseAttack = 120;
+		baseDefense = 150;
+		baseAttackSpeed = 30;
+		range = 575;
+		baseRegeneration = 3;
+
+		upgradeName = "";
+		this->root->setScale(1.1);
+		this->ReprocessAllStatus("Attack");
+		this->ReprocessAllStatus("Defense");
+		this->ReprocessAllStatus("MoveSpeed");
+		this->ReprocessAllStatus("AttackSpeed");
+		this->ReprocessAllStatus("Regeneration");
+	}
+}

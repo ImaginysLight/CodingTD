@@ -17,7 +17,7 @@ WingedOrc::WingedOrc(int line, bool isOwned, int unitId, int playerId)
 
 	upgradeName = "Winged Orc 2";
 	upgradeGoldCost = 300;
-	upgradeEnergyCost = 1;
+	upgradeKnowledgeCost = 1;
 	upgradeLevelRequired = 2;
 
 	delayTimeAfterAttack = 0.08;

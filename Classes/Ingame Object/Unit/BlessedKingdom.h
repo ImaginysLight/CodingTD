@@ -15,4 +15,7 @@ public:
 	//Special: Blessing Aura: All allies within this tower range will be blessed, restoring 2 / 2.75 / 3.5% hps.
 	void Update() override;
 	vector<BaseUnitClass*> FindTargets() override;
+
+	int level = 1;
+	void Upgrade() override;
 };

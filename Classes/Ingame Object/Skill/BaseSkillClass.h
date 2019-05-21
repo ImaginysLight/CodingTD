@@ -7,10 +7,21 @@ USING_NS_CC;
 using namespace std;
 
 // Thể hiện đối tượng bất kỳ thuộc về 1 người chơi trong game scene
+extern struct SkillRequired {
+	int energy;
+	int level;
+	bool needToSelect;
+	SkillRequired(int energy, int level, bool needToSelect = false);
+	SkillRequired();
+};
 class BaseSkillClass {
 public:
 	//Các thứ static
 	static vector<BaseSkillClass*> AllIngameSkill_Vector;
+	static unordered_map<string, SkillRequired> SkillRequirement;
+	static void LoadSkillRequirement();
+	
+
 	//Các thông số cơ bản
 	string name = "";
 	string description = "";

@@ -17,7 +17,7 @@ EnragedUrsa::EnragedUrsa(int line, bool isOwned, int unitId, int playerId)
 
 	upgradeName = "Enraged Ursa 2";
 	upgradeGoldCost = 950;
-	upgradeEnergyCost = 2;
+	upgradeKnowledgeCost = 2;
 	upgradeLevelRequired = 3;
 
 	animationIndexOnTriggerAttack = 8;

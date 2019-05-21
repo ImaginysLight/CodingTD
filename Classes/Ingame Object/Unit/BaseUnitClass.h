@@ -66,7 +66,7 @@ public:
 	//Các thông số nâng cấp
 	string upgradeName = "";
 	int upgradeGoldCost = 0;
-	int upgradeEnergyCost = 0;
+	int upgradeKnowledgeCost = 0;
 	int upgradeLevelRequired = 0;
 
 	//Các node biểu hiện unit trong game
@@ -97,6 +97,7 @@ public:
 	virtual void Attack(vector<BaseUnitClass*>& targets);
 	virtual vector<BaseUnitClass*> FindTargets();
 	virtual void StotpAction(string actionName);
+	virtual void Upgrade();
 
 	//Hồi máu mỗi giây
 	float nextRegenerationTriggerTime = Tool::currentIngameTime + 1;

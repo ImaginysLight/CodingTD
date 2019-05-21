@@ -1,16 +1,16 @@
 #include"Unit/BaseUnitClass.h"
 
 #include"Unit/FrozenKingdom.h"
-#include"Unit/FrozenKingdom_2.h"
-#include"Unit/FrozenKingdom_3.h"
+//#include"Unit/FrozenKingdom_2.h"
+//#include"Unit/FrozenKingdom_3.h"
 
 #include"Unit/FlamedKingdom.h"
-#include"Unit/FlamedKingdom_2.h"
-#include"Unit/FlamedKingdom_3.h"
+//#include"Unit/FlamedKingdom_2.h"
+//#include"Unit/FlamedKingdom_3.h"
 
 #include"Unit/BlessedKingdom.h"
-#include"Unit/BlessedKingdom_2.h"
-#include"Unit/BlessedKingdom_3.h"
+//#include"Unit/BlessedKingdom_2.h"
+//#include"Unit/BlessedKingdom_3.h"
 
 #include"Unit/FrostWyvern.h"
 #include"Unit/FrostWyvern_2.h"

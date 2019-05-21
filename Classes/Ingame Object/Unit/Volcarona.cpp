@@ -17,7 +17,7 @@ Volcarona::Volcarona(int line, bool isOwned, int unitId, int playerId)
 
 	upgradeName = "Volcarona 2";
 	upgradeGoldCost = 700;
-	upgradeEnergyCost = 1;
+	upgradeKnowledgeCost = 1;
 	upgradeLevelRequired = 3;
 
 	animationIndexOnTriggerAttack = 5;

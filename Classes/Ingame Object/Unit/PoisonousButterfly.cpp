@@ -17,7 +17,7 @@ PoisonousButterfly::PoisonousButterfly(int line, bool isOwned, int unitId, int p
 
 	upgradeName = "Poisonous Butterfly 2";
 	upgradeGoldCost = 550;
-	upgradeEnergyCost = 2;
+	upgradeKnowledgeCost = 2;
 	upgradeLevelRequired = 3;
 
 	animationIndexOnTriggerAttack = 11;

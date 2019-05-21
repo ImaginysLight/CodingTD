@@ -17,7 +17,7 @@ FrostWyvern::FrostWyvern(int line, bool isOwned, int unitId, int playerId)
 
 	upgradeName = "Frost Wyvern 2";
 	upgradeGoldCost = 300;
-	upgradeEnergyCost = 1;
+	upgradeKnowledgeCost = 1;
 	upgradeLevelRequired = 2;
 
 	animationIndexOnTriggerAttack = 12;

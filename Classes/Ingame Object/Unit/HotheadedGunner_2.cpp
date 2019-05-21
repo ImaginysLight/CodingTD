@@ -17,7 +17,7 @@ HotheadedGunner_2::HotheadedGunner_2(int line, bool isOwned, int unitId, int pla
 
 	upgradeName = "Hotheaded Gunner 3";
 	upgradeGoldCost = 650;
-	upgradeEnergyCost = 1;
+	upgradeKnowledgeCost = 1;
 	upgradeLevelRequired = 3;
 
 	animationIndexOnTriggerAttack = 6;

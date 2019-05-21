@@ -15,4 +15,7 @@ public:
 	// Special: Frozen Aura : Whoever entered this tower range without permission will be cold, decrease Attack Speed by 10 / 15 / 20 % .
 	void Update() override;
 	vector<BaseUnitClass*> FindTargets() override;
+
+	int level = 1;
+	void Upgrade() override;
 };

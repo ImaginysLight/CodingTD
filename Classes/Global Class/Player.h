@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include<iostream>
+#include<vector>
 using namespace std;
 
 class Player {
@@ -15,8 +16,5 @@ public:
 
 	//Phần trong gameplay
 	string elementName = "";
-
-
-
 
 };

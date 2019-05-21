@@ -73,10 +73,10 @@ void BaseUnitClass::UpdateIngameInfo(string spriteName, int unitId, int ownerPla
 	}
 	
 	//Scale theo level
-	this->sprite->setScale(0.9);
-	if (name.find("2") != std::string::npos) this->sprite->setScale(1);
-	else if (name.find("3") != std::string::npos) this->sprite->setScale(1.1);
-	else if (name.find("4") != std::string::npos) this->sprite->setScale(1.2);
+	this->root->setScale(0.9);
+	if (name.find("2") != std::string::npos) this->root->setScale(1);
+	else if (name.find("3") != std::string::npos) this->root->setScale(1.1);
+	else if (name.find("4") != std::string::npos) this->root->setScale(1.2);
 }
 
 void BaseUnitClass::Update()
@@ -236,6 +236,11 @@ void BaseUnitClass::StotpAction(string actionName) {
 	}
 }
 
+void BaseUnitClass::Upgrade()
+{
+	//Hàm này chỉ sử dụng cho Kingdom
+}
+
 void BaseUnitClass::Regeneration()
 {
 	if (this->currentHealth < this->maxHealth && this->currentHealth > 0) {
@@ -302,10 +307,13 @@ void BaseUnitClass::onDamageReceive(DamageReceive dmg) {
 void BaseUnitClass::ClearStatusStat(string statusInfluence)
 {
 	if (statusInfluence == "Attack") this->attack = baseAttack;
-	if (statusInfluence == "Defense") this->defense = baseDefense;
-	if (statusInfluence == "MoveSpeed") this->moveSpeed = baseMoveSpeed;
-	if (statusInfluence == "AttackSpeed") this->attackSpeed = baseAttackSpeed;
-	if (statusInfluence == "Regeneration") this->regeneration = baseRegeneration;
+if (statusInfluence == "Defense") this->defense = baseDefense;
+if (statusInfluence == "MoveSpeed") {
+	this->moveSpeed = baseMoveSpeed;
+	if (this->action == "Move") this->action = "Idle";
+}
+if (statusInfluence == "AttackSpeed") this->attackSpeed = baseAttackSpeed;
+if (statusInfluence == "Regeneration") this->regeneration = baseRegeneration;
 }
 
 StatusReceive::StatusReceive(string statusName, string statusInfluence, float value, float releaseStatusTime, int statusOrder)
@@ -340,7 +348,7 @@ void BaseUnitClass::onStatusTrigger(int id, StatusReceive &stt) {
 	//and Attack Speed by 10 / 17 / 25%
 	if (stt.statusName == "The Presence of Ice - Move Speed")
 		thisUnit->moveSpeed += stt.value;
-	
+
 	else if (stt.statusName == "The Presence of Ice - Attack Speed")
 		thisUnit->attackSpeed *= stt.value;
 
@@ -359,7 +367,7 @@ void BaseUnitClass::onStatusTrigger(int id, StatusReceive &stt) {
 	else if (stt.statusName == "Rotten Aura - Attack") {
 		thisUnit->attack *= stt.value;
 	}
-	else if (stt.statusName == "Unhealable") {
+	else if (stt.statusName == "Unhealable") { // Have priority 5
 		thisUnit->regeneration = 0;
 	}
 	//Frozen Aura: Whoever entered this tower range without permission will be cold, decrease Attack Speed by 10 / 15 / 20%.
@@ -388,6 +396,20 @@ void BaseUnitClass::onStatusTrigger(int id, StatusReceive &stt) {
 	//Agent Orange decrease Defense by 35 / 50% for 1 second.
 	else if (stt.statusName == "Agent Orange") {
 		thisUnit->defense *= stt.value;
+	}
+	//halved their Move Speed and Attack but double Health and Defense. (Current Health will scale equal to amount of bonus Health)
+	else if (stt.statusName == "Cool Blooded - Attack") {
+		thisUnit->attack *= stt.value;
+	}
+	else if (stt.statusName == "Cool Blooded - Move Speed") {
+		thisUnit->moveSpeed *= stt.value;
+	}
+	else if (stt.statusName == "Cool Blooded - Defense") {
+		thisUnit->defense *= stt.value;
+	}
+	//double attack
+	else if (stt.statusName == "Burning Enthusiasm"){
+		thisUnit->attack *= stt.value;
 	}
 }
 

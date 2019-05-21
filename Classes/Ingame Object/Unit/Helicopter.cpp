@@ -17,7 +17,7 @@ Helicopter::Helicopter(int line, bool isOwned, int unitId, int playerId)
 
 	upgradeName = "Helicopter 2";
 	upgradeGoldCost = 500;
-	upgradeEnergyCost = 4;
+	upgradeKnowledgeCost = 4;
 	upgradeLevelRequired = 3;
 
 	animationIndexOnTriggerAttack = 5;

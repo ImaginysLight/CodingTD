@@ -14,7 +14,8 @@ BlessedKingdom::BlessedKingdom(int line, bool isOwned, int unitId, int playerId)
 
 	upgradeName = "Blessed Kingdom 2";
 	upgradeGoldCost = 200;
-	upgradeEnergyCost = 3;
+	upgradeKnowledgeCost = 3;
+	upgradeLevelRequired = 0;
 
 	this->UpdateIngameInfo("Sprites/Blessed Kingdom/default.png", unitId, playerId, isOwned, "Blessed Kingdom", line);
 	if (this->isOwned) this->root->setPosition(Vec2(50, 50));
@@ -137,8 +138,11 @@ vector<BaseUnitClass*> BlessedKingdom::FindTargets()
 					break;
 				}
 			}
+			float healMultiply = 2.0;
+			if (level == 2)healMultiply = 2.75;
+			if (level == 3)healMultiply = 3.5;
 			if (!isAffected)
-				target->ApplyStatus(StatusReceive("Blessing Aura", "Regeneration", 2.0*target->maxHealth / 100.0, Tool::currentIngameTime + 2, 1));
+				target->ApplyStatus(StatusReceive("Blessing Aura", "Regeneration", healMultiply*target->maxHealth / 100.0, Tool::currentIngameTime + 2, 1));
 		}
 	}
 	//Sắp xếp theo máu tăng dần
@@ -147,6 +151,53 @@ vector<BaseUnitClass*> BlessedKingdom::FindTargets()
 	//Lấy 1 thằng máu thấp nhất
 	if (shotableTargets.size() > 0) result.push_back(shotableTargets[0]);
 	return result;
+}
+
+void BlessedKingdom::Upgrade()
+{
+	level++;
+	if (level == 2) {
+		float currentHealthPercent = (float)currentHealth / maxHealth;
+		name = "Blessed Kingdom 2";
+		description = "Kingdom";
+		maxHealth = 1000;
+		currentHealth = maxHealth*currentHealthPercent;
+		baseAttack = 55;
+		baseDefense = 70;
+		baseAttackSpeed = 60;
+		range = 650;
+		baseRegeneration = 4;
+
+		upgradeName = "Blessed Kingdom 3";
+		upgradeGoldCost = 500;
+		upgradeKnowledgeCost = 5;
+		this->root->setScale(1);
+		this->ReprocessAllStatus("Attack");
+		this->ReprocessAllStatus("Defense");
+		this->ReprocessAllStatus("MoveSpeed");
+		this->ReprocessAllStatus("AttackSpeed");
+		this->ReprocessAllStatus("Regeneration");
+	}
+	else if (level == 3) {
+		float currentHealthPercent = (float)currentHealth / maxHealth;
+		name = "Blessed Kingdom 3";
+		description = "Kingdom";
+		maxHealth = 1000;
+		currentHealth = maxHealth * currentHealthPercent;
+		baseAttack = 65;
+		baseDefense = 100;
+		baseAttackSpeed = 60;
+		range = 700;
+		baseRegeneration = 7;
+
+		upgradeName = "";
+		this->root->setScale(1.1);
+		this->ReprocessAllStatus("Attack");
+		this->ReprocessAllStatus("Defense");
+		this->ReprocessAllStatus("MoveSpeed");
+		this->ReprocessAllStatus("AttackSpeed");
+		this->ReprocessAllStatus("Regeneration");
+	}
 }
 
 

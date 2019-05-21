@@ -17,7 +17,7 @@ PolarBear_2::PolarBear_2(int line, bool isOwned, int unitId, int playerId)
 
 	upgradeName = "Polar Bear 3";
 	upgradeGoldCost = 750;
-	upgradeEnergyCost = 3;
+	upgradeKnowledgeCost = 3;
 	upgradeLevelRequired = 3;
 
 	animationIndexOnTriggerAttack = 13;

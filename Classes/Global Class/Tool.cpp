@@ -20,6 +20,12 @@ void Tool::updateScale(Vector<Node*> node, int scaleX, int scaleY){
 	}
 }
 
+int Tool::CreateRandomNumber(int begin, int end)
+{
+	srand(time(NULL));
+	return rand() % (end - begin + 1) + begin;
+}
+
 
 string Tool::ConvertUTF16ToString(wstring utf16) {
 	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t> convert;

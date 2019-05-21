@@ -17,7 +17,7 @@ UFODriver_2::UFODriver_2(int line, bool isOwned, int unitId, int playerId)
 
 	upgradeName = "UFO Driver 3";
 	upgradeGoldCost = 400;
-	upgradeEnergyCost = 1;
+	upgradeKnowledgeCost = 1;
 	upgradeLevelRequired = 2;
 
 	animationIndexOnTriggerAttack = 5;

@@ -17,7 +17,7 @@ LiquidAssassin::LiquidAssassin(int line, bool isOwned, int unitId, int playerId)
 
 	upgradeName = "Liquid Assassin 2";
 	upgradeGoldCost = 400;
-	upgradeEnergyCost = 1;
+	upgradeKnowledgeCost = 1;
 	upgradeLevelRequired = 2;
 
 	delayTimeAfterAttack = 0;
@@ -30,7 +30,7 @@ LiquidAssassin::~LiquidAssassin()
 {
 }
 
-//Death Strike : blink toward an enemy on any line and attack, dealt 100 / 175 / 250 bonus damage on attack.
+//Death Scratch : blink toward an enemy on any line and attack, dealt 100 / 175 / 250 bonus damage on attack.
 //This ability has 1 charge and will be restored when an enemy dies within 550 / 650 / 750 range around Assassin, cooldown 5s
 void LiquidAssassin::Update()
 {

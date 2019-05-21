@@ -14,7 +14,7 @@ FlamedKingdom::FlamedKingdom(int line, bool isOwned, int unitId, int playerId)
 
 	upgradeName = "Flamed Kingdom 2";
 	upgradeGoldCost = 200;
-	upgradeEnergyCost = 3;
+	upgradeKnowledgeCost = 3;
 
 	this->UpdateIngameInfo("Sprites/Flamed Kingdom/default.png", unitId, playerId, isOwned, "Flamed Kingdom", line);
 	if (this->isOwned) this->root->setPosition(Vec2(50, 50));
@@ -137,8 +137,11 @@ vector<BaseUnitClass*> FlamedKingdom::FindTargets()
 				break;
 			}
 		}
+		float burnValue = -8;
+		if (level == 2) burnValue = -14;
+		if (level == 3) burnValue = -20;
 		if (!isAffected) {
-			target->ApplyStatus(StatusReceive("Burning Aura", "Regeneration", -8, Tool::currentIngameTime + 5, 69));
+			target->ApplyStatus(StatusReceive("Burning Aura", "Regeneration", burnValue, Tool::currentIngameTime + 5, 69));
 		}
 	}
 
@@ -149,3 +152,49 @@ vector<BaseUnitClass*> FlamedKingdom::FindTargets()
 
 
 
+void FlamedKingdom::Upgrade()
+{
+	level++;
+	if (level == 2) {
+		float currentHealthPercent = (float)currentHealth / maxHealth;
+		name = "Flamed Kingdom 2";
+		description = "Kingdom";
+		maxHealth = 2000;
+		currentHealth = maxHealth * currentHealthPercent;
+		baseAttack = 88;
+		baseDefense = 25;
+		baseAttackSpeed = 45;
+		range = 450;
+		baseRegeneration = 1;
+
+		upgradeName = "Flamed Kingdom 3";
+		upgradeGoldCost = 500;
+		upgradeKnowledgeCost = 5;
+		this->root->setScale(1);
+		this->ReprocessAllStatus("Attack");
+		this->ReprocessAllStatus("Defense");
+		this->ReprocessAllStatus("MoveSpeed");
+		this->ReprocessAllStatus("AttackSpeed");
+		this->ReprocessAllStatus("Regeneration");
+	}
+	else if (level == 3) {
+		float currentHealthPercent = (float)currentHealth / maxHealth;
+		name = "Flamed Kingdom 3";
+		description = "Kingdom";
+		maxHealth = 2000;
+		currentHealth = maxHealth * currentHealthPercent;
+		baseAttack = 90;
+		baseDefense = 50;
+		baseAttackSpeed = 50;
+		range = 600;
+		baseRegeneration = 1;
+
+		upgradeName = "";
+		this->root->setScale(1.1);
+		this->ReprocessAllStatus("Attack");
+		this->ReprocessAllStatus("Defense");
+		this->ReprocessAllStatus("MoveSpeed");
+		this->ReprocessAllStatus("AttackSpeed");
+		this->ReprocessAllStatus("Regeneration");
+	}
+}

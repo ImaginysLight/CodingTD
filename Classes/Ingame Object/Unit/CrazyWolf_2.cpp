@@ -17,7 +17,7 @@ CrazyWolf_2::CrazyWolf_2(int line, bool isOwned, int unitId, int playerId)
 
 	upgradeName = "Crazy Wolf 3";
 	upgradeGoldCost = 450;
-	upgradeEnergyCost = 2;
+	upgradeKnowledgeCost = 2;
 	upgradeLevelRequired = 3;
 
 	animationIndexOnTriggerAttack = 8;
