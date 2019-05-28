@@ -2,8 +2,14 @@
 #include "cocos2d.h"
 #include"Global Class/Tool.h"
 #include"LobbyScene.h"
+//#include "Object/SocketClient.h"
+
+#include <network/SocketIO.h>
+using namespace cocos2d::network;
+using namespace cocos2d::ui;
+
 USING_NS_CC;
-class LoginScene : public cocos2d::Scene
+class LoginScene : public cocos2d::Scene //, public SocketIO::SIODelegate
 {
 public:
 	static cocos2d::Scene* createScene();
@@ -20,5 +26,10 @@ public:
 	void btn_Click(Ref *pSender, cocos2d::ui::Button::Widget::TouchEventType type);
 	void RunActionNotify(string content);
 
+	void onReceiveEvent(SIOClient* client, const std::string& data);
+	/*virtual void onConnect(SIOClient* client);
+	virtual void onMessage(SIOClient* client, const std::string& data);
+	virtual void onClose(SIOClient* client);
+	virtual void onError(SIOClient* client, const std::string& data);*/
 };
 

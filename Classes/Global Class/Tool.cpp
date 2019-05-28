@@ -1,12 +1,15 @@
 ﻿#include"Tool.h"
 using namespace std;
-
+#include "json\document.h"
+#include "json\rapidjson.h"
+#include <network/SocketIO.h>
 
 int Tool::defaultTextSize = 20;
 float Tool::currentIngameTime = 0;
 Player* Tool::currentPlayer = new Player(); 
 Player* Tool::opponentPlayer = new Player();
 
+SocketClient* Tool::Socket_Client = new SocketClient();
 
 void Tool::setNodeSize(Node* node, int width, int height){
 	node->setScaleX(width/ node->getBoundingBox().size.width);
@@ -18,12 +21,6 @@ void Tool::updateScale(Vector<Node*> node, int scaleX, int scaleY){
 		x->setScaleX(x->getScaleX()*scaleX);
 		x->setScaleY(x->getScaleY()*scaleY);
 	}
-}
-
-int Tool::CreateRandomNumber(int begin, int end)
-{
-	srand(time(NULL));
-	return rand() % (end - begin + 1) + begin;
 }
 
 
@@ -47,17 +44,6 @@ void Tool::CutString(string* str, vector <string*> &vec, string cutPoint) {
 	string* temp = new string;
 	*temp = str->substr(root, str->size() - root);
 	vec.push_back(temp);
-}
-
-void Tool::CutString(string str, vector <string> &vec, string cutPoint) {
-	int root = 0;
-	size_t pos = str.find(cutPoint);
-	while (pos != std::string::npos) {
-		vec.push_back(str.substr(root, pos - root));
-		root = pos + cutPoint.size();
-		pos = str.find(cutPoint, pos + 1);
-	}
-	vec.push_back(str.substr(root, pos - root));
 }
 
 int Tool::ConvertStringToInt(string a) {
@@ -99,5 +85,8 @@ void Tool::Button_ChangeState(Button *& btn, bool isShow, float fadeTime)
 	}
 }
 
-
-
+int Tool::CreateRandomNumber(int begin, int end)
+{
+	srand(time(NULL));
+	return rand() % (end - begin + 1) + begin;
+}

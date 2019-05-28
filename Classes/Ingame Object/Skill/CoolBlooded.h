@@ -13,5 +13,4 @@ public:
 	CoolBlooded(int targetId);
 	~CoolBlooded();
 	int targetId = 0;
-	void Update() override;
 };

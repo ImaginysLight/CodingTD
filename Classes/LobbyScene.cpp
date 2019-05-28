@@ -1,4 +1,7 @@
-#include"LobbyScene.h"
+﻿#include"LobbyScene.h"
+#include "json\document.h"
+#include "json\rapidjson.h"
+#include <network/SocketIO.h>
 USING_NS_CC;
 
 Scene* LobbyScene::createScene()
@@ -12,12 +15,63 @@ bool LobbyScene::init()
 
 	SetupGUI();
 
+	//_client = SocketIO::connect("http://127.0.0.1:3000", *this);
+	Tool::Socket_Client->_client->on("_Find_The_Opponent_",CC_CALLBACK_2(LobbyScene::findTheOpponent, this));
+
 	return true;
 }
 
 void LobbyScene::menuCloseCallback(Ref* pSender)
 {
 	Director::getInstance()->end();
+}
+
+void LobbyScene::findTheOpponent(SIOClient* client, const std::string& data)
+{
+	vector <string*> Vec;
+	int check;
+	std::string *room = new string;
+	rapidjson::Document document;
+	document.Parse<0>(data.c_str());
+	//check name has member in json
+	if (document.HasMember("Room")) {
+		*room = document["Room"].GetString();
+		check = room->find("_");
+		if (check != -1)
+		{
+			Tool::CutString(room, Vec, "_");
+			if (Tool::currentPlayer->id == Tool::ConvertStringToInt(*Vec[0]) || Tool::currentPlayer->id == Tool::ConvertStringToInt(*Vec[1]))
+			{
+				//Chỗ này trông sida vcl
+				if (Tool::currentPlayer->id != Tool::ConvertStringToInt(*Vec[0]))
+				{
+					//Tool::Socket_Client->_client->emit("Get_Infor_Opponent", "{\"id\":\"" + *Vec[0] + "\"}");
+					Tool::opponentPlayer->id = Tool::ConvertStringToInt(*Vec[0]);
+				}
+				if (Tool::currentPlayer->id != Tool::ConvertStringToInt(*Vec[1]))
+				{
+					//Tool::Socket_Client->_client->emit("Get_Infor_Opponent", "{\"id\":\"" + *Vec[1] + "\"}");
+					Tool::opponentPlayer->id = Tool::ConvertStringToInt(*Vec[1]);
+				}	
+				Tool::currentPlayer->room_name = document["Room"].GetString();
+				//Tool::opponentPlayer->id = document["id"].GetInt();
+				//Tool::opponentPlayer->username = document["username"].GetString();
+				Director::getInstance()->replaceScene(ChooseCardScene::createScene());
+				//CCLOG("change Scene");
+			}
+		}
+		else
+		{
+			CCLOG("Room: %s ", document["Room"].GetString());
+		}
+	}
+}
+
+
+void LobbyScene::findInforTheOpponent(SIOClient* client, const std::string& data)
+{
+	/*rapidjson::Document document;
+	document.Parse<0>(data.c_str());*/
 }
 
 void LobbyScene::SetupGUI()
@@ -72,6 +126,17 @@ void LobbyScene::btn_Click(Ref *pSender, cocos2d::ui::Button::Widget::TouchEvent
 		if (name == "btn_Tutorial") {
 			Director::getInstance()->replaceScene(TutorialScene::createScene());
 		}
+		if (name == "btn_Play") {
+			Tool::Socket_Client->_client->emit("_Find_The_Opponent_", "{\"id\":\""+ to_string(Tool::currentPlayer->id) + "\"}");
+		}
+		if (name == "btn_Rank")
+		{
+			Director::getInstance()->replaceScene(RankingScene::createScene());
+		}
+		if (name == "btn_Extend")
+		{
+			Director::getInstance()->replaceScene(ListRoomScene::createScene());
+		}
 	}
 }
 
@@ -80,3 +145,8 @@ void LobbyScene::RunActionNotify(string content)
 	lbl_Notify->setString(content);
 	lbl_Notify->runAction(Sequence::create(FadeIn::create(0.75), DelayTime::create(0.75), FadeOut::create(1), nullptr));
 }
+
+//void LobbyScene::onConnect(SIOClient* client){}
+//void LobbyScene::onMessage(SIOClient* client, const std::string& data){}
+//void LobbyScene::onClose(SIOClient* client){}
+//void LobbyScene::onError(SIOClient* client, const std::string& data){}

@@ -11,7 +11,10 @@ USING_NS_CC;
 class GameScene : public cocos2d::Scene
 {
 public:
-	
+	static vector<string> playerPickedUnit;
+	static vector<string> chatBoxContent;
+	static void ClearStaticVariables();
+
 	Size visibleSize;
 	Node* staticUI, *questionTable, *buyingBar, *unitDetails, *upgradeTable;
 	Label* lbl_Notify;
@@ -34,11 +37,10 @@ public:
 		Label* lbl_KingdomLevel;
 		int kingdomLevel = 1;
 		Button *btn_Skill1, *btn_Skill2;
-		BaseUnitClass* kingdom;
+		BaseUnitClass* kingdom, *opponentKingdom;
 	};
 	IngamePlayer ingamePlayerInfo;
 	void UpdateIngamePlayerInfo();
-	static vector<string> playerPickedUnit;
 	void LoadIngamePlayerInfo();
 
 	//Dùng skill
@@ -94,7 +96,6 @@ public:
 
 	//Các vấn đề về Chatbox
 	ui::ScrollView *sc_ChatBox;
-	vector<string> chatBoxContent;
 	EditBox* EditBox_Chat;
 	Button* btn_SendMessage;
 	void CreateChatbox();
@@ -117,13 +118,19 @@ public:
 	void WrongAnswer();
 	void btn_AnswerClick(Ref *pSender, cocos2d::ui::Button::Widget::TouchEventType type);
 	void ChangeQuestionTableState(bool questionAvailable);
-	bool isAllowedToChooseQuestion = false;
+	bool isAllowedToChooseQuestion = true;
 	void CreateQuestionTable();
 
 	//Các vấn đề server
 	void Request_RandomQuestion(string level);
 	void Respone_ReadQuestion(cocos2d::network::HttpClient * sender, cocos2d::network::HttpResponse * response);
 	void Request_ReadQuestion();
+	///
+	void onReceiveEvent_Question(SIOClient* client, const std::string& data);  // click chọn độ khó xong vẫn phải chờ hết giờ mới chuyển qua câu hỏi, ko phải chuyển ngay @@
+	void onReceiveEvent_InitializeIngameObject(SIOClient* client, const std::string& data);
+	void onReceiveEvent_ExcuteSkill(SIOClient* client, const std::string& data);
+	void onReceiveEvent_SendMessage(SIOClient* client, const std::string& data);
+	void onReceiveEvent_UpgradeKingdom(SIOClient* client, const std::string& data);
 
 	//Setup trong init
 	void SetupCamera();

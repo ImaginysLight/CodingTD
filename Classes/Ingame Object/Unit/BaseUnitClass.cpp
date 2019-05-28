@@ -397,20 +397,6 @@ void BaseUnitClass::onStatusTrigger(int id, StatusReceive &stt) {
 	else if (stt.statusName == "Agent Orange") {
 		thisUnit->defense *= stt.value;
 	}
-	//halved their Move Speed and Attack but double Health and Defense. (Current Health will scale equal to amount of bonus Health)
-	else if (stt.statusName == "Cool Blooded - Attack") {
-		thisUnit->attack *= stt.value;
-	}
-	else if (stt.statusName == "Cool Blooded - Move Speed") {
-		thisUnit->moveSpeed *= stt.value;
-	}
-	else if (stt.statusName == "Cool Blooded - Defense") {
-		thisUnit->defense *= stt.value;
-	}
-	//double attack
-	else if (stt.statusName == "Burning Enthusiasm"){
-		thisUnit->attack *= stt.value;
-	}
 }
 
 void BaseUnitClass::ProcessSpecial(int id, DamageReceive &dmg) {

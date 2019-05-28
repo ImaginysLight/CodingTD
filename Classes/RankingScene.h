@@ -14,10 +14,12 @@ public:
 	Size visibleSize;
 	ui::ScrollView *ScrollView_RankingTable;
 
-	Node* CreateRow(int id, string name, int stat1, int stat2);
+	Node* CreateRow(int stt, int id, string name, int stat1, int stat2);
 	void SetupGUI();
 	void btn_Click(Ref *pSender, cocos2d::ui::Button::Widget::TouchEventType type);
 	void RunActionNotify(string content);
+
+	void onReceiveEvent(SIOClient* client, const std::string& data);
 
 };
 

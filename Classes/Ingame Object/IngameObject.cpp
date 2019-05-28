@@ -107,4 +107,11 @@ pair<string, Animate*> IngameObject::CreateAnimateWithKey(string characterName, 
 	return result;
 }
 
+string IngameObject::GetKingdomByElement(string element)
+{
+	if (element == "Fire") return "Flamed Kingdom";
+	if (element == "Ice") return "Frozen Kingdom";
+	if (element == "Nature") return "Blessed Kingdom";
+}
+
 

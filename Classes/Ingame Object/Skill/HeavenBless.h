@@ -6,7 +6,7 @@
 USING_NS_CC;
 using namespace std;
 
-//give an ally a power of Ice, halved their Move Speed and Attack but double Health and Defense. (Current Health will scale equal to amount of bonus Health)
+//encourage all allies with a bless from heaven, increase current Health and max Health by 300.
 
 class HeavenBless : public BaseSkillClass {
 public:

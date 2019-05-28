@@ -6,8 +6,8 @@
 USING_NS_CC;
 using namespace std;
 
-//Description: give an ally a power of Fire, double their Attack but receive pure damage equal to 10 % of bonus Attack (from every source) each second.
-//Duration : 10
+//Description: give an ally a power of Fire, double their Attack but receive pure damage equal to 10% of that bonus each second.
+//Duration : Permanently
 //Energy cost : 15
 
 
