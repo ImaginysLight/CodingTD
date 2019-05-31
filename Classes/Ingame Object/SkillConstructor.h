@@ -5,6 +5,7 @@
 #include"Skill/HellFire.h"
 #include"Skill/NaturalWind.h"
 #include"Skill/HeavenBless.h"
+#include"Skill/PassiveSkill.h"
 class BaseUnitClass;
 
 class SkillConstructor {

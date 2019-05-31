@@ -157,6 +157,7 @@ void GameScene::UpdateIngameObject(float time) {
 	//Update Unit
 	for (int i = 0; i < BaseUnitClass::AllIngameUnit_Vector.size(); i++) {
 		if (!BaseUnitClass::AllIngameUnit_Vector[i]->isAlive) {
+			if (!BaseUnitClass::AllIngameUnit_Vector[i]->isOwned) GameScene::ingamePlayerInfo.numOfEnemyDefeated++;
 			BaseUnitClass::AllIngameUnit_Vector.erase(BaseUnitClass::AllIngameUnit_Vector.begin() + i);
 			continue;
 		}
@@ -276,10 +277,13 @@ void GameScene::ChangeQuestionTableState(bool questionAvailable) {
 
 void GameScene::InitializeIngameObject(string objectName, int line, int playerId)
 {
+	//Tạo lính
 	bool isOwned = playerId == Tool::currentPlayer->id ? true : false;
 	BaseUnitClass* object = ObjectConstructor::InitializeObject(objectName, line, isOwned, playerId, ++BaseUnitClass::Unit_Id_Counter);
 	BaseUnitClass::AllIngameUnit_Vector.push_back(object);
 	this->addChild(object->root, 4 - object->line);
+
+	//Set vị trí random
 	if (BaseUnitClass::AllIngameUnit_Vector.size() % 2)
 		BaseUnitClass::AllIngameUnit_Vector[BaseUnitClass::AllIngameUnit_Vector.size() - 1]->root->setPositionY(
 			BaseUnitClass::AllIngameUnit_Vector[BaseUnitClass::AllIngameUnit_Vector.size() - 1]->root->getPositionY()
@@ -288,6 +292,11 @@ void GameScene::InitializeIngameObject(string objectName, int line, int playerId
 		BaseUnitClass::AllIngameUnit_Vector[BaseUnitClass::AllIngameUnit_Vector.size() - 1]->root->setPositionY(
 			BaseUnitClass::AllIngameUnit_Vector[BaseUnitClass::AllIngameUnit_Vector.size() - 1]->root->getPositionY()
 			+ Tool::CreateRandomNumber(25, 50));
+
+	//Apply passive skill
+	if(object->isOwned) PassiveSkill::ApplyPassive(object->unitId, Tool::currentPlayer->elementName);
+	else PassiveSkill::ApplyPassive(object->unitId, Tool::opponentPlayer->elementName);
+	
 }
 
 void GameScene::onReceiveEvent_InitializeIngameObject(SIOClient* client, const std::string& data)
@@ -839,6 +848,7 @@ void GameScene::onReceiveEvent_UpgradeKingdom(SIOClient * client, const std::str
 			ingamePlayerInfo.kingdomLevel++;
 			ingamePlayerInfo.lbl_KingdomLevel->setString(to_string(ingamePlayerInfo.kingdomLevel));
 			ingamePlayerInfo.btn_UpgradeKingdom->setName(ingamePlayerInfo.kingdom->name);
+			ingamePlayerInfo.energyCap += 25;
 		}
 		else {
 			ingamePlayerInfo.opponentKingdom->Upgrade();
@@ -1083,13 +1093,30 @@ void GameScene::UpdateIngamePlayerInfo()
 
 void GameScene::CorrectAnswer()
 {
-	auto answerTimeRemain = destinationTime - Tool::currentIngameTime;
-	ingamePlayerInfo.gold += currentQuestionLevel * 15 * (1 + answerTimeRemain / (currentQuestionLevel * 20));
-	ingamePlayerInfo.lbl_Gold->setString("Gold: " + to_string(ingamePlayerInfo.gold));
+	GameScene::ingamePlayerInfo.numOfCorrectQuestion++;
+
+	//( 1 + TimeRemaining % / 1.5) * QuestionLevel * 100 ) Gold và 1 Knowledge cho câu đúng,
+	auto TimeRemaining = destinationTime - Tool::currentIngameTime;
+	auto QuestionTime = currentQuestionLevel * 20;
+	auto TimeRemainingPercent = TimeRemaining / QuestionTime;
+	ingamePlayerInfo.gold += (1 + TimeRemainingPercent / 1.5)*currentQuestionLevel * 100;
+	ingamePlayerInfo.knowledge += 1;
+	GameScene::UpdateIngamePlayerInfo();
+
+	PassiveSkill::Improve(Tool::currentPlayer->elementName);
 }
 
 void GameScene::WrongAnswer()
 {
+	GameScene::ingamePlayerInfo.numOfWrongQuestion++;
+
+	//( 1 + TimeRemaining % / 1.5) * QuestionLevel * 100 ) * Rand[0.2 , 0.6] Gold cho câu sai.
+	auto TimeRemaining = destinationTime - Tool::currentIngameTime;
+	auto QuestionTime = currentQuestionLevel * 20;
+	auto TimeRemainingPercent = TimeRemaining / QuestionTime;
+	auto randomNumber = Tool::CreateRandomNumber(2, 6) / 10.0;
+	ingamePlayerInfo.gold += (1 + TimeRemainingPercent / 1.5)*currentQuestionLevel * 100 * randomNumber;
+	GameScene::UpdateIngamePlayerInfo();
 }
 
 void GameScene::ShowUnitDetails()

@@ -28,6 +28,7 @@ public:
 		int knowledge = 5;
 		int numOfCorrectQuestion = 0;
 		int numOfWrongQuestion = 0;
+		int numOfEnemyDefeated = 0;
 		Sprite* sp_Background;
 		Label* lbl_PlayerName;
 		Label* lbl_Gold;

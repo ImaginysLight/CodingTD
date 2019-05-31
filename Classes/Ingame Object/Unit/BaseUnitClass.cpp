@@ -307,13 +307,13 @@ void BaseUnitClass::onDamageReceive(DamageReceive dmg) {
 void BaseUnitClass::ClearStatusStat(string statusInfluence)
 {
 	if (statusInfluence == "Attack") this->attack = baseAttack;
-if (statusInfluence == "Defense") this->defense = baseDefense;
-if (statusInfluence == "MoveSpeed") {
-	this->moveSpeed = baseMoveSpeed;
-	if (this->action == "Move") this->action = "Idle";
-}
-if (statusInfluence == "AttackSpeed") this->attackSpeed = baseAttackSpeed;
-if (statusInfluence == "Regeneration") this->regeneration = baseRegeneration;
+	if (statusInfluence == "Defense") this->defense = baseDefense;
+	if (statusInfluence == "MoveSpeed") {
+		this->moveSpeed = baseMoveSpeed;
+		if (this->action == "Move") this->action = "Idle";
+	}
+	if (statusInfluence == "AttackSpeed") this->attackSpeed = baseAttackSpeed;
+	if (statusInfluence == "Regeneration") this->regeneration = baseRegeneration;
 }
 
 StatusReceive::StatusReceive(string statusName, string statusInfluence, float value, float releaseStatusTime, int statusOrder)
