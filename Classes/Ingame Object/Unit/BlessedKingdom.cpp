@@ -4,13 +4,13 @@ BlessedKingdom::BlessedKingdom(int line, bool isOwned, int unitId, int playerId)
 {
 	name = "Blessed Kingdom";
 	description = "Kingdom";
-	maxHealth = 900;
+	maxHealth = 1800;
 	currentHealth = maxHealth;
-	baseAttack = 45;
+	baseAttack = 60;
 	baseDefense = 50;
 	baseAttackSpeed = 60;
 	range = 600;
-	baseRegeneration = 3;
+	baseRegeneration = 2;
 
 	upgradeName = "Blessed Kingdom 2";
 	upgradeGoldCost = 200;
@@ -20,6 +20,8 @@ BlessedKingdom::BlessedKingdom(int line, bool isOwned, int unitId, int playerId)
 	this->UpdateIngameInfo("Sprites/Blessed Kingdom/default.png", unitId, playerId, isOwned, "Blessed Kingdom", line);
 	if (this->isOwned) this->root->setPosition(Vec2(50, 50));
 	else this->root->setPosition(Vec2(3050,50));
+
+	Tool::setNodeSize(this->sprite, 315, 300);
 }
 
 BlessedKingdom::~BlessedKingdom()
@@ -160,13 +162,13 @@ void BlessedKingdom::Upgrade()
 		float currentHealthPercent = (float)currentHealth / maxHealth;
 		name = "Blessed Kingdom 2";
 		description = "Kingdom";
-		maxHealth = 1000;
+		maxHealth = 1440;
 		currentHealth = maxHealth*currentHealthPercent;
-		baseAttack = 55;
-		baseDefense = 70;
+		baseAttack = 80;
+		baseDefense = 75;
 		baseAttackSpeed = 60;
 		range = 650;
-		baseRegeneration = 4;
+		baseRegeneration = 3;
 
 		upgradeName = "Blessed Kingdom 3";
 		upgradeGoldCost = 500;
@@ -182,13 +184,13 @@ void BlessedKingdom::Upgrade()
 		float currentHealthPercent = (float)currentHealth / maxHealth;
 		name = "Blessed Kingdom 3";
 		description = "Kingdom";
-		maxHealth = 1000;
+		maxHealth = 1125;
 		currentHealth = maxHealth * currentHealthPercent;
-		baseAttack = 65;
-		baseDefense = 100;
+		baseAttack = 100;
+		baseDefense = 110;
 		baseAttackSpeed = 60;
 		range = 700;
-		baseRegeneration = 7;
+		baseRegeneration = 6;
 
 		upgradeName = "";
 		this->root->setScale(1.1);

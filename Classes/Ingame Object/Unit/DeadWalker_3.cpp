@@ -4,12 +4,12 @@ DeadWalker_3::DeadWalker_3(int line, bool isOwned, int unitId, int playerId)
 {
 	name = "Dead Walker 3";
 	description = "A pretty zombie with decay aura.";
-	goldCost = 120;
+	goldCost = 150;
 	levelRequired = 1;
-	maxHealth = 528;
+	maxHealth = 450;
 	currentHealth = maxHealth;
-	baseAttack = 80;
-	baseDefense = 75;
+	baseAttack = 90;
+	baseDefense = 50;
 	baseMoveSpeed = 70;
 	baseAttackSpeed = 30;
 	range = 0;

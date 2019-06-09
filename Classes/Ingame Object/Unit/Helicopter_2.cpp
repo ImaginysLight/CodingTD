@@ -4,13 +4,13 @@ Helicopter_2::Helicopter_2(int line, bool isOwned, int unitId, int playerId)
 {
 	name = "Helicopter 2";
 	description = "A multi-target Helicopter, slow but can attack every line.";
-	goldCost = 120;
+	goldCost = 125;
 	levelRequired = 2;
-	maxHealth = 375;
+	maxHealth = 300;
 	currentHealth = maxHealth;
-	baseAttack = 96;
+	baseAttack = 100;
 	baseDefense = 50;
-	baseMoveSpeed = 50;
+	baseMoveSpeed = 45;
 	baseAttackSpeed = 20;
 	range = 625;
 	baseRegeneration = 1;

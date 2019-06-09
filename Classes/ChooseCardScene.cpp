@@ -2,7 +2,6 @@
 #include "json\document.h"
 #include "json\rapidjson.h"
 #include <network/SocketIO.h>
-//#include "Object/SocketClient.h"
 #include "Global Class/Tool.h"
 USING_NS_CC;
 
@@ -14,7 +13,6 @@ USING_NS_CC;
 
 Scene* ChooseCardScene::createScene()
 {
-	GameScene::ClearStaticVariables();
 	return ChooseCardScene::create();
 }
 
@@ -39,7 +37,7 @@ void ChooseCardScene::menuCloseCallback(Ref* pSender)
 void ChooseCardScene::onReceive_BanCard(SIOClient* client, const std::string& data) {
 	rapidjson::Document document;
 	document.Parse<0>(data.c_str());
-	if (document["Room"].GetString() == Tool::currentPlayer->room_name)
+	if (document["Room"].GetString() == Player::currentPlayer->room_name)
 	{
 		bannedCard.push_back({ Tool::ConvertStringToInt(document["CurrentId"].GetString()), document["cardName"].GetString() });
 	}
@@ -47,40 +45,41 @@ void ChooseCardScene::onReceive_BanCard(SIOClient* client, const std::string& da
 void ChooseCardScene::onReceive_PickCard(SIOClient* client, const std::string& data) {
 	rapidjson::Document document;
 	document.Parse<0>(data.c_str());
-	if (document["Room"].GetString() == Tool::currentPlayer->room_name)
+	if (document["Room"].GetString() == Player::currentPlayer->room_name)
 	{
-		if (Tool::currentPlayer->id == Tool::ConvertStringToInt(document["Id"].GetString())) {
-			GameScene::playerPickedUnit.push_back(document["cardName"].GetString());
-			ChooseCardScene::lbl_CurrentPlayerPick->setString(
-				lbl_CurrentPlayerPick->getString() +
-				document["cardName"].GetString() + "\n"
-			);
+		string cardName = document["cardName"].GetString();
+		auto sp_Card = Sprite::create("Sprites/" + cardName + "/card.png");
+		Tool::setNodeSize(sp_Card, 90, 90);
+		this->addChild(sp_Card);
+		if (Player::currentPlayer->id == Tool::ConvertStringToInt(document["Id"].GetString())) {
+			Player::currentPlayer->picked_units.push_back(cardName);
+			ChooseCardScene::currentPlayerPosition -= Vec2(0, visibleSize.height*0.15);
+			sp_Card->setPosition(ChooseCardScene::currentPlayerPosition);
 		}
 		else {
-			ChooseCardScene::lbl_OpponentPlayerPick->setString(
-				lbl_OpponentPlayerPick->getString() +
-				document["cardName"].GetString() + "\n"
-			);
+			Player::opponentPlayer->picked_units.push_back(cardName);
+			ChooseCardScene::opponentPlayerPosition -= Vec2(0, visibleSize.height*0.15);
+			sp_Card->setPosition(ChooseCardScene::opponentPlayerPosition);
 		}
 	}
 }
 void ChooseCardScene::onReceive_SelectElement(SIOClient* client, const std::string& data) {
 	rapidjson::Document document;
 	document.Parse<0>(data.c_str());
-	if (document["Room"].GetString() == Tool::currentPlayer->room_name)
+	if (document["Room"].GetString() == Player::currentPlayer->room_name)
 	{
-		if (Tool::currentPlayer->id == Tool::ConvertStringToInt(document["Id"].GetString())) {
-			Tool::currentPlayer->elementName = document["elementName"].GetString();
+		if (Player::currentPlayer->id == Tool::ConvertStringToInt(document["Id"].GetString())) {
+			Player::currentPlayer->elementName = document["elementName"].GetString();
 			ChooseCardScene::lbl_CurrentPlayerPick->setString(
 				lbl_CurrentPlayerPick->getString() +
-				IngameObject::GetKingdomByElement(Tool::currentPlayer->elementName) + "\n"
+				IngameObject::GetKingdomByElement(Player::currentPlayer->elementName) + "\n"
 			);
 		}
 		else {
-			Tool::opponentPlayer->elementName = document["elementName"].GetString();
+			Player::opponentPlayer->elementName = document["elementName"].GetString();
 			ChooseCardScene::lbl_OpponentPlayerPick->setString(
 				lbl_OpponentPlayerPick->getString() +
-				IngameObject::GetKingdomByElement(Tool::opponentPlayer->elementName) + "\n"
+				IngameObject::GetKingdomByElement(Player::opponentPlayer->elementName) + "\n"
 			);
 		}
 	}
@@ -97,10 +96,10 @@ void ChooseCardScene::btn_BanCard_Click(Ref *pSender, cocos2d::ui::Button::Widge
 		string card = term->getName();
 		if (turn == 2 && counter-- > 0) { // BAN card
 			term->setColor(Color3B::RED);
-			Tool::Socket_Client->_client->emit("_Prohibit_Card_", "{\"cardName\":\"" + card + "\", \"Room\":\"" + Tool::currentPlayer->room_name + "\", \"OpponentId\":\"" + to_string(Tool::opponentPlayer->id) + "\"}");
+			Tool::Socket_Client->_client->emit("_Prohibit_Card_", "{\"cardName\":\"" + card + "\", \"Room\":\"" + Player::currentPlayer->room_name + "\", \"OpponentId\":\"" + to_string(Player::opponentPlayer->id) + "\"}");
 		}
 		if (turn == 3 && counter-- > 0) {//PICK card
-			Tool::Socket_Client->_client->emit("_Pick_Card_", "{\"cardName\":\"" + card + "\", \"Room\":\"" + Tool::currentPlayer->room_name + "\", \"Id\":\"" + to_string(Tool::currentPlayer->id) + "\"}");
+			Tool::Socket_Client->_client->emit("_Pick_Card_", "{\"cardName\":\"" + card + "\", \"Room\":\"" + Player::currentPlayer->room_name + "\", \"Id\":\"" + to_string(Player::currentPlayer->id) + "\"}");
 			term->setColor(Color3B::GREEN);
 		}
 	}
@@ -118,7 +117,7 @@ void ChooseCardScene::btn_ChooseKingdom_Click(Ref * pSender, cocos2d::ui::Button
 		}
 		((Button*)pSender)->setEnabled(true);
 		((Button*)pSender)->addTouchEventListener(CC_CALLBACK_2(ChooseCardScene::btn_Click, this));
-		Tool::Socket_Client->_client->emit("_Select_Element_", "{\"elementName\":\"" + name + "\", \"Room\":\"" + Tool::currentPlayer->room_name + "\", \"Id\":\"" + to_string(Tool::currentPlayer->id) + "\"}");
+		Tool::Socket_Client->_client->emit("_Select_Element_", "{\"elementName\":\"" + name + "\", \"Room\":\"" + Player::currentPlayer->room_name + "\", \"Id\":\"" + to_string(Player::currentPlayer->id) + "\"}");
 	}
 }
 
@@ -132,16 +131,15 @@ void ChooseCardScene::SetupGUI()
 	lbl_Turn->setPosition(Vec2(visibleSize.width *0.5, visibleSize.height*0.05));
 	this->addChild(lbl_Turn);
 
+	currentPlayerPosition = Vec2(visibleSize.width*0.15, visibleSize.height*0.82);
+	opponentPlayerPosition = Vec2(visibleSize.width*0.85, visibleSize.height*0.82);
+
 	ChooseCardScene::lbl_CurrentPlayerPick = Tool::CreateLabel("", Tool::defaultTextSize*0.9, Color4B::GREEN);
-	lbl_CurrentPlayerPick->setMaxLineWidth(150);
-	lbl_CurrentPlayerPick->setPosition(Vec2(visibleSize.width*0.15, visibleSize.height*0.8));
-	lbl_CurrentPlayerPick->setAnchorPoint(Vec2(0.5, 1));
+	lbl_CurrentPlayerPick->setPosition(visibleSize.width*0.15, visibleSize.height*0.775);
 	this->addChild(lbl_CurrentPlayerPick);
 
 	ChooseCardScene::lbl_OpponentPlayerPick = Tool::CreateLabel("", Tool::defaultTextSize*0.9, Color4B::RED);
-	lbl_OpponentPlayerPick->setMaxLineWidth(150);
-	lbl_OpponentPlayerPick->setPosition(Vec2(visibleSize.width*0.85, visibleSize.height*0.8));
-	lbl_OpponentPlayerPick->setAnchorPoint(Vec2(0.5, 1));
+	lbl_OpponentPlayerPick->setPosition(visibleSize.width*0.85, visibleSize.height*0.775);
 	this->addChild(lbl_OpponentPlayerPick);
 
 	auto sp_SceneName = Sprite::create("UI/LoginScene/Login.png");
@@ -205,9 +203,9 @@ void ChooseCardScene::ChangeTurn() {
 				this->addChild(btn_Kingdom);
 				vecButton.push_back(btn_Kingdom);
 			}
-			vecButton[0]->setPosition(Vec2(visibleSize.width*0.3, visibleSize.height*0.5));
-			vecButton[1]->setPosition(Vec2(visibleSize.width*0.5, visibleSize.height*0.5));
-			vecButton[2]->setPosition(Vec2(visibleSize.width*0.7, visibleSize.height*0.5));
+			vecButton[0]->setPosition(Vec2(visibleSize.width*0.4, visibleSize.height*0.3));
+			vecButton[1]->setPosition(Vec2(visibleSize.width*0.6, visibleSize.height*0.3));
+			vecButton[2]->setPosition(Vec2(visibleSize.width*0.5, visibleSize.height*0.6));
 		}
 	
 		ChooseCardScene::lbl_Turn->setString("Select your Kingdom");
@@ -260,7 +258,7 @@ void ChooseCardScene::ChangeTurn() {
 		{
 			for (auto button : ChooseCardScene::vecButton) {
 				for (auto card : bannedCard) {
-					if (Tool::currentPlayer->id == card.first && button->getName() == card.second) {
+					if (Player::currentPlayer->id == card.first && button->getName() == card.second) {
 						button->setEnabled(false);
 					}
 				}

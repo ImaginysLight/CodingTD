@@ -27,6 +27,7 @@ public:
 	void RunActionNotify(string content);
 
 	void onReceiveEvent(SIOClient* client, const std::string& data);
+	void onReceiveEvent_GetInfoPlayer(SIOClient* client, const std::string& data);
 	/*virtual void onConnect(SIOClient* client);
 	virtual void onMessage(SIOClient* client, const std::string& data);
 	virtual void onClose(SIOClient* client);

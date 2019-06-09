@@ -4,9 +4,9 @@ Helicopter::Helicopter(int line, bool isOwned, int unitId, int playerId)
 {
 	name = "Helicopter";
 	description = "A multi-target helicopter, slow but can attack every line.";
-	goldCost = 120;
+	goldCost = 125;
 	levelRequired = 2;
-	maxHealth = 300;
+	maxHealth = 250;
 	currentHealth = maxHealth;
 	baseAttack = 100;
 	baseDefense = 50;
@@ -16,8 +16,8 @@ Helicopter::Helicopter(int line, bool isOwned, int unitId, int playerId)
 	baseRegeneration = 1;
 
 	upgradeName = "Helicopter 2";
-	upgradeGoldCost = 500;
-	upgradeKnowledgeCost = 4;
+	upgradeGoldCost = 375;
+	upgradeKnowledgeCost = 5;
 	upgradeLevelRequired = 3;
 
 	animationIndexOnTriggerAttack = 5;

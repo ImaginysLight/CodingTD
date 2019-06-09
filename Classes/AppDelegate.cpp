@@ -28,6 +28,9 @@
 #include"RankingScene.h"
 #include"LobbyScene.h"
 #include"ChooseCardScene.h"
+#include"PlayerInformationScene.h"
+#include"TutorialScene.h"
+#include"CardScene.h"
 
 // #define USE_AUDIO_ENGINE 1
 // #define USE_SIMPLE_AUDIO_ENGINE 1

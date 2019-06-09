@@ -4,19 +4,19 @@ ElementalAlien::ElementalAlien(int line, bool isOwned, int unitId, int playerId)
 {
 	name = "Elemental Alien";
 	description = "Its power depend on your element.";
-	goldCost = 100;
+	goldCost = 175;
 	levelRequired = 1;
-	maxHealth = 400;
+	maxHealth = 280;
 	currentHealth = maxHealth;
-	baseAttack = 50;
+	baseAttack = 60;
 	baseDefense = 50;
 	baseMoveSpeed = 70;
-	baseAttackSpeed = 30;
+	baseAttackSpeed = 28;
 	range = 0;
 	baseRegeneration = 1;
 
 	upgradeName = "Elemental Alien 2";
-	upgradeGoldCost = 200;
+	upgradeGoldCost = 250;
 	upgradeKnowledgeCost = 1;
 	upgradeLevelRequired = 2;
 
@@ -24,7 +24,7 @@ ElementalAlien::ElementalAlien(int line, bool isOwned, int unitId, int playerId)
 
 	this->UpdateIngameInfo("Sprites/Elemental Alien/attack/attack (1).png", unitId, playerId, isOwned, "Elemental Alien", line);
 
-	this->element = this->isOwned ? Tool::currentPlayer->elementName : Tool::opponentPlayer->elementName;
+	this->element = this->isOwned ? Player::currentPlayer->elementName : Player::opponentPlayer->elementName;
 	if (element == "Ice") {
 		this->sprite->setColor(IngameObject::elementColor["Ice"]);
 	}

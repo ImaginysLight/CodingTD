@@ -4,14 +4,14 @@ VampireDragon_2::VampireDragon_2(int line, bool isOwned, int unitId, int playerI
 {
 	name = "Vampire Dragon 2";
 	description = "A vampire with fast Regeneration and can restore Health on attack. Can revive upon death.";
-	goldCost = 175;
+	goldCost = 200;
 	levelRequired = 2;
-	maxHealth = 560;
+	maxHealth = 480;
 	currentHealth = maxHealth;
 	baseAttack = 66;
 	baseDefense = 75;
-	baseMoveSpeed = 85;
-	baseAttackSpeed = 50;
+	baseMoveSpeed = 90;
+	baseAttackSpeed = 60;
 	range = 0;
 	baseRegeneration = 15;
 
@@ -72,7 +72,7 @@ void VampireDragon_2::Die()
 
 void VampireDragon_2::Respawn()
 {
-	float percentPower = (35 + (float)this->maxHealth / (1.8 * 5.6)) / 100.0;
+	float percentPower = (30 + this->maxHealth * 0.25) / 100.0;
 	maxHealth = 560 * percentPower;
 	currentHealth = maxHealth;
 	baseAttack = 66 * percentPower;
@@ -89,4 +89,6 @@ void VampireDragon_2::Respawn()
 }
 
 //Blessings From Demeter : On death, it will respawn with power proportional to amount of Health stolen,
-//this ability only trigger one time. (35 + (float)this->maxHealth / (1.8 * 5.6)) / 100.0; (Level 2)
+//this ability only trigger one time.
+//( 40 + 0.1*maxHealth ) % power in Level 1
+//( 30 + 0.25*maxHealth ) % power in Level 2

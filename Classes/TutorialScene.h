@@ -6,7 +6,7 @@
 #include "ui\CocosGUI.h"
 #include <vector>
 #include "Global Class/Tool.h"
-
+#include "LobbyScene.h"
 USING_NS_CC;
 
 using namespace cocos2d::ui;
@@ -28,6 +28,5 @@ public:
 	void onClick(Ref *pSender, cocos2d::ui::Button::Widget::TouchEventType type);
 	vector<Label*> vecLabel;
 	vector<Sprite*> vecSprite;
-	Button* btn_Back, *btn_Next;
-
+	Button* btn_Back, *btn_Next, *btn_Exit;
 };

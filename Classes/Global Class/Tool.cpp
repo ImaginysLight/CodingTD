@@ -6,8 +6,6 @@ using namespace std;
 
 int Tool::defaultTextSize = 20;
 float Tool::currentIngameTime = 0;
-Player* Tool::currentPlayer = new Player(); 
-Player* Tool::opponentPlayer = new Player();
 
 SocketClient* Tool::Socket_Client = new SocketClient();
 
@@ -89,4 +87,26 @@ int Tool::CreateRandomNumber(int begin, int end)
 {
 	srand(time(NULL));
 	return rand() % (end - begin + 1) + begin;
+}
+
+pair<ProgressTimer*, DrawNode*> Tool::CreateBar(int width, int height, Color3B frontColor, Color4F backColor)
+{
+	auto frontBar = ProgressTimer::create(Sprite::create("Sprites/Health Bar.png"));
+	frontBar->setType(ProgressTimer::Type::BAR);
+	frontBar->setBarChangeRate(Vec2(1, 0));
+	frontBar->setMidpoint(Vec2(0, 0));
+	frontBar->setPercentage(100);
+	frontBar->setAnchorPoint(Vec2(0, 0));
+	frontBar->setColor(frontColor);
+	Tool::setNodeSize(frontBar, width, height);
+
+	auto background = DrawNode::create();
+	background->clear();
+	Vec2 rectangle[4];
+	rectangle[0] = Vec2(0, 0);
+	rectangle[1] = Vec2(0, frontBar->getBoundingBox().size.height);
+	rectangle[2] = Vec2(frontBar->getBoundingBox().size.width, frontBar->getBoundingBox().size.height);
+	rectangle[3] = Vec2(frontBar->getBoundingBox().size.width, 0);
+	background->drawPolygon(rectangle, 4, backColor, 1, backColor);
+	return { frontBar,background };
 }

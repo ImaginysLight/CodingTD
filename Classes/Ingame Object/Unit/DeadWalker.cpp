@@ -4,19 +4,19 @@ DeadWalker::DeadWalker(int line, bool isOwned, int unitId, int playerId)
 {
 	name = "Dead Walker";
 	description = "A pretty zombie with decay aura.";
-	goldCost = 120;
+	goldCost = 150;
 	levelRequired = 1;
-	maxHealth = 600;
+	maxHealth = 375;
 	currentHealth = maxHealth;
-	baseAttack = 48;
-	baseDefense = 50;
-	baseMoveSpeed = 65;
+	baseAttack = 60;
+	baseDefense = 30;
+	baseMoveSpeed = 60;
 	baseAttackSpeed = 30;
 	range = 0;
 	baseRegeneration = 2;
 
 	upgradeName = "Dead Walker 2";
-	upgradeGoldCost = 250;
+	upgradeGoldCost = 400;
 	upgradeKnowledgeCost = 1;
 	upgradeLevelRequired = 1;
 

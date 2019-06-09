@@ -4,19 +4,19 @@ LiquidAssassin_2::LiquidAssassin_2(int line, bool isOwned, int unitId, int playe
 {
 	name = "Liquid Assassin 2";
 	description = "An assassin loves to knock out some squishy opponent.";
-	goldCost = 100;
+	goldCost = 175;
 	levelRequired = 1;
-	maxHealth = 400;
+	maxHealth = 525;
 	currentHealth = maxHealth;
-	baseAttack = 48;
-	baseDefense = 60;
-	baseMoveSpeed = 100;
-	baseAttackSpeed = 48;
+	baseAttack = 70;
+	baseDefense = 50;
+	baseMoveSpeed = 80;
+	baseAttackSpeed = 30;
 	range = 0;
 	baseRegeneration = 3;
 
 	upgradeName = "Liquid Assassin 3";
-	upgradeGoldCost = 550;
+	upgradeGoldCost = 600;
 	upgradeKnowledgeCost = 2;
 	upgradeLevelRequired = 3;
 
@@ -54,7 +54,7 @@ void LiquidAssassin_2::Attack(vector<BaseUnitClass*>& targets)
 {
 	if (this->isDeathStrikeReady) {
 		float currentAttack = this->attack;
-		this->attack += 175;
+		if (targets[0]->description != "Kingdom") this->attack += 175;
 		this->cooldownTime = Tool::currentIngameTime + 5;
 		this->isDeathStrikeReady = false;
 		this->root->runAction(MoveTo::create(0.5, targets[0]->root->getPosition()));

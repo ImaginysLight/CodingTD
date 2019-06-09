@@ -9,6 +9,7 @@ using namespace std;
 class HotheadedGunner : public BaseUnitClass {
 public:
 	HotheadedGunner(int line, bool isOwned, int unitId, int playerId);
+	void onDamageReceive(DamageReceive dmg) override;
 	~HotheadedGunner();
 
 	

@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "cocos2d.h"
 #include"Global Class/Tool.h"
+#include"Global Class/Player.h"
 #include"LobbyScene.h"
 #include"GameScene.h"
 
@@ -20,6 +21,7 @@ public:
 	Size visibleSize;
 	int timer = 0, turn = 0, counter = 0;
 	Label* lbl_Notify, *lbl_Turn, *lbl_Cooldown, *lbl_CurrentPlayerPick, *lbl_OpponentPlayerPick;
+	Vec2 currentPlayerPosition, opponentPlayerPosition;
 	EditBox *editBox_Username, *editBox_Password;
 	Button *btn_Login, *btn_Register;
 	vector<Button*> vecButton;

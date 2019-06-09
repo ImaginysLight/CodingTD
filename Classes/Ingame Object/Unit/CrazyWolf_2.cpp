@@ -4,19 +4,19 @@ CrazyWolf_2::CrazyWolf_2(int line, bool isOwned, int unitId, int playerId)
 {
 	name = "Crazy Wolf 2";
 	description = "A crazy beast with great resillience.";
-	goldCost = 100;
+	goldCost = 150;
 	levelRequired = 2;
-	maxHealth = 350;
+	maxHealth = 400;
 	currentHealth = maxHealth;
-	baseAttack = 30;
-	baseDefense = 50;
+	baseAttack = 50;
+	baseDefense = 70;
 	baseMoveSpeed = 100;
 	baseAttackSpeed = 40;
 	range = 0;
 	baseRegeneration = 7;
 
 	upgradeName = "Crazy Wolf 3";
-	upgradeGoldCost = 450;
+	upgradeGoldCost = 650;
 	upgradeKnowledgeCost = 2;
 	upgradeLevelRequired = 3;
 

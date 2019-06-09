@@ -4,9 +4,9 @@ PolarBear::PolarBear(int line, bool isOwned, int unitId, int playerId)
 {
 	name = "Polar Bear";
 	description = "A diehard unit who can slow down attackers and stun on attack.";
-	goldCost = 280;
+	goldCost = 300;
 	levelRequired = 2;
-	maxHealth = 1456;
+	maxHealth = 1200;
 	currentHealth = maxHealth;
 	baseAttack = 60;
 	baseDefense = 75;
@@ -16,7 +16,7 @@ PolarBear::PolarBear(int line, bool isOwned, int unitId, int playerId)
 	baseRegeneration = 3;
 
 	upgradeName = "Polar Bear 2";
-	upgradeGoldCost = 500;
+	upgradeGoldCost = 600;
 	upgradeKnowledgeCost = 2;
 	upgradeLevelRequired = 3;
 

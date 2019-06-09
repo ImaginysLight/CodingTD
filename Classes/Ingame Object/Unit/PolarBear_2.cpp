@@ -4,19 +4,19 @@ PolarBear_2::PolarBear_2(int line, bool isOwned, int unitId, int playerId)
 {
 	name = "Polar Bear 2";
 	description = "A diehard unit who can slow down attackers and stun on attack.";
-	goldCost = 280;
+	goldCost = 300;
 	levelRequired = 2;
-	maxHealth = 1680;
+	maxHealth = 1400;
 	currentHealth = maxHealth;
 	baseAttack = 40;
 	baseDefense = 100;
-	baseMoveSpeed = 45;
+	baseMoveSpeed = 40;
 	baseAttackSpeed = 30;
 	range = 0;
 	baseRegeneration = 4;
 
 	upgradeName = "Polar Bear 3";
-	upgradeGoldCost = 750;
+	upgradeGoldCost = 900;
 	upgradeKnowledgeCost = 3;
 	upgradeLevelRequired = 3;
 

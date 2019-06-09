@@ -6,6 +6,8 @@ using namespace cocos2d::network;
 using namespace cocos2d::ui;
 
 #include "ui/CocosGUI.h"
+#include "LobbyScene.h"
+#include "MyRoomScene.h"
 
 USING_NS_CC;
 //USING_NS_CC_EXT; 
@@ -21,9 +23,11 @@ public:
 	Size visibleSize;
 	Label* lbl_Notify;
 	EditBox *editBox_Username, *editBox_Password;
-	Button *btn_Login, *btn_Register;
-	ScrollView *scrollView;
+	Button *btn_Login, *btn_Register, *btn_Exit;
+	ScrollView *scrollView_ListRoom;
 
+	Node* CreateRow(string stt, string name, string id);
+	Node* CreateRow_Default();
 	void SetupGUI();
 	void btn_Click(Ref *pSender, cocos2d::ui::Button::Widget::TouchEventType type);
 	void RunActionNotify(string content);

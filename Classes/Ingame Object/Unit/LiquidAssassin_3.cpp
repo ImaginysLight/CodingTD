@@ -4,16 +4,16 @@ LiquidAssassin_3::LiquidAssassin_3(int line, bool isOwned, int unitId, int playe
 {
 	name = "Liquid Assassin 3";
 	description = "An assassin loves to knock out some squishy opponent.";
-	goldCost = 100;
+	goldCost = 175;
 	levelRequired = 1;
-	maxHealth = 400;
+	maxHealth = 525;
 	currentHealth = maxHealth;
-	baseAttack = 55;
-	baseDefense = 75;
+	baseAttack = 77;
+	baseDefense = 70;
 	baseMoveSpeed = 100;
-	baseAttackSpeed = 45;
+	baseAttackSpeed = 30;
 	range = 0;
-	baseRegeneration = 4;
+	baseRegeneration = 5;
 
 	delayTimeAfterAttack = 0;
 	animationIndexOnTriggerAttack = 9;
@@ -49,7 +49,7 @@ void LiquidAssassin_3::Attack(vector<BaseUnitClass*>& targets)
 {
 	if (this->isDeathStrikeReady) {
 		float currentAttack = this->attack;
-		this->attack += 250;
+		if (targets[0]->description != "Kingdom") this->attack += 250;
 		this->cooldownTime = Tool::currentIngameTime + 5;
 		this->isDeathStrikeReady = false;
 		this->root->runAction(MoveTo::create(0.5, targets[0]->root->getPosition()));

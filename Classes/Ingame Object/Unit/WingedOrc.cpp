@@ -6,17 +6,17 @@ WingedOrc::WingedOrc(int line, bool isOwned, int unitId, int playerId)
 	description = "A short-ranged bird, useful for 'rat' Kingdom in early game, and become fucking annoyed for melee unit in late game.";
 	goldCost = 125;
 	levelRequired = 1;
-	maxHealth = 500;
+	maxHealth = 375;
 	currentHealth = maxHealth;
-	baseAttack = 48;
-	baseDefense = 50;
+	baseAttack = 42;
+	baseDefense = 30;
 	baseMoveSpeed = 90;
 	baseAttackSpeed = 25;
 	range = 175;
 	baseRegeneration = 1;
 
 	upgradeName = "Winged Orc 2";
-	upgradeGoldCost = 300;
+	upgradeGoldCost = 350;
 	upgradeKnowledgeCost = 1;
 	upgradeLevelRequired = 2;
 

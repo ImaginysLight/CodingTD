@@ -4,10 +4,11 @@
 #include"TutorialScene.h"
 #include"LoginScene.h"
 //#include "Object\SocketClient.h" 
-#include "GameScene.h";
+#include "GameScene.h"
 #include "RankingScene.h"
-#include "ListRoomScene.h";
-#include"ChooseCardScene.h"
+#include "ListRoomScene.h"
+#include "ChooseCardScene.h"
+#include"PlayerInformationScene.h"
 
 #include <network/SocketIO.h>
 using namespace cocos2d::network;
@@ -25,14 +26,13 @@ public:
 
 	Size visibleSize;
 	Label* lbl_Notify;
-	Button *btn_Extend, *btn_Play, *btn_Rank, *btn_Tutorial;
+	Button *btn_Extend, *btn_Play, *btn_Rank, *btn_Tutorial, *btn_Logout,*btn_Info;
 
 	void SetupGUI();
 	void btn_Click(Ref *pSender, cocos2d::ui::Button::Widget::TouchEventType type);
 	void RunActionNotify(string content);
 
 	void findTheOpponent(SIOClient* client, const std::string& data);
-	void findInforTheOpponent(SIOClient* client, const std::string& data);
 	/*virtual void onConnect(SIOClient* client);
 	virtual void onMessage(SIOClient* client, const std::string& data);
 	virtual void onClose(SIOClient* client);

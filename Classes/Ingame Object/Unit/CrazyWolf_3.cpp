@@ -4,14 +4,14 @@ CrazyWolf_3::CrazyWolf_3(int line, bool isOwned, int unitId, int playerId)
 {
 	name = "Crazy Wolf 3";
 	description = "A crazy beast with great resillience.";
-	goldCost = 100;
+	goldCost = 150;
 	levelRequired = 2;
-	maxHealth = 400;
+	maxHealth = 360;
 	currentHealth = maxHealth;
-	baseAttack = 75;
-	baseDefense = 75;
+	baseAttack = 50;
+	baseDefense = 100;
 	baseMoveSpeed = 115;
-	baseAttackSpeed = 40;
+	baseAttackSpeed = 45;
 	range = 0;
 	baseRegeneration = 10;
 

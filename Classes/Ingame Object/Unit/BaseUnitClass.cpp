@@ -13,7 +13,6 @@ BaseUnitClass* BaseUnitClass::GetUnitById(int id)
 	return nullptr;
 }
 
-
 bool BaseUnitClass::SortByHealth(BaseUnitClass* unit1, BaseUnitClass* unit2) {
 	return (unit1->currentHealth < unit2->currentHealth);
 }
@@ -23,12 +22,8 @@ bool BaseUnitClass::SortStatus(StatusReceive stt1, StatusReceive stt2) {
 }
 
 void BaseUnitClass::UpdateIngameInfo(string spriteName, int unitId, int ownerPlayerId, bool isOwned, string animateName, int line) {
-	attack = baseAttack;
-	defense = baseDefense;
-	attackSpeed = baseAttackSpeed;
-	moveSpeed = baseMoveSpeed;
-	regeneration = baseRegeneration;
 
+	//Thông số trong game
 	this->isOwned = isOwned;
 	this->ownerPlayerId = ownerPlayerId;
 	this->unitId = unitId;
@@ -38,6 +33,23 @@ void BaseUnitClass::UpdateIngameInfo(string spriteName, int unitId, int ownerPla
 	sprite = Sprite::create(spriteName);		
 	sprite->setAnchorPoint(Vec2(0, 0));
 	sprite->setPositionY(sprite->getPositionY() - 50);
+	root->addChild(sprite, 1);
+
+	//Friendship Level
+	if (this->isOwned) this->friendshipLevel = Player::currentPlayer->friendshipLevel[this->animateName];
+	else this->friendshipLevel = Player::opponentPlayer->friendshipLevel[this->animateName];
+	this->ExcuteFriendshipEffect();
+
+	//Cập nhật thông số cơ bản
+	attack = baseAttack;
+	defense = baseDefense;
+	attackSpeed = baseAttackSpeed;
+	moveSpeed = baseMoveSpeed;
+	regeneration = baseRegeneration;
+	currentHealth = maxHealth;
+
+
+	//Thanh máu
 	healthBar = ProgressTimer::create(Sprite::create("Sprites/Health Bar.png"));
 	healthBar->setType(ProgressTimer::Type::BAR);
 	healthBar->setBarChangeRate(Vec2(1, 0));
@@ -47,9 +59,7 @@ void BaseUnitClass::UpdateIngameInfo(string spriteName, int unitId, int ownerPla
 	if (this->isOwned) this->healthBar->setColor(Color3B::GREEN);
 	else  this->healthBar->setColor(Color3B::RED);
 	Tool::setNodeSize(healthBar, sprite->getBoundingBox().size.width*0.35, 8);
-	root->addChild(sprite, 1);
 	root->addChild(healthBar, 1);
-
 	auto rectNode = DrawNode::create();
 	rectNode->clear();
 	Vec2 rectangle[4];
@@ -57,13 +67,13 @@ void BaseUnitClass::UpdateIngameInfo(string spriteName, int unitId, int ownerPla
 	rectangle[1] = Vec2(0, healthBar->getBoundingBox().size.height);
 	rectangle[2] = Vec2(healthBar->getBoundingBox().size.width, healthBar->getBoundingBox().size.height);
 	rectangle[3] = Vec2(healthBar->getBoundingBox().size.width, 0);
-
 	Color4F grey(0.69, 0.69, 0.69, 0.33);
 	rectNode->drawPolygon(rectangle, 4, grey, 1, grey);
 	rectNode->setPosition(Vec2(healthBar->getPositionX() -  healthBar->getBoundingBox().size.width / 2,
 		healthBar->getPositionY() - healthBar->getBoundingBox().size.height / 2));
 	this->root->addChild(rectNode);
 
+	//Vị trí xuất hiện
 	string spawnPosition = this->isOwned ? "1_" : "2_";
 	spawnPosition += to_string(line);
 	root->setPosition(IngameObject::spawnPoint[spawnPosition]);
@@ -71,8 +81,8 @@ void BaseUnitClass::UpdateIngameInfo(string spriteName, int unitId, int ownerPla
 		root->setRotation3D(Vec3(0, 180, 0));
 		this->healthBar->setMidpoint(Vec2(1, 0));
 	}
-	
-	//Scale theo level
+
+	//Scale độ lớn theo level
 	this->root->setScale(0.9);
 	if (name.find("2") != std::string::npos) this->root->setScale(1);
 	else if (name.find("3") != std::string::npos) this->root->setScale(1.1);
@@ -285,9 +295,9 @@ void BaseUnitClass::onDamageReceive(DamageReceive dmg) {
 		Sprite* sp_Animation = Sprite::create("Sprites/Blank Image.png");
 		//Chỉnh màu animation
 		if (this->isOwned)
-			sp_Animation->setColor(IngameObject::elementColor[Tool::opponentPlayer->elementName]);
+			sp_Animation->setColor(IngameObject::elementColor[Player::opponentPlayer->elementName]);
 		else
-			sp_Animation->setColor(IngameObject::elementColor[Tool::currentPlayer->elementName]);
+			sp_Animation->setColor(IngameObject::elementColor[Player::currentPlayer->elementName]);
 
 		sp_Animation->setPosition(this->sprite->getBoundingBox().size / 2);
 		this->sprite->addChild(sp_Animation);
@@ -314,6 +324,109 @@ void BaseUnitClass::ClearStatusStat(string statusInfluence)
 	}
 	if (statusInfluence == "AttackSpeed") this->attackSpeed = baseAttackSpeed;
 	if (statusInfluence == "Regeneration") this->regeneration = baseRegeneration;
+}
+
+void BaseUnitClass::ExcuteFriendshipEffect()
+{
+	if (this->animateName == "Frost Wyvern") {
+		if (this->friendshipLevel > 0) this->maxHealth += 40;
+		if (this->friendshipLevel > 1) this->baseDefense += 10;
+		if (this->friendshipLevel > 2) this->range += 50;
+		if (this->friendshipLevel > 3) this->maxHealth += 50;
+		if (this->friendshipLevel > 4) this->baseAttackSpeed += 5;
+	}
+	else if (this->animateName == "Polar Bear") {
+		if (this->friendshipLevel > 0) this->maxHealth += 50;
+		if (this->friendshipLevel > 1) this->baseAttack += 4;
+		if (this->friendshipLevel > 2) this->baseDefense += 25;
+		if (this->friendshipLevel > 3) this->baseAttack += 6;
+		if (this->friendshipLevel > 4) this->maxHealth += 70;
+	}
+	else if (this->animateName == "Volcarona") {
+		if (this->friendshipLevel > 0) this->baseAttack += 5;
+		if (this->friendshipLevel > 1) this->maxHealth += 25;
+		if (this->friendshipLevel > 2) this->range += 50;
+		if (this->friendshipLevel > 3) this->baseAttack += 5;
+		if (this->friendshipLevel > 4) this->baseAttackSpeed += 5;
+	}
+	else if (this->animateName == "Enraged Ursa") {
+		if (this->friendshipLevel > 0) this->maxHealth += 25;
+		if (this->friendshipLevel > 1) this->baseAttackSpeed += 2;
+		if (this->friendshipLevel > 2) this->baseMoveSpeed += 10;
+		if (this->friendshipLevel > 3) this->baseAttackSpeed += 4;
+		if (this->friendshipLevel > 4) this->baseDefense += 20;
+	}
+	else if (this->animateName == "Poisonous Butterfly") {
+		if (this->friendshipLevel > 0) this->baseAttackSpeed += 2;
+		if (this->friendshipLevel > 1) this->maxHealth += 28;
+		if (this->friendshipLevel > 2) this->baseAttackSpeed += 3;
+		if (this->friendshipLevel > 3) this->maxHealth += 32;
+		if (this->friendshipLevel > 4) this->baseAttackSpeed += 5;
+	}
+	else if (this->animateName == "Vampire Dragon") {
+		if (this->friendshipLevel > 0) this->baseAttack += 5;
+		if (this->friendshipLevel > 1) this->baseRegeneration += 2;
+		if (this->friendshipLevel > 2) this->baseAttackSpeed += 8;
+		if (this->friendshipLevel > 3) this->baseRegeneration += 3;
+		if (this->friendshipLevel > 4) this->baseAttack += 9;
+	}
+	else if (this->animateName == "Hotheaded Gunner") {
+		if (this->friendshipLevel > 0) this->baseAttack += 2;
+		if (this->friendshipLevel > 1) this->maxHealth += 25;
+		if (this->friendshipLevel > 2) this->baseAttack += 3;
+		if (this->friendshipLevel > 3) this->maxHealth += 35;
+		if (this->friendshipLevel > 4) this->baseAttack += 5;
+	}
+	else if (this->animateName == "UFO Driver") {
+		if (this->friendshipLevel > 0) this->maxHealth += 50;
+		if (this->friendshipLevel > 1) this->baseAttack += 2;
+		if (this->friendshipLevel > 2) this->baseDefense += 8;
+		if (this->friendshipLevel > 3) this->baseAttackSpeed += 2;
+		if (this->friendshipLevel > 4) this->baseAttack += 3;
+	}
+	else if (this->animateName == "Winged Orc") {
+		if (this->friendshipLevel > 0) this->baseAttackSpeed += 2;
+		if (this->friendshipLevel > 1) this->maxHealth += 40;
+		if (this->friendshipLevel > 2) this->baseAttackSpeed += 3;
+		if (this->friendshipLevel > 3) this->maxHealth += 40;
+		if (this->friendshipLevel > 4) this->baseAttackSpeed += 5;
+	}
+	else if (this->animateName == "Helicopter") {
+		if (this->friendshipLevel > 0) this->maxHealth += 28;
+		if (this->friendshipLevel > 1) this->baseAttackSpeed += 2;
+		if (this->friendshipLevel > 2) this->maxHealth += 42;
+		if (this->friendshipLevel > 3) this->baseAttackSpeed += 2;
+		if (this->friendshipLevel > 4) this->baseDefense += 10;
+	}
+	else if (this->animateName == "Crazy Wolf") {
+		if (this->friendshipLevel > 0) this->baseRegeneration += 1;
+		if (this->friendshipLevel > 1) this->baseAttack += 4;
+		if (this->friendshipLevel > 2) this->baseRegeneration += 1;
+		if (this->friendshipLevel > 3) this->baseAttack += 6;
+		if (this->friendshipLevel > 4) this->baseRegeneration += 2;
+	}
+	else if (this->animateName == "Dead Walker") {
+		if (this->friendshipLevel > 0) this->maxHealth += 40;
+		if (this->friendshipLevel > 1) this->baseDefense += 4;
+		if (this->friendshipLevel > 2) this->maxHealth += 50;
+		if (this->friendshipLevel > 3) this->baseDefense += 6;
+		if (this->friendshipLevel > 4) this->maxHealth += 60;
+	}
+	else if (this->animateName == "Liquid Assassin") {
+		if (this->friendshipLevel > 0) this->baseAttack += 6;
+		if (this->friendshipLevel > 1) this->maxHealth += 30;
+		if (this->friendshipLevel > 2) this->baseDefense += 5;
+		if (this->friendshipLevel > 3) this->maxHealth += 45;
+		if (this->friendshipLevel > 4) this->baseAttack += 9;
+	}
+	else if (this->animateName == "Elemental Alien") {
+		if (this->friendshipLevel > 0) this->baseDefense += 5;
+		if (this->friendshipLevel > 1) this->maxHealth += 25;
+		if (this->friendshipLevel > 2) this->baseAttackSpeed += 2;
+		if (this->friendshipLevel > 3) this->maxHealth += 35;
+		if (this->friendshipLevel > 4) this->baseAttackSpeed += 5;
+	}
+
 }
 
 StatusReceive::StatusReceive(string statusName, string statusInfluence, float value, float releaseStatusTime, int statusOrder)
@@ -398,6 +511,7 @@ void BaseUnitClass::onStatusTrigger(int id, StatusReceive &stt) {
 		thisUnit->defense *= stt.value;
 	}
 }
+
 
 void BaseUnitClass::ProcessSpecial(int id, DamageReceive &dmg) {
 	auto thisUnit = BaseUnitClass::GetUnitById(id);

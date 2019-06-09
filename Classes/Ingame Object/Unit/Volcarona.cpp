@@ -4,11 +4,11 @@ Volcarona::Volcarona(int line, bool isOwned, int unitId, int playerId)
 {
 	name = "Volcarona";
 	description = "Squishy ranger but high output damage and Fire Armor buff.";
-	goldCost = 120;
+	goldCost = 125;
 	levelRequired = 2;
-	maxHealth = 448;
+	maxHealth = 400;
 	currentHealth = maxHealth;
-	baseAttack = 100;
+	baseAttack = 80;
 	baseDefense = 25;
 	baseMoveSpeed = 65;
 	baseAttackSpeed = 30;
@@ -16,9 +16,9 @@ Volcarona::Volcarona(int line, bool isOwned, int unitId, int playerId)
 	baseRegeneration = 3;
 
 	upgradeName = "Volcarona 2";
-	upgradeGoldCost = 700;
+	upgradeGoldCost = 350;
 	upgradeKnowledgeCost = 1;
-	upgradeLevelRequired = 3;
+	upgradeLevelRequired = 2;
 
 	animationIndexOnTriggerAttack = 5;
 

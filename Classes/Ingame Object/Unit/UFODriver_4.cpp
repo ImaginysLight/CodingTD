@@ -4,14 +4,14 @@ UFODriver_4::UFODriver_4(int line, bool isOwned, int unitId, int playerId)
 {
 	name = "UFO Driver 4";
 	description = "An absent-minded driver, sometimes pressing the wrong button.";
-	goldCost = 60;
+	goldCost = 75;
 	levelRequired = 1;
-	maxHealth = 475;
+	maxHealth = 200;
 	currentHealth = maxHealth;
-	baseAttack = 64;
-	baseDefense = 0;
+	baseAttack = 45;
+	baseDefense = 40;
 	baseMoveSpeed = 75;
-	baseAttackSpeed = 45;
+	baseAttackSpeed = 40;
 	range = 450;
 	baseRegeneration = 3;
 
@@ -24,15 +24,15 @@ UFODriver_4::~UFODriver_4()
 {
 }
 
-//Wrong Button : each 6 / 5 / 4 / 3th attack, the driver presses the wrong button, causing the next attack
-//to increase damage by 1.4 / 2.4 / 3.1 / 4.6, but the UFO runs of energy in 6 / 4 / 2 / 6 second.
+//each 5 / 4 / 4 / 3th attack, the driver presses the wrong button, 
+//causing the next attack to increase damage by 2 / 2.4 / 2.8 / 3, but the UFO runs of energy in 3.5 / 2.5 / 2 / 2 second.
 void UFODriver_4::Attack(vector<BaseUnitClass*>& targets)
 {
 	this->numOfAttack++;
 	float currentAttack = this->attack;
 	if (numOfAttack == 3) {
 		numOfAttack = 0;
-		this->attack *= 4.6;
+		this->attack *= 3;
 		auto label = Tool::CreateLabel("Wrong Button");
 		label->runAction(Sequence::create(MoveBy::create(1, Vec2(0, 40)), RemoveSelf::create(), nullptr));
 		if (this->isOwned) label->setRotation3D(Vec3(0, 180, 0));
@@ -43,6 +43,6 @@ void UFODriver_4::Attack(vector<BaseUnitClass*>& targets)
 
 	this->attack = currentAttack;
 	if (numOfAttack == 0) {
-		this->hardEffect.push_back(HardEffect("Stun", Tool::currentIngameTime, Tool::currentIngameTime + 6));
+		this->hardEffect.push_back(HardEffect("Stun", Tool::currentIngameTime, Tool::currentIngameTime + 2));
 	}
 }

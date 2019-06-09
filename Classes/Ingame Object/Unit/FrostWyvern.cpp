@@ -3,14 +3,14 @@
 FrostWyvern::FrostWyvern(int line, bool isOwned, int unitId, int playerId)
 {
 	name = "Frost Wyvern";
-	description = "Slow down all enemies on the line, can launch Frost Nova which pierce Defense to counter low defense unit.";
-	goldCost = 140;
+	description = "It slows enemy on the line, can launch Frost Nova which pierce Defense to counter low defense unit.";
+	goldCost = 150;
 	levelRequired = 1;
-	maxHealth = 700;
+	maxHealth = 300;
 	currentHealth = maxHealth;
 	baseAttack = 60;
 	baseDefense = 50;
-	baseMoveSpeed = 45;
+	baseMoveSpeed = 60;
 	baseAttackSpeed = 20;
 	range = 200;
 	baseRegeneration = 2;

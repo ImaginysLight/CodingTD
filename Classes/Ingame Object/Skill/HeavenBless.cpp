@@ -14,6 +14,7 @@ HeavenBless::HeavenBless(int playerId)
 			auto sp = Sprite::create("Sprites/Heaven Bless/heal/heal (1).png");
 			ally->root->addChild(sp);
 			sp->runAction(Sequence::create(IngameObject::animate["Heaven Bless_heal"]->clone(), RemoveSelf::create(), nullptr));
+			sp->setPosition(Vec2(ally->sprite->getBoundingBox().size / 2));
 		}
 	}
 

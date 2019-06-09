@@ -9,7 +9,7 @@ HellFire::HellFire(int playerId)
 	this->expiredTime = Tool::currentIngameTime + 5;
 	this->isAddedChild = true;
 	BaseSkillClass::AllIngameSkill_Vector.push_back(this);
-	IngameObject::animate["Hell Fire_fire"]->setDuration(1.8);
+	IngameObject::animate["Hell Fire_fire"]->setDuration(2.3);
 	//Animation
 	for (int i = 0; i < 20; i++) {
 		auto sp1 = Sprite::create("Sprites/Hell Fire/fire/fire (1).png");

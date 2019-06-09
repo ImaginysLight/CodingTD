@@ -4,13 +4,13 @@ PolarBear_3::PolarBear_3(int line, bool isOwned, int unitId, int playerId)
 {
 	name = "Polar Bear 3";
 	description = "A diehard unit who can slow down attackers and stun on attack.";
-	goldCost = 280;
+	goldCost = 300;
 	levelRequired = 2;
-	maxHealth = 1750;
+	maxHealth = 1500;
 	currentHealth = maxHealth;
 	baseAttack = 30;
 	baseDefense = 150;
-	baseMoveSpeed = 50;
+	baseMoveSpeed = 45;
 	baseAttackSpeed = 40;
 	range = 0;
 	baseRegeneration = 5;

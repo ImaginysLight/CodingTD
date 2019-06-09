@@ -1,5 +1,4 @@
 ﻿#pragma once
-#include"Player.h"
 #include"Question.h"
 #include"cocos2d.h"
 #include"ui\CocosGUI.h"
@@ -27,7 +26,6 @@ static class Tool{
 public:
 	//Các biến toàn cục
 	static SocketClient* Socket_Client;
-	static Player* currentPlayer, *opponentPlayer;
 	static int defaultTextSize; // Để thay đổi độ lớn text hàng loạt cho dễ
 	static float currentIngameTime; //  Thời gian hiện tại trong game
 
@@ -39,6 +37,7 @@ public:
 	//Các hàm tạo node tổng quát
 	static Label* CreateLabel(string content, int size = Tool::defaultTextSize, Color4B color = Color4B::WHITE, CCTextAlignment align = CCTextAlignment::LEFT);
 	static Button* CreateButtonWithoutSprite(string name, string titleText, int size = Tool::defaultTextSize, Color3B color = Color3B::WHITE);
+	static pair<ProgressTimer*, DrawNode*> CreateBar(int width, int height, Color3B frontColor, Color4F backColor = Color4F(0.69, 0.69, 0.69, 0.33));
 
 	//Xử lý size
 	static void setNodeSize(Node* node, int width, int height);

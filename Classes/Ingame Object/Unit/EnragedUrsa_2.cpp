@@ -4,14 +4,14 @@ EnragedUrsa_2::EnragedUrsa_2(int line, bool isOwned, int unitId, int playerId)
 {
 	name = "Enraged Ursa 2";
 	description = "A heavy frenzy warrior will burn everything to hell with aoe attack.";
-	goldCost = 230;
+	goldCost = 250;
 	levelRequired = 2;
-	maxHealth = 920;
+	maxHealth = 625;
 	currentHealth = maxHealth;
-	baseAttack = 264;
-	baseDefense = 25;
-	baseMoveSpeed = 75;
-	baseAttackSpeed = 25;
+	baseAttack = 250;
+	baseDefense = 30;
+	baseMoveSpeed = 70;
+	baseAttackSpeed = 24;
 	range = 0;
 	baseRegeneration = 3;
 

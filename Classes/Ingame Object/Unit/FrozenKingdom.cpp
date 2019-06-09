@@ -4,10 +4,10 @@ FrozenKingdom::FrozenKingdom(int line, bool isOwned, int unitId, int playerId)
 {
 	name = "Frozen Kingdom";
 	description = "Kingdom";
-	maxHealth = 1000;
+	maxHealth = 2000;
 	currentHealth = maxHealth;
-	baseAttack = 80;
-	baseDefense = 100;
+	baseAttack = 90;
+	baseDefense = 75;
 	baseAttackSpeed = 30;
 	range = 400;
 	baseRegeneration = 1;
@@ -19,6 +19,8 @@ FrozenKingdom::FrozenKingdom(int line, bool isOwned, int unitId, int playerId)
 	this->UpdateIngameInfo("Sprites/Frozen Kingdom/default.png", unitId, playerId, isOwned, "Frozen Kingdom", line);
 	if (this->isOwned) this->root->setPosition(Vec2(50, 50));
 	else this->root->setPosition(Vec2(3050,50));
+
+	Tool::setNodeSize(this->sprite, 315, 300);
 }
 
 FrozenKingdom::~FrozenKingdom()
@@ -164,7 +166,7 @@ void FrozenKingdom::Upgrade()
 		description = "Kingdom";
 		maxHealth = 1750;
 		currentHealth = maxHealth * currentHealthPercent;
-		baseAttack = 96;
+		baseAttack = 115;
 		baseDefense = 100;
 		baseAttackSpeed = 30;
 		range = 500;
@@ -184,12 +186,12 @@ void FrozenKingdom::Upgrade()
 		float currentHealthPercent = (float)currentHealth / maxHealth;
 		name = "Frozen Kingdom 3";
 		description = "Kingdom";
-		maxHealth = 1750;
+		maxHealth = 1500;
 		currentHealth = maxHealth * currentHealthPercent;
-		baseAttack = 120;
+		baseAttack = 140;
 		baseDefense = 150;
 		baseAttackSpeed = 30;
-		range = 575;
+		range = 600;
 		baseRegeneration = 3;
 
 		upgradeName = "";

@@ -26,6 +26,10 @@ bool TutorialScene::init()
 		this->addChild(lbl_Tutorial);
 	}
 
+	auto sp_Background = Sprite::create("UI/LoginScene/background1.png");
+	sp_Background->setPosition(visibleSize / 2);
+	this->addChild(sp_Background, -1);
+
 	// Button ← →
 	{
 		btn_Back = Button::create();
@@ -45,6 +49,12 @@ bool TutorialScene::init()
 		btn_Next->addTouchEventListener(CC_CALLBACK_2(TutorialScene::onClick, this));
 		btn_Next->setName("btn_Next");
 		this->addChild(btn_Next);
+
+		btn_Exit = Button::create("UI/LobbyScene/btn_Exit_nomal.png", "UI/LobbyScene/btn_Exit_select.png");
+		btn_Exit->setPosition(Vec2(visibleSize.width*0.15, visibleSize.height * 0.1));
+		btn_Exit->addTouchEventListener(CC_CALLBACK_2(TutorialScene::onClick, this));
+		btn_Exit->setName("btn_Exit");
+		this->addChild(btn_Exit);
 	}
 
 	// Thông tin hướng dẫn
@@ -77,6 +87,7 @@ bool TutorialScene::init()
 		}
 
 	}
+
 
 	//Set thông số cho các Label và Sprite trong Tutorial
 	{
@@ -213,6 +224,10 @@ void TutorialScene::onClick(Ref * sender, Widget::TouchEventType type)
 					MoveTo::create(1, Vec2(visibleSize.width / 2, visibleSize.height*0.5)),
 				nullptr));
 			}
+		}
+		else if (name == "btn_Exit")
+		{
+			Director::getInstance()->replaceScene(LobbyScene::createScene());
 		}
 	}
 

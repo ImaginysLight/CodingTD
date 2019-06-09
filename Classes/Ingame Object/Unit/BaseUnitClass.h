@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include "cocos2d.h"
-#include"../../Global Class/Tool.h"
+#include"../../Global Class/Player.h"
 #include"../IngameObject.h" 
 #include"../Skill/BaseSkillClass.h"
 class BaseSkillClass;
@@ -40,6 +40,7 @@ public:
 	static bool SortByHealth(BaseUnitClass* unit1, BaseUnitClass* unit2);
 	static bool SortStatus(StatusReceive stt1, StatusReceive stt2);
 	static BaseUnitClass* GetUnitById(int id);
+	static pair<ProgressTimer*, DrawNode*> CreateBar(int width, int height, Color3B frontColor, Color4F backColor);
 	static int Unit_Id_Counter;
 	static void ProcessSpecial(int id, DamageReceive &dmg); //Xử lý các thứ ngoại lệ
 	static void onStatusTrigger(int id, StatusReceive &stt);
@@ -62,6 +63,7 @@ public:
 	float range = 0;
 	float baseRegeneration = 0;
 	float regeneration = 0;
+	int friendshipLevel = 0;
 
 	//Các thông số nâng cấp
 	string upgradeName = "";
@@ -112,6 +114,7 @@ public:
 	//Các hiệu ứng trên unit liên quan tới stat, như trừ damage, tăng hồi máu, slow speed....
 	vector<StatusReceive> statusReceive;
 	void ClearStatusStat(string statusInfluence);
+	void ExcuteFriendshipEffect();
 	virtual void ReprocessAllStatus(string influence);
 	virtual void ApplyStatus(StatusReceive stt);
 	

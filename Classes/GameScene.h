@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "cocos2d.h"
+#include"CardScene.h"
 #include"Global Class/Tool.h"
 #include"network/HttpClient.h"
 #include"Ingame Object/IngameObject.h"
@@ -7,14 +8,12 @@
 #include"Ingame Object/ObjectConstructor.h"
 #include"Ingame Object/SkillConstructor.h"
 #include"Ingame Object/Skill/BaseSkillClass.h"
+#include"Global Class/Player.h"
+#include"Global Class/Trophy.h"
 USING_NS_CC;
 class GameScene : public cocos2d::Scene
 {
 public:
-	static vector<string> playerPickedUnit;
-	static vector<string> chatBoxContent;
-	static void ClearStaticVariables();
-
 	Size visibleSize;
 	Node* staticUI, *questionTable, *buyingBar, *unitDetails, *upgradeTable;
 	Label* lbl_Notify;
@@ -22,10 +21,16 @@ public:
 
 	//Thông số trong game của người chơi
 	struct IngamePlayer {
-		float gold = 300;
-		float energy = 200;
+		float gold = 200;
+		float energy = 0;
 		float energyCap = 100;
-		int knowledge = 5;
+		int knowledge = 1;
+		float Gps = 5;
+		float Eps = 1;
+		float correctAnswerGoldRate = 1.0;
+		float wrongAnswerGoldRate = 1.0;
+		float defeatGoldRate = 0.1;
+		float defeatEnergyRate = 0;
 		int numOfCorrectQuestion = 0;
 		int numOfWrongQuestion = 0;
 		int numOfEnemyDefeated = 0;
@@ -78,24 +83,15 @@ public:
 	//Khởi tạo object
 	void InitializeIngameObject(string objectName, int line, int playerId);
 
+	//Endgame
+	void Endgame(bool isVictorious);
+
 	//Xem thông tin unit khi click
 	BaseUnitClass* choosingUnit = new BaseUnitClass();
-	struct UnitDetails {
-		Node* details;
-		Label* lbl_Name;
-		Label* lbl_Health;
-		Label* lbl_Attack;
-		Label* lbl_Defense;
-		Label* lbl_AttackSpeed;
-		Label* lbl_MoveSpeed;
-		Label* lbl_Range;
-		Label* lbl_Regeneration;
-		Sprite* sp_Background;
-		UnitDetails(BaseUnitClass object, Vec2 position);
-	};
 	void ShowUnitDetails();
 
 	//Các vấn đề về Chatbox
+	vector<string> chatBoxContent;
 	ui::ScrollView *sc_ChatBox;
 	EditBox* EditBox_Chat;
 	Button* btn_SendMessage;
@@ -123,10 +119,6 @@ public:
 	void CreateQuestionTable();
 
 	//Các vấn đề server
-	void Request_RandomQuestion(string level);
-	void Respone_ReadQuestion(cocos2d::network::HttpClient * sender, cocos2d::network::HttpResponse * response);
-	void Request_ReadQuestion();
-	///
 	void onReceiveEvent_Question(SIOClient* client, const std::string& data);  // click chọn độ khó xong vẫn phải chờ hết giờ mới chuyển qua câu hỏi, ko phải chuyển ngay @@
 	void onReceiveEvent_InitializeIngameObject(SIOClient* client, const std::string& data);
 	void onReceiveEvent_ExcuteSkill(SIOClient* client, const std::string& data);
@@ -141,7 +133,7 @@ public:
 	void update(float time);
 	void UpdateIngameObject(float time);
 	void UpdateQuestionInfo(float time);
-	void UpdatePlayerResource(float time);
+	void UpdatePlayerResourcePerSecond(float time);
 
 
 	//Các hàm cơ bản

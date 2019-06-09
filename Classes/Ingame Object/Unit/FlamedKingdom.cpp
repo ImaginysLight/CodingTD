@@ -6,8 +6,8 @@ FlamedKingdom::FlamedKingdom(int line, bool isOwned, int unitId, int playerId)
 	description = "Kingdom";
 	maxHealth = 1500;
 	currentHealth = maxHealth;
-	baseAttack = 75;
-	baseDefense = 0;
+	baseAttack = 150;
+	baseDefense = 30;
 	baseAttackSpeed = 40;
 	range = 300;
 	baseRegeneration = 1;
@@ -19,6 +19,8 @@ FlamedKingdom::FlamedKingdom(int line, bool isOwned, int unitId, int playerId)
 	this->UpdateIngameInfo("Sprites/Flamed Kingdom/default.png", unitId, playerId, isOwned, "Flamed Kingdom", line);
 	if (this->isOwned) this->root->setPosition(Vec2(50, 50));
 	else this->root->setPosition(Vec2(3050,50));
+
+	Tool::setNodeSize(this->sprite, 315, 300);
 }
 
 FlamedKingdom::~FlamedKingdom()
@@ -159,11 +161,11 @@ void FlamedKingdom::Upgrade()
 		float currentHealthPercent = (float)currentHealth / maxHealth;
 		name = "Flamed Kingdom 2";
 		description = "Kingdom";
-		maxHealth = 2000;
+		maxHealth = 1600;
 		currentHealth = maxHealth * currentHealthPercent;
-		baseAttack = 88;
-		baseDefense = 25;
-		baseAttackSpeed = 45;
+		baseAttack = 150;
+		baseDefense = 30;
+		baseAttackSpeed = 50;
 		range = 450;
 		baseRegeneration = 1;
 
@@ -181,10 +183,10 @@ void FlamedKingdom::Upgrade()
 		float currentHealthPercent = (float)currentHealth / maxHealth;
 		name = "Flamed Kingdom 3";
 		description = "Kingdom";
-		maxHealth = 2000;
+		maxHealth = 1650;
 		currentHealth = maxHealth * currentHealthPercent;
-		baseAttack = 90;
-		baseDefense = 50;
+		baseAttack = 180;
+		baseDefense = 32;
 		baseAttackSpeed = 50;
 		range = 600;
 		baseRegeneration = 1;

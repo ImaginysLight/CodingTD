@@ -12,9 +12,12 @@ public:
 	CREATE_FUNC(RankingScene);
 
 	Size visibleSize;
+	Button *btn_Exit;
 	ui::ScrollView *ScrollView_RankingTable;
+	
 
-	Node* CreateRow(int stt, int id, string name, int stat1, int stat2);
+	Node* CreateRow(string stt, string id, string name, string score, string question);
+	Node* CreateRow_Default();
 	void SetupGUI();
 	void btn_Click(Ref *pSender, cocos2d::ui::Button::Widget::TouchEventType type);
 	void RunActionNotify(string content);

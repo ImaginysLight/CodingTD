@@ -31,7 +31,8 @@ io.sockets.on('connection', function(socket){
 	//kiểm tra đăng nhập
 	socket.on('_Log_in_', function(data){
 		var mes = JSON.parse(data)
-		//console.log(mes.username +"_"+mes.password);
+		console.log(data);
+		console.log(mes.username +"_"+mes.password);
 		con.query("SELECT *FROM `player` WHERE player.username like '" + mes.username + "' and player.password like '"+ mes.password +"'",
 			function (error, result, fields) {
 				if (error) throw error;
@@ -44,12 +45,70 @@ io.sockets.on('connection', function(socket){
 		});
 	});
 
+	//lay thong tin nguoi choi
+	socket.on('Get_infor_Player', function(data){
+		var mes = JSON.parse(data)
+		//console.log(mes.username +"_"+mes.password);
+		con.query("SELECT * FROM `player` WHERE player.id = "+ mes.id, 
+			function (error, result, fields) {
+				if (error) throw error;
+				socket.emit('Get_infor_Player', {id: mes.id, username: result[0].username, password: result[0].password, experience: result[0].experience, correct_answer: result[0].correct_answer, wrong_answer: result[0].wrong_answer, total_win: result[0].total_win, total_lose: result[0].total_lose, total_kill: result[0].total_kill, friendship_point: result[0].friendship_point, friendship_level: result[0].friendship_level, room_name: result[0].room_name, submit_available: result[0].submit_available, status: result[0].status});
+		});
+	});
+
+
+	//tạo phòng
+	socket.on('Create_Room', function(data){
+		var mes = JSON.parse(data)
+		//console.log(mes.username +"_"+mes.password);
+		con.query("UPDATE `player` set player.room_name = '1' where player.id = " + mes.id, 
+			function (error, result, fields) {
+				if (error) throw error;
+				console.log('create room success');
+		});
+	});
+
+	//hủy Phòng
+	socket.on('Destroy_Room', function(data){
+		var mes = JSON.parse(data)
+		//console.log(mes.username +"_"+mes.password);
+		con.query("UPDATE `player` set player.room_name = '0' where player.id = " + mes.id, 
+			function (error, result, fields) {
+				if (error) throw error;
+				//io.sockets.emit('Destroy_Room', {Room: mes.Room, id: mes.id});
+				console.log('destroy room success');
+		});
+	});
+
+
+	socket.on('Update_Room', function(data){
+		var mes = JSON.parse(data)
+		//console.log(mes.username +"_"+mes.password);
+		con.query("UPDATE `player` set player.room_name = '1' where player.id = " + mes.OppenontId, 
+			function (error, result, fields) {
+				if (error) throw error;
+				io.sockets.emit('Update_Room', {Room: mes.Room, CurrentId: mes.OppenontId});
+				console.log('update room success');
+		});
+	});
+
+	socket.on('Join_Room', function(data){
+		var mes = JSON.parse(data)
+		var room_name = mes.OppenontId+'_'+mes.CurrentId;
+		console.log(mes.OppenontId +"_"+mes.CurrentId);
+		con.query("UPDATE `player` set player.room_name = '0' where player.id = " + mes.OppenontId + " or player.id = "+ mes.CurrentId, 
+			function (error, result, fields) {
+				if (error) throw error;
+				io.sockets.emit('Join_Room', {Room: room_name});
+				console.log('join success');
+		});
+	});
 
 	//lấy danh sách phòng chờ
 	socket.on('_Get_List_Room_', function(data){
 		var mes = JSON.parse(data)
 		//console.log(mes.username +"_"+mes.password);
-		con.query("SELECT * FROM `player` WHERE player.room_name like '0'", 
+		con.query("SELECT * FROM `player` WHERE player.room_name like '1'", 
 			function (error, result, fields) {
 				if (error) throw error;
 				if(result.length >= 1){
@@ -59,13 +118,17 @@ io.sockets.on('connection', function(socket){
 		    		var key = "Room"+i;
 		    		var value = result[i].id;
 		    		_Get_List_Room_[key] = value;
+		    		var key = "username"+i;
+		    		var value = result[i].username;
+		    		_Get_List_Room_[key] = value;
+
 		    	}
 		    	
 				socket.emit('_Get_List_Room_', {_Get_List_Room_});	
 				console.log(_Get_List_Room_);
 				}
 				else{
-					socket.emit('_Get_List_Room_', {CountRoom: 0});
+					socket.emit('_Get_List_Room_', {_Get_List_Room_: {CountRoom: 0}});
 				}
 		});
 	});
@@ -105,7 +168,7 @@ io.sockets.on('connection', function(socket){
 	socket.on('_Find_The_Opponent_', function(data){
 		var mes = JSON.parse(data)
 		//console.log(mes.username +"_"+mes.password);
-		con.query("SELECT * FROM `player` WHERE player.room_name like '1' and player.id != "+ mes.id,
+		con.query("SELECT * FROM `player` WHERE player.ready like '1' and player.id != "+ mes.id,
 			function (error, result, fields) {
 				if (error) throw error;
 				if(result.length == 1){
@@ -115,11 +178,16 @@ io.sockets.on('connection', function(socket){
 					if (error) throw error;
 						io.sockets.emit('_Find_The_Opponent_', {Room: result[0].id +"_"+mes.id ,id: results[0].id, username: results[0].username});
 						console.log(results[0].username);
+						con.query("UPDATE `player` set player.ready = '0' where player.id = " + result[0].id,
+						function (error, result, fields) {
+							if (error) throw error;
+							console.log('ok')
+					});
 					});
 
 				}
 				else{
-					con.query("UPDATE `player` set player.room_name = '1' where player.id = " + mes.id,
+					con.query("UPDATE `player` set player.ready = '1' where player.id = " + mes.id,
 						function (error, result, fields) {
 							if (error) throw error;
 							socket.emit('_Find_The_Opponent_', {Room: "Doi Nguoi Choi Khac"});
@@ -129,20 +197,19 @@ io.sockets.on('connection', function(socket){
 	});
 
 
-//mình có cần lấy tên ko hay chỉ lấy id thôi???
-//mai mốt lấy hết mà
-//thế h lấy id dể test thôi đúng ko?
-//uk
-// socket.on('_Find_The_Opponent_', function(data){
-		 // var mes = JSON.parse(data)
-		 // //console.log(mes.username +"_"+mes.password);
-		 // con.query("SELECT * FROM `player` WHERE player.id != "+ mes.id,
-			 // function (error, result, fields) {
-				 // if (error) throw error;
-				 // socket.emit('Get_Infor_Opponent', {id: result[0]});
-				 
-			// });
-	 // });
+	//chủ phòng nhấn nút play
+	socket.on('_Ready_', function(data){
+		var mes = JSON.parse(data)
+		io.sockets.emit('_Ready_', {Room: mes.Room});
+	});
+
+
+	//chủ phòng đuổi người chơi ra khỏi phòng
+	socket.on('_Chase_Player_', function(data){
+		var mes = JSON.parse(data)
+		io.sockets.emit('_Chase_Player_', {Room: mes.Room, CurrentId: mes.OppenontId});
+	});
+
 
 	//compile code c/c++ onl
 	socket.on('_Get_Code_C_', function(code){
@@ -212,6 +279,7 @@ io.sockets.on('connection', function(socket){
 	});
 
 
+
 	//chọn hệ
 	socket.on('_Select_Element_', function(data){
 		var mes = JSON.parse(data)
@@ -221,6 +289,7 @@ io.sockets.on('connection', function(socket){
 	//cấm
 	socket.on('_Prohibit_Card_', function(data){
 		var mes = JSON.parse(data)
+		console.log(mes.OppenontId);
 		io.sockets.emit('_Prohibit_Card_', {cardName: mes.cardName, Room: mes.Room, CurrentId: mes.OpponentId});
 	});
 	
@@ -235,7 +304,7 @@ io.sockets.on('connection', function(socket){
 		var mes = JSON.parse(data)
 		io.sockets.emit('_Upgrade_Kingdom_', {Room: mes.Room, Id: mes.Id});
 	});
-	
+
 	//tạo lính
 	socket.on('Create_Unit', function(data){
 		var mes = JSON.parse(data)

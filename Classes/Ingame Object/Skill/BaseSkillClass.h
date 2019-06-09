@@ -1,6 +1,5 @@
 ﻿#pragma once
 #include "cocos2d.h"
-#include"../../Global Class/Tool.h"
 #include"../IngameObject.h"
 #include"../Unit/BaseUnitClass.h"
 USING_NS_CC;
