@@ -49,7 +49,7 @@ public:
 	static void ClearOpponentInfo();
 	static void GetOpponentPlayerInfo(int id);
 	static void GetCurrentPLayerInfo(int id);
-
+	static string GetFriendshipLevelString(PlayerInfo *player);
 	static void GetFriendshipLevel(string friendship);
 	static pair<int, int> CalculateLevel(int exp);
 

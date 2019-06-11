@@ -44,3 +44,13 @@ void Player::GetCurrentPLayerInfo(int id)
 {
 }
 
+string Player::GetFriendshipLevelString(PlayerInfo * player)
+{
+	string result = "";
+	if (player->friendshipLevel.size() != 14) return "";
+	for (auto card : player->friendshipLevel) {
+		result += card.first + ":" + to_string(card.second) + ",";
+	}
+	return result.substr(result.size() - 1, 0);
+}
+
