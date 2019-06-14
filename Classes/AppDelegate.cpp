@@ -30,6 +30,7 @@
 #include"ChooseCardScene.h"
 #include"PlayerInformationScene.h"
 #include"TutorialScene.h"
+#include"ResultScene.h"
 #include"CardScene.h"
 
 // #define USE_AUDIO_ENGINE 1

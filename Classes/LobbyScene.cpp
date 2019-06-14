@@ -4,6 +4,8 @@
 #include <network/SocketIO.h>
 USING_NS_CC;
 
+string LobbyScene::notify = "";
+
 Scene* LobbyScene::createScene()
 {
 	return LobbyScene::create();
@@ -15,9 +17,17 @@ bool LobbyScene::init()
 
 	SetupGUI();
 
+	if (LobbyScene::notify != "") {
+		auto node_Notify = Tool::CreateNotificationTable(notify,"OK");
+		node_Notify->setPosition(visibleSize / 2);
+		this->addChild(node_Notify, 10);
+		LobbyScene::notify = "";
+	}
+
 	//_client = SocketIO::connect("http://127.0.0.1:3000", *this);
 	Tool::Socket_Client->_client->on("_Find_The_Opponent_",CC_CALLBACK_2(LobbyScene::findTheOpponent, this));
-
+	Tool::Socket_Client->_client->on("Get_Player_Info", CC_CALLBACK_2(LobbyScene::onReceiveEvent_GetPlayerInfo, this));
+	Tool::Socket_Client->_client->emit("Get_Player_Info", "{\"id\":\"" + to_string(Player::currentPlayer->id) + "\"}");
 	return true;
 }
 
@@ -60,6 +70,24 @@ void LobbyScene::findTheOpponent(SIOClient* client, const std::string& data)
 			CCLOG("Room: %s ", document["Room"].GetString());
 		}
 	}
+}
+
+void LobbyScene::onReceiveEvent_GetPlayerInfo(SIOClient * client, const std::string & data)
+{
+	rapidjson::Document document;
+	document.Parse<0>(data.c_str());
+	Player::currentPlayer->username = document["username"].GetString();
+	Player::currentPlayer->password = document["password"].GetString();
+	Player::currentPlayer->experience = document["experience"].GetInt();
+	Player::currentPlayer->total_correctAnswer = document["correct_answer"].GetInt();
+	Player::currentPlayer->total_wrongAnswer = document["wrong_answer"].GetInt();
+	Player::currentPlayer->total_win = document["total_win"].GetInt();
+	Player::currentPlayer->total_lose = document["total_lose"].GetInt();
+	Player::currentPlayer->total_kill = document["total_kill"].GetInt();
+	Player::currentPlayer->friendshipPoint = document["friendship_point"].GetInt();
+	Player::GetFriendshipLevel(Player::currentPlayer, document["friendship_level"].GetString());
+	Player::currentPlayer->room_name = document["room_name"].GetString();
+	Player::currentPlayer->submit_available = document["submit_available"].GetInt();
 }
 
 void LobbyScene::SetupGUI()

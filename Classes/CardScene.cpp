@@ -149,6 +149,7 @@ void CardScene::btn_UpFriendship_Click(Ref * pSender, cocos2d::ui::Button::Widge
 			Player::currentPlayer->friendshipLevel[name] ++;
 			RefreshScene(name);
 			RunActionNotify("Upgrade successful!");
+			Player::UploadPlayerInfo(Player::currentPlayer);
 		}
 		processUpgradeNode->setVisible(false);
 	}
@@ -162,6 +163,7 @@ void CardScene::btn_DownFriendship_Click(Ref * pSender, cocos2d::ui::Button::Wid
 		RefreshScene(name);
 		processUpgradeNode->setVisible(false);
 		RunActionNotify("Downgrade successful!");
+		Player::UploadPlayerInfo(Player::currentPlayer);
 	}
 }
 

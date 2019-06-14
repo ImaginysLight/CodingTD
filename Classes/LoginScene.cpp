@@ -2,7 +2,6 @@
 #include "json\document.h"
 #include "json\rapidjson.h"
 #include <network/SocketIO.h>
-//#include "Object/SocketClient.h"
 #include "Global Class/Tool.h"
 USING_NS_CC;
 
@@ -21,7 +20,6 @@ bool LoginScene::init()
 	
 	//_client = SocketIO::connect("http://127.0.0.1:3000", *this);
  	Tool::Socket_Client->_client->on("_Check_Login_", CC_CALLBACK_2(LoginScene::onReceiveEvent, this));
-	Tool::Socket_Client->_client->on("Get_infor_Player", CC_CALLBACK_2(LoginScene::onReceiveEvent_GetInfoPlayer, this));
 	return true;
 }
 
@@ -47,33 +45,18 @@ void LoginScene::onReceiveEvent(SIOClient* client, const std::string& data)
 			Player::currentPlayer->id = document["Check"].GetInt();
 			//CCLOG("ID: %d ",document["id"].GetInt());
 			//_client->disconnect();
-			Tool::Socket_Client->_client->emit("Get_infor_Player", "{\"id\":\"" + to_string(Player::currentPlayer->id) + "\"}");
+			
 			Director::getInstance()->replaceScene(LobbyScene::createScene());
 		}
 		else
 		{
-			CCLOG("Login Fail");
+			auto node_Notify = Tool::CreateNotificationTable("Incorrect Username or Password\nPlease try again", "OK");
+			node_Notify->setPosition(visibleSize / 2);
+			this->addChild(node_Notify, 10);
 		}
 	}
 }
-void LoginScene::onReceiveEvent_GetInfoPlayer(SIOClient * client, const std::string & data)
-{
-	rapidjson::Document document;
-	document.Parse<0>(data.c_str());
-	Player::currentPlayer->id = Tool::ConvertStringToInt(document["id"].GetString());
-	Player::currentPlayer->username = document["username"].GetString();
-	Player::currentPlayer->password = document["password"].GetString();
-	Player::currentPlayer->experience = document["experience"].GetInt();
-	Player::currentPlayer->total_correctAnswer = document["correct_answer"].GetInt();
-	Player::currentPlayer->total_wrongAnswer = document["wrong_answer"].GetInt();
-	Player::currentPlayer->total_win = document["total_win"].GetInt();
-	Player::currentPlayer->total_lose = document["total_lose"].GetInt();
-	Player::currentPlayer->total_kill = document["total_kill"].GetInt();
-	Player::currentPlayer->friendshipPoint = document["friendship_point"].GetInt();
-	Player::GetFriendshipLevel(document["friendship_level"].GetString());
-	Player::currentPlayer->room_name = document["room_name"].GetString();
-	Player::currentPlayer->submit_available = document["submit_available"].GetInt();
-}
+
 void LoginScene::btn_Click(Ref *pSender, cocos2d::ui::Button::Widget::TouchEventType type) {
 	Button* term;
 	switch (type)
@@ -88,6 +71,7 @@ void LoginScene::btn_Click(Ref *pSender, cocos2d::ui::Button::Widget::TouchEvent
 			}
 			else
 			{
+				
 				std::string username = editBox_Username->getText();
 				std::string password = editBox_Password->getText();
 				Tool::Socket_Client->_client->emit("_Log_in_", "{\"username\":\"" + username + "\", \"password\":\"" + password + "\"}");
@@ -98,6 +82,10 @@ void LoginScene::btn_Click(Ref *pSender, cocos2d::ui::Button::Widget::TouchEvent
 			//LoginScene::onClose(_client);
 			Director::getInstance()->end();
 		}
+		else if (term->getName() == "btn_Connect") {
+			Tool::Socket_Client->_client = SocketIO::connect(LoginScene::editBox_Domain->getText(), *Tool::Socket_Client);
+			Tool::Socket_Client->_client->on("_Check_Login_", CC_CALLBACK_2(LoginScene::onReceiveEvent, this));
+		}
 	}
 	default: break;
 	}
@@ -105,6 +93,23 @@ void LoginScene::btn_Click(Ref *pSender, cocos2d::ui::Button::Widget::TouchEvent
 
 void LoginScene::SetupGUI()
 {
+	{
+		auto btn = Tool::CreateButtonWithoutSprite("btn_Connect", "Connect");
+		btn->setPosition(Vec2(visibleSize.width*0.1, visibleSize.height*0.1));
+		btn->addTouchEventListener(CC_CALLBACK_2(LoginScene::btn_Click, this));
+		this->addChild(btn);
+		editBox_Domain = ui::EditBox::create(Size(visibleSize.width / 3, 30), "", "");
+		editBox_Domain->setPosition(Vec2(visibleSize.width*0.5, visibleSize.height*0.1));
+		editBox_Domain->setTextHorizontalAlignment(TextHAlignment::CENTER);
+		editBox_Domain->setFontSize(Tool::defaultTextSize);
+		editBox_Domain->setFontColor(Color3B(175, 225, 200));
+		editBox_Domain->setPlaceHolder("Domain");
+		editBox_Domain->setPlaceholderFontColor(Color3B::GRAY);
+		editBox_Domain->setMaxLength(100);
+		editBox_Domain->setText("localhost:3000");
+		this->addChild(editBox_Domain);
+
+	}
 	auto sp_SceneName = Sprite::create("UI/LoginScene/Login.png");
 	sp_SceneName->setPosition(Vec2(visibleSize.width * 0.5, visibleSize.height*0.9));
 	this->addChild(sp_SceneName);

@@ -21,7 +21,7 @@ bool TutorialScene::init()
 
 	//Label chữ tutorial (tạo cái sprite coi)
 	{
-		Label* lbl_Tutorial = Label::createWithTTF("Tutorial", "fonts/arial.ttf", Tool::defaultTextSize*2);
+		Label* lbl_Tutorial = Tool::CreateLabel("Tutorial", Tool::defaultTextSize * 2);
 		lbl_Tutorial->setPosition(Vec2(visibleSize.width / 2, visibleSize.height*.9));
 		this->addChild(lbl_Tutorial);
 	}
@@ -58,36 +58,33 @@ bool TutorialScene::init()
 	}
 
 	// Thông tin hướng dẫn
-	{
-		//Trang 1 
-		{
-			Label* lbl = Label::createWithTTF(Tool::ConvertUTF16ToString(L"Đây là hướng dẫn game, và đây là trang 1!"),"fonts/arial.ttf",Tool::defaultTextSize);
-			vecLabel.push_back(lbl);
+	labelContent.push_back(Tool::ConvertUTF16ToString(L"Chào mừng đến với CodingTD Online\nGame vừa thủ thành đối kháng vừa học lập trình hay nhất vũ trụ!"));
+	labelContent.push_back(Tool::ConvertUTF16ToString(L"Hãy chơi thử trước nào!\nBạn có thể bấm Play để tìm đối thủ ngẫu nhiên\nhoặc bấm Extend để tạo phòng."));
+	labelContent.push_back(Tool::ConvertUTF16ToString(L"Đầu tiên, hãy chọn 1 trong 3 Flamed Kingdom, Frozen Kingdom, Blessed Kingdom\nđại diện cho 3 hệ Fire, Ice, Nature."));
+	labelContent.push_back(Tool::ConvertUTF16ToString(L"Đối phương sẽ không biết bạn chọn Kingdom gì cho tới khi hết lượt\nTrận đấu sẽ bị hủy nếu có người không chọn Kingdom!"));
+	labelContent.push_back(Tool::ConvertUTF16ToString(L"TIếp theo, bạn có thể cấm tối đa 2 thẻ mua lính của đối phương."));
+	labelContent.push_back(Tool::ConvertUTF16ToString(L"Bạn được chọn tối đa 4 thẻ mua lính.\nNhững thẻ màu xám là đã bị cấm bởi đối phương."));
+	labelContent.push_back(Tool::ConvertUTF16ToString(L"Ngôi nhà to nhất bạn thấy chính là Kingdom của bạn.\nBạn phải đánh sập Kingdom đối phương, nằm phía tay phải cách xa bạn 3100 pixel, để chiến thắng"));
+	labelContent.push_back(Tool::ConvertUTF16ToString(L"Đây là thanh mua lính, trên đó có các thẻ bạn đã chọn, và 2 thẻ đặc biệt tương ứng với Kingdom của bạn. Hãy kéo thẻ ra một trong 3 đường để mua lính."));
+	labelContent.push_back(Tool::ConvertUTF16ToString(L"Ngoài Buy còn có 2 chế độ là Upgrade để nâng cấp lính, và View để xem thông tin, và nút Up↑ để nâng cấp nhà chính"));
+	labelContent.push_back(Tool::ConvertUTF16ToString(L"Thông thường, lính chỉ có thể tấn công trên đường của mình.\nNhưng lính ở cả 3 đường đều có thể tấn công Kingdom."));
+	labelContent.push_back(Tool::ConvertUTF16ToString(L"Có 3 loại tài nguyên quan trọng trong trận đấu.\nGold dùng để mua lính và nâng cấp.\nKnowledge dùng để nâng cấp.\nEnergy dùng để sử dụng Skill."));
+	labelContent.push_back(Tool::ConvertUTF16ToString(L"Mỗi hệ có 3 skill riêng, gồm 2 chủ động và 1 bị động. Có thể chuyển sang mode View và bấm vào Skill để xem chi tiết."));
+	labelContent.push_back(Tool::ConvertUTF16ToString(L"Phía trên là bảng câu hỏi, lần lượt 2 người chơi sẽ được chọn độ khó cho câu hỏi tiếp theo."));
+	labelContent.push_back(Tool::ConvertUTF16ToString(L"Thời gian tồn tại của câu hỏi phụ thuộc vào độ khó.\nBạn sẽ nhận được Gold tùy vào kết quả trả lời, và 1 Knowledge cho câu trả lời đúng."));
+	labelContent.push_back(Tool::ConvertUTF16ToString(L"Phía tay phải là khung chat, bạn nhập nội dung vào ô và bấm nút Send để gửi tin nhắn đi."));
+	labelContent.push_back(Tool::ConvertUTF16ToString(L"Bây giờ bạn đã nắm được cách chơi cơ bản, hãy kết thúc trận đấu và xem thành quả."));
+	labelContent.push_back(Tool::ConvertUTF16ToString(L"Bạn sẽ nhận được kinh nghiệm dựa trên những gì bạn đã thể hiện trong trận đấu. Khi đạt đủ kinh nghiệm, bạn sẽ lên cấp và nhận được 1 Friendship Point."));
+	labelContent.push_back(Tool::ConvertUTF16ToString(L"Bạn sẽ nhận được cúp dựa trên số trận thắng, số quân địch hạ gục, và số câu trả lời đúng"));
+	labelContent.push_back(Tool::ConvertUTF16ToString(L"Vậy là bạn đã nắm được tổng quan về cách chơi, hãy đứng dậy hít một hơi và chúng ta đi sâu vào chi tiết."));
 
-			Sprite* sp = Sprite::create("UI/TutorialScene/background.png");
-			vecSprite.push_back(sp);
-		}
+	for (auto content : labelContent) {
+		Label* lbl = Tool::CreateLabel(content, Tool::defaultTextSize, Color4B::WHITE, CCTextAlignment::CENTER);
+		vecLabel.push_back(lbl);
 
-		//Trang 2
-		{
-			Label* lbl = Label::createWithTTF(Tool::ConvertUTF16ToString(L"Đây là hướng dẫn game, và đây là trang 2!"), "fonts/arial.ttf", Tool::defaultTextSize);
-			vecLabel.push_back(lbl);
-
-			Sprite* sp = Sprite::create("UI/TutorialScene/background.png");
-			vecSprite.push_back(sp);
-		}
-
-		//Trang 2
-		{
-			Label* lbl = Label::createWithTTF(Tool::ConvertUTF16ToString(L"Đây là hướng dẫn game, và đây là trang 3!"), "fonts/arial.ttf", Tool::defaultTextSize);
-			vecLabel.push_back(lbl);
-
-			Sprite* sp = Sprite::create("UI/TutorialScene/background.png");
-			vecSprite.push_back(sp);
-		}
-
+		Sprite* sp = Sprite::create("UI/TutorialScene/background.png");
+		vecSprite.push_back(sp);
 	}
-
 
 	//Set thông số cho các Label và Sprite trong Tutorial
 	{
@@ -141,7 +138,7 @@ void TutorialScene::onClick(Ref * sender, Widget::TouchEventType type)
 				//Khóa button trong lúc chuyển trang
 				btn_Back->setEnabled(false);
 				btn_Next->setEnabled(false);
-				vecLabel[currentPage]->runAction(Sequence::create(DelayTime::create(2.5),
+				vecLabel[currentPage]->runAction(Sequence::create(DelayTime::create(1),
 					CallFunc::create([&]() {	btn_Back->setEnabled(true);
 												btn_Next->setEnabled(true);
 												currentPage--;
@@ -149,34 +146,34 @@ void TutorialScene::onClick(Ref * sender, Widget::TouchEventType type)
 				nullptr));
 
 				// Hiệu ứng chuyển trang cũ
-				vecLabel[currentPage]->runAction(Sequence::create(MoveBy::create(1, Vec2(1000, 0)),
+				vecLabel[currentPage]->runAction(Sequence::create(MoveBy::create(0.4, Vec2(1000, 0)),
 					CallFunc::create([&]() {	vecLabel[currentPage]->setVisible(false);
 												vecSprite[currentPage]->setVisible(false);
 					}),
-					MoveTo::create(1, Vec2(visibleSize.width / 2, visibleSize.height*0.2)),
+					MoveTo::create(0.4, Vec2(visibleSize.width / 2, visibleSize.height*0.2)),
 				nullptr));
 
-				vecSprite[currentPage]->runAction(Sequence::create(MoveBy::create(1, Vec2(1000, 0)),
+				vecSprite[currentPage]->runAction(Sequence::create(MoveBy::create(0.4, Vec2(1000, 0)),
 					CallFunc::create([&]() {	vecLabel[currentPage]->setVisible(false);
 												vecSprite[currentPage]->setVisible(false);
 					}),
-					MoveTo::create(1, Vec2(visibleSize.width / 2, visibleSize.height*0.5)),
+					MoveTo::create(0.4, Vec2(visibleSize.width / 2, visibleSize.height*0.5)),
 				nullptr));
 
 				// Hiệu ứng đổi trang mới
 
-				vecLabel[currentPage - 1]->runAction(Sequence::create(MoveBy::create(0.5, Vec2(-1000, 0)),
+				vecLabel[currentPage - 1]->runAction(Sequence::create(MoveBy::create(0.4, Vec2(-1000, 0)),
 					CallFunc::create([&]() {	vecLabel[currentPage - 1]->setVisible(true);
 												vecSprite[currentPage - 1]->setVisible(true);
 					}),
-					MoveTo::create(1, Vec2(visibleSize.width / 2, visibleSize.height*0.2)),
+					MoveTo::create(0.4, Vec2(visibleSize.width / 2, visibleSize.height*0.2)),
 				nullptr));
 
-				vecSprite[currentPage - 1]->runAction(Sequence::create(MoveBy::create(0.5, Vec2(-1000, 0)),
+				vecSprite[currentPage - 1]->runAction(Sequence::create(MoveBy::create(0.4, Vec2(-1000, 0)),
 					CallFunc::create([&]() {	vecLabel[currentPage - 1]->setVisible(true);
 												vecSprite[currentPage - 1]->setVisible(true);
 					}),
-					MoveTo::create(1, Vec2(visibleSize.width / 2, visibleSize.height*0.5)),
+					MoveTo::create(0.4, Vec2(visibleSize.width / 2, visibleSize.height*0.5)),
 				nullptr));
 			}
 		}
@@ -186,7 +183,7 @@ void TutorialScene::onClick(Ref * sender, Widget::TouchEventType type)
 				//Khóa button trong lúc chuyển trang
 				btn_Back->setEnabled(false);
 				btn_Next->setEnabled(false);
-				vecLabel[currentPage]->runAction(Sequence::create(DelayTime::create(2.5),
+				vecLabel[currentPage]->runAction(Sequence::create(DelayTime::create(1),
 					CallFunc::create([&]() {	btn_Back->setEnabled(true);
 												btn_Next->setEnabled(true);
 												currentPage++;
@@ -194,34 +191,34 @@ void TutorialScene::onClick(Ref * sender, Widget::TouchEventType type)
 				nullptr));
 
 				// Hiệu ứng chuyển trang cũ
-				vecLabel[currentPage]->runAction(Sequence::create(MoveBy::create(1, Vec2(-1000, 0)),
+				vecLabel[currentPage]->runAction(Sequence::create(MoveBy::create(0.4, Vec2(-1000, 0)),
 					CallFunc::create([&]() {	vecLabel[currentPage]->setVisible(false); 
 												vecSprite[currentPage]->setVisible(false);
 					}),
-					MoveTo::create(1, Vec2(visibleSize.width / 2, visibleSize.height*0.2)),
+					MoveTo::create(0.4, Vec2(visibleSize.width / 2, visibleSize.height*0.2)),
 				nullptr));
 
-				vecSprite[currentPage]->runAction(Sequence::create(MoveBy::create(1, Vec2(-1000, 0)),
+				vecSprite[currentPage]->runAction(Sequence::create(MoveBy::create(0.4, Vec2(-1000, 0)),
 					CallFunc::create([&]() {	vecLabel[currentPage]->setVisible(false);
 												vecSprite[currentPage]->setVisible(false);
 					}),
-					MoveTo::create(1, Vec2(visibleSize.width / 2, visibleSize.height*0.5)),
+					MoveTo::create(0.4, Vec2(visibleSize.width / 2, visibleSize.height*0.5)),
 				nullptr));
 				
 				// Hiệu ứng đổi trang mới
 
-				vecLabel[currentPage+1]->runAction(Sequence::create(MoveBy::create(0.5, Vec2(1000, 0)),
+				vecLabel[currentPage+1]->runAction(Sequence::create(MoveBy::create(0.4, Vec2(1000, 0)),
 					CallFunc::create([&]() {	vecLabel[currentPage+1]->setVisible(true);
 												vecSprite[currentPage+1]->setVisible(true);
 					}),
-					MoveTo::create(1, Vec2(visibleSize.width / 2, visibleSize.height*0.2)),
+					MoveTo::create(0.4, Vec2(visibleSize.width / 2, visibleSize.height*0.2)),
 				nullptr));
 
-				vecSprite[currentPage+1]->runAction(Sequence::create(MoveBy::create(0.5, Vec2(1000, 0)),
+				vecSprite[currentPage+1]->runAction(Sequence::create(MoveBy::create(0.4, Vec2(1000, 0)),
 					CallFunc::create([&]() {	vecLabel[currentPage+1]->setVisible(true);
 												vecSprite[currentPage+1]->setVisible(true);
 					}),
-					MoveTo::create(1, Vec2(visibleSize.width / 2, visibleSize.height*0.5)),
+					MoveTo::create(0.4, Vec2(visibleSize.width / 2, visibleSize.height*0.5)),
 				nullptr));
 			}
 		}

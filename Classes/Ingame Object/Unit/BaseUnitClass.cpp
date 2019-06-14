@@ -253,7 +253,7 @@ void BaseUnitClass::Upgrade()
 
 void BaseUnitClass::Regeneration()
 {
-	if (this->currentHealth < this->maxHealth && this->currentHealth > 0) {
+	if (this->currentHealth > 0) {
 		this->currentHealth += this->regeneration;
 		this->currentHealth = currentHealth > maxHealth ? maxHealth : currentHealth;
 		this->UpdateHealthBar();
@@ -278,7 +278,7 @@ void BaseUnitClass::onDamageReceive(DamageReceive dmg) {
 	//Kiểm tra xem người bắn còn sống không
 	if (dmg.special == "" && dmg.attackerId != 0) {
 		auto attacker = BaseUnitClass::GetUnitById(dmg.attackerId);
-		if (attacker == NULL || !attacker->isAlive || attacker->action == "Die") return;
+		if (attacker == nullptr || !attacker->isAlive || attacker->action == "Die") return;
 	}
 
 	else if (dmg.special != "") {

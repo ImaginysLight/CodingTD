@@ -19,7 +19,7 @@ public:
 
 	Size visibleSize;
 	Label* lbl_Notify;
-	EditBox *editBox_Username, *editBox_Password;
+	EditBox *editBox_Username, *editBox_Password, *editBox_Domain;
 	Button *btn_Login, *btn_Register;
 
 	void SetupGUI();
@@ -27,10 +27,5 @@ public:
 	void RunActionNotify(string content);
 
 	void onReceiveEvent(SIOClient* client, const std::string& data);
-	void onReceiveEvent_GetInfoPlayer(SIOClient* client, const std::string& data);
-	/*virtual void onConnect(SIOClient* client);
-	virtual void onMessage(SIOClient* client, const std::string& data);
-	virtual void onClose(SIOClient* client);
-	virtual void onError(SIOClient* client, const std::string& data);*/
 };
 

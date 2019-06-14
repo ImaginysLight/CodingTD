@@ -110,3 +110,35 @@ pair<ProgressTimer*, DrawNode*> Tool::CreateBar(int width, int height, Color3B f
 	background->drawPolygon(rectangle, 4, backColor, 1, backColor);
 	return { frontBar,background };
 }
+
+Node * Tool::CreateNotificationTable(string lblContent, string btnRightContent, string btnLeftContent, Size tableSize)
+{
+	Node* result = Node::create();
+	Sprite* sp_Background = Sprite::create("UI/Unit Details Background.png");
+	Tool::setNodeSize(sp_Background, tableSize.width, tableSize.height);
+	result->addChild(sp_Background,-1);
+
+	Label* lbl_Content = Tool::CreateLabel(lblContent,Tool::defaultTextSize,Color4B::WHITE,CCTextAlignment::CENTER);
+	lbl_Content->setName("lbl_Content");
+	lbl_Content->setAnchorPoint(Vec2(0.5, 0));
+	lbl_Content->setMaxLineWidth(tableSize.width - 10);
+	result->addChild(lbl_Content);
+
+	Button* btn_Right = Tool::CreateButtonWithoutSprite("btn_Right", btnRightContent);
+	btn_Right->addTouchEventListener([&](Ref *pSender, cocos2d::ui::Button::Widget::TouchEventType type) {
+		((Node*)pSender)->getParent()->runAction(RemoveSelf::create());
+	});
+	result->addChild(btn_Right);
+
+	if (btnLeftContent == "") {
+		btn_Right->setPositionY(-tableSize.height/4);
+	}
+	else {
+		btn_Right->setPosition(Vec2(tableSize.width / 4, -tableSize.height / 4));
+		Button* btn_Left = Tool::CreateButtonWithoutSprite("btn_Left", btnLeftContent);
+		btn_Left->setPosition(Vec2(-tableSize.width / 4, -tableSize.height / 4));
+		result->addChild(btn_Left);
+	}
+
+	return result;
+}

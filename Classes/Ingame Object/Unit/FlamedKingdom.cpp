@@ -4,9 +4,9 @@ FlamedKingdom::FlamedKingdom(int line, bool isOwned, int unitId, int playerId)
 {
 	name = "Flamed Kingdom";
 	description = "Kingdom";
-	maxHealth = 1500;
+	maxHealth = 2500;
 	currentHealth = maxHealth;
-	baseAttack = 150;
+	baseAttack = 45;
 	baseDefense = 30;
 	baseAttackSpeed = 40;
 	range = 300;
@@ -16,11 +16,10 @@ FlamedKingdom::FlamedKingdom(int line, bool isOwned, int unitId, int playerId)
 	upgradeGoldCost = 200;
 	upgradeKnowledgeCost = 3;
 
-	this->UpdateIngameInfo("Sprites/Flamed Kingdom/default.png", unitId, playerId, isOwned, "Flamed Kingdom", line);
-	if (this->isOwned) this->root->setPosition(Vec2(50, 50));
+	this->UpdateIngameInfo("Sprites/Flamed Kingdom/default_315x300.png", unitId, playerId, isOwned, "Flamed Kingdom", line);
+	if (this->isOwned) this->root->setPosition(Vec2(-50, 50));
 	else this->root->setPosition(Vec2(3050,50));
 
-	Tool::setNodeSize(this->sprite, 315, 300);
 }
 
 FlamedKingdom::~FlamedKingdom()
@@ -40,10 +39,10 @@ void FlamedKingdom::Update()
 {
 	for (auto unit : BaseUnitClass::AllIngameUnit_Vector) {
 		if (unit->isOwned == this->isOwned && unit->isAlive && unit->action != "Die") {
-			if (unit->root->getPositionX() < 0)
-				unit->root->runAction(MoveTo::create(0.2, Vec2(50, unit->root->getPositionY())));
-			if (unit->root->getPositionX() > 3000)
-				unit->root->runAction(MoveTo::create(0.2, Vec2(2950, unit->root->getPositionY())));
+			if (unit->root->getPositionX() < -100)
+				unit->root->runAction(MoveTo::create(0.2, Vec2(0, unit->root->getPositionY())));
+			if (unit->root->getPositionX() > 3100)
+				unit->root->runAction(MoveTo::create(0.2, Vec2(3000, unit->root->getPositionY())));
 		}
 	}
 
@@ -161,11 +160,11 @@ void FlamedKingdom::Upgrade()
 		float currentHealthPercent = (float)currentHealth / maxHealth;
 		name = "Flamed Kingdom 2";
 		description = "Kingdom";
-		maxHealth = 1600;
+		maxHealth = 2750;
 		currentHealth = maxHealth * currentHealthPercent;
-		baseAttack = 150;
-		baseDefense = 30;
-		baseAttackSpeed = 50;
+		baseAttack = 60;
+		baseDefense = 50;
+		baseAttackSpeed = 45;
 		range = 450;
 		baseRegeneration = 1;
 
@@ -183,10 +182,10 @@ void FlamedKingdom::Upgrade()
 		float currentHealthPercent = (float)currentHealth / maxHealth;
 		name = "Flamed Kingdom 3";
 		description = "Kingdom";
-		maxHealth = 1650;
+		maxHealth = 3000;
 		currentHealth = maxHealth * currentHealthPercent;
-		baseAttack = 180;
-		baseDefense = 32;
+		baseAttack = 72;
+		baseDefense = 75;
 		baseAttackSpeed = 50;
 		range = 600;
 		baseRegeneration = 1;

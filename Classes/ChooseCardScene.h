@@ -20,7 +20,7 @@ public:
 
 	Size visibleSize;
 	int timer = 0, turn = 0, counter = 0;
-	Label* lbl_Notify, *lbl_Turn, *lbl_Cooldown, *lbl_CurrentPlayerPick, *lbl_OpponentPlayerPick;
+	Label* lbl_Notify, *lbl_Turn, *lbl_Cooldown, *lbl_CurrentPlayerPick, *lbl_OpponentPlayerPick,*lbl_CurrentPlayerName,*lbl_OpponentPlayerName;
 	Vec2 currentPlayerPosition, opponentPlayerPosition;
 	EditBox *editBox_Username, *editBox_Password;
 	Button *btn_Login, *btn_Register;
@@ -38,5 +38,6 @@ public:
 	void onReceive_BanCard(SIOClient* client, const std::string& data);
 	void onReceive_PickCard(SIOClient* client, const std::string& data);
 	void onReceive_SelectElement(SIOClient* client, const std::string& data);
+	void onReceiveEvent_GetInfoPlayer(SIOClient* client, const std::string& data);
 };
 

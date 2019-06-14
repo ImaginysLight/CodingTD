@@ -24,6 +24,7 @@ public:
 	void menuCloseCallback(cocos2d::Ref* pSender);
 	CREATE_FUNC(LobbyScene);
 
+	static string notify;
 	Size visibleSize;
 	Label* lbl_Notify;
 	Button *btn_Extend, *btn_Play, *btn_Rank, *btn_Tutorial, *btn_Logout,*btn_Info;
@@ -33,10 +34,6 @@ public:
 	void RunActionNotify(string content);
 
 	void findTheOpponent(SIOClient* client, const std::string& data);
-	/*virtual void onConnect(SIOClient* client);
-	virtual void onMessage(SIOClient* client, const std::string& data);
-	virtual void onClose(SIOClient* client);
-	virtual void onError(SIOClient* client, const std::string& data);*/
-
+	void onReceiveEvent_GetPlayerInfo(SIOClient* client, const std::string& data);
 };
 

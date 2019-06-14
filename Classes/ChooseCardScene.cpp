@@ -19,13 +19,18 @@ Scene* ChooseCardScene::createScene()
 bool ChooseCardScene::init()
 {
 	visibleSize = Director::getInstance()->getVisibleSize();
-
-	SetupGUI();
 	
 	//_client = SocketIO::connect("http://127.0.0.1:3000", *this);
  	Tool::Socket_Client->_client->on("_Prohibit_Card_", CC_CALLBACK_2(ChooseCardScene::onReceive_BanCard, this));
 	Tool::Socket_Client->_client->on("_Pick_Card_", CC_CALLBACK_2(ChooseCardScene::onReceive_PickCard, this));
 	Tool::Socket_Client->_client->on("_Select_Element_", CC_CALLBACK_2(ChooseCardScene::onReceive_SelectElement, this));
+
+	Tool::Socket_Client->_client->on("Get_Player_Info", CC_CALLBACK_2(ChooseCardScene::onReceiveEvent_GetInfoPlayer, this));
+	Tool::Socket_Client->_client->emit("Get_Player_Info", "{\"id\":\"" + to_string(Player::currentPlayer->id) + "\"}");
+	Tool::Socket_Client->_client->emit("Get_Player_Info", "{\"id\":\"" + to_string(Player::opponentPlayer->id) + "\"}");
+	
+	SetupGUI();
+
 	return true;
 }
 
@@ -85,6 +90,45 @@ void ChooseCardScene::onReceive_SelectElement(SIOClient* client, const std::stri
 	}
 }
 
+void ChooseCardScene::onReceiveEvent_GetInfoPlayer(SIOClient * client, const std::string & data)
+{
+	rapidjson::Document document;
+	document.Parse<0>(data.c_str());
+	if (Player::currentPlayer->id == Tool::ConvertStringToInt(document["id"].GetString())) {
+		Player::currentPlayer->username = document["username"].GetString();
+		Player::currentPlayer->password = document["password"].GetString();
+		Player::currentPlayer->experience = document["experience"].GetInt();
+		Player::currentPlayer->total_correctAnswer = document["correct_answer"].GetInt();
+		Player::currentPlayer->total_wrongAnswer = document["wrong_answer"].GetInt();
+		Player::currentPlayer->total_win = document["total_win"].GetInt();
+		Player::currentPlayer->total_lose = document["total_lose"].GetInt();
+		Player::currentPlayer->total_kill = document["total_kill"].GetInt();
+		Player::currentPlayer->friendshipPoint = document["friendship_point"].GetInt();
+		Player::GetFriendshipLevel(Player::currentPlayer,document["friendship_level"].GetString());
+		Player::currentPlayer->room_name = document["room_name"].GetString();
+		Player::currentPlayer->submit_available = document["submit_available"].GetInt();
+
+		ChooseCardScene::lbl_CurrentPlayerName->setString(Player::currentPlayer->username);
+	}
+	else if (Player::opponentPlayer->id == Tool::ConvertStringToInt(document["id"].GetString())) {
+		Player::opponentPlayer->username = document["username"].GetString();
+		Player::opponentPlayer->password = document["password"].GetString();
+		Player::opponentPlayer->experience = document["experience"].GetInt();
+		Player::opponentPlayer->total_correctAnswer = document["correct_answer"].GetInt();
+		Player::opponentPlayer->total_wrongAnswer = document["wrong_answer"].GetInt();
+		Player::opponentPlayer->total_win = document["total_win"].GetInt();
+		Player::opponentPlayer->total_lose = document["total_lose"].GetInt();
+		Player::opponentPlayer->total_kill = document["total_kill"].GetInt();
+		Player::opponentPlayer->friendshipPoint = document["friendship_point"].GetInt();
+		Player::GetFriendshipLevel(Player::opponentPlayer, document["friendship_level"].GetString());
+		Player::opponentPlayer->room_name = document["room_name"].GetString();
+		Player::opponentPlayer->submit_available = document["submit_available"].GetInt();
+
+		ChooseCardScene::lbl_OpponentPlayerName->setString(Player::opponentPlayer->username);
+	}
+
+}
+
 void ChooseCardScene::btn_BanCard_Click(Ref *pSender, cocos2d::ui::Button::Widget::TouchEventType type) {
 	Button* term;
 	switch (type)
@@ -123,33 +167,6 @@ void ChooseCardScene::btn_ChooseKingdom_Click(Ref * pSender, cocos2d::ui::Button
 
 void ChooseCardScene::SetupGUI()
 {
-	ChooseCardScene::lbl_Cooldown = Tool::CreateLabel("");
-	lbl_Cooldown->setPosition(Vec2(visibleSize.width *0.65, visibleSize.height*0.05));
-	this->addChild(lbl_Cooldown);
-
-	ChooseCardScene::lbl_Turn = Tool::CreateLabel("");
-	lbl_Turn->setPosition(Vec2(visibleSize.width *0.5, visibleSize.height*0.05));
-	this->addChild(lbl_Turn);
-
-	currentPlayerPosition = Vec2(visibleSize.width*0.15, visibleSize.height*0.82);
-	opponentPlayerPosition = Vec2(visibleSize.width*0.85, visibleSize.height*0.82);
-
-	ChooseCardScene::lbl_CurrentPlayerPick = Tool::CreateLabel("", Tool::defaultTextSize*0.9, Color4B::GREEN);
-	lbl_CurrentPlayerPick->setPosition(visibleSize.width*0.15, visibleSize.height*0.775);
-	this->addChild(lbl_CurrentPlayerPick);
-
-	ChooseCardScene::lbl_OpponentPlayerPick = Tool::CreateLabel("", Tool::defaultTextSize*0.9, Color4B::RED);
-	lbl_OpponentPlayerPick->setPosition(visibleSize.width*0.85, visibleSize.height*0.775);
-	this->addChild(lbl_OpponentPlayerPick);
-
-	auto sp_SceneName = Sprite::create("UI/LoginScene/Login.png");
-	sp_SceneName->setPosition(Vec2(visibleSize.width * 0.5, visibleSize.height*0.9));
-	this->addChild(sp_SceneName);
-
-	auto sp_Background = Sprite::create("UI/BG/background1.png");
-	sp_Background->setPosition(visibleSize / 2);
-	this->addChild(sp_Background, -1);
-
 	auto frame1 = Sprite::create("UI/BG/frame1.png");
 	frame1->setPosition(Vec2(visibleSize.width * 0.5, visibleSize.height*0.5));
 	this->addChild(frame1);
@@ -161,6 +178,42 @@ void ChooseCardScene::SetupGUI()
 	auto frame3 = Sprite::create("UI/BG/frame2.png");
 	frame3->setPosition(Vec2(visibleSize.width * 0.85f, visibleSize.height*0.5));
 	this->addChild(frame3);
+
+	ChooseCardScene::lbl_CurrentPlayerName = Tool::CreateLabel("");
+	lbl_CurrentPlayerName->setPosition(Vec2(visibleSize.width*0.15, visibleSize.height*0.88));
+	this->addChild(lbl_CurrentPlayerName, 1);
+
+	ChooseCardScene::lbl_OpponentPlayerName = Tool::CreateLabel("");
+	lbl_OpponentPlayerName->setPosition(Vec2(visibleSize.width*0.85, visibleSize.height*0.88));
+	this->addChild(lbl_OpponentPlayerName, 1);
+
+	ChooseCardScene::lbl_Cooldown = Tool::CreateLabel("");
+	lbl_Cooldown->setPosition(Vec2(visibleSize.width *0.65, visibleSize.height*0.88));
+	this->addChild(lbl_Cooldown);
+
+	ChooseCardScene::lbl_Turn = Tool::CreateLabel("");
+	lbl_Turn->setPosition(Vec2(visibleSize.width *0.45, visibleSize.height*0.88));
+	this->addChild(lbl_Turn);
+
+	currentPlayerPosition = Vec2(visibleSize.width*0.15, visibleSize.height*0.82);
+	opponentPlayerPosition = Vec2(visibleSize.width*0.85, visibleSize.height*0.82);
+
+	ChooseCardScene::lbl_CurrentPlayerPick = Tool::CreateLabel("", Tool::defaultTextSize*0.9, Color4B::GREEN);
+	lbl_CurrentPlayerPick->setPosition(visibleSize.width*0.15, visibleSize.height*0.775);
+	this->addChild(lbl_CurrentPlayerPick);
+
+	ChooseCardScene::lbl_OpponentPlayerPick = Tool::CreateLabel("", Tool::defaultTextSize*0.9, Color4B::RED);
+	lbl_OpponentPlayerPick->setPosition(visibleSize.width*0.85, visibleSize.height*0.775);
+	lbl_OpponentPlayerPick->setVisible(false);
+	this->addChild(lbl_OpponentPlayerPick);
+
+	/*auto sp_SceneName = Sprite::create("UI/LoginScene/Login.png");
+	sp_SceneName->setPosition(Vec2(visibleSize.width * 0.5, visibleSize.height*0.9));
+	this->addChild(sp_SceneName);*/
+
+	auto sp_Background = Sprite::create("UI/BG/background1.png");
+	sp_Background->setPosition(visibleSize / 2);
+	this->addChild(sp_Background, -1);
 
 	this->schedule(schedule_selector(ChooseCardScene::UpdateEachSecond), 1);
 }
@@ -214,8 +267,13 @@ void ChooseCardScene::ChangeTurn() {
 	}
 	//Turn 2: BAN card: 10 giây
 	if (turn == 2) {
+		if (Player::currentPlayer->elementName == "" || Player::opponentPlayer->elementName == "") {
+			LobbyScene::notify = "The game was canceled due to someone did not choose the Kingdom";
+			Director::getInstance()->replaceScene(LobbyScene::createScene());
+		}
 		//Setup GUI
 		{
+			lbl_OpponentPlayerPick->setVisible(true);
 			for (auto child : vecButton) {
 				Tool::Button_ChangeState(child, false, 0.5);
 			}

@@ -45,12 +45,12 @@ extern struct PlayerInfo {
 
 static class Player {
 public:
-	static PlayerInfo *currentPlayer, *opponentPlayer;
+	static PlayerInfo *currentPlayer, *opponentPlayer, oldPlayerInfo;
 	static void ClearOpponentInfo();
 	static void GetOpponentPlayerInfo(int id);
 	static void GetCurrentPLayerInfo(int id);
 	static string GetFriendshipLevelString(PlayerInfo *player);
-	static void GetFriendshipLevel(string friendship);
+	static void GetFriendshipLevel(PlayerInfo* player, string friendship);
 	static pair<int, int> CalculateLevel(int exp);
-
+	static void UploadPlayerInfo(PlayerInfo *player);
 };

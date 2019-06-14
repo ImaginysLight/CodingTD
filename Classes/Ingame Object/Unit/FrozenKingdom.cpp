@@ -4,10 +4,10 @@ FrozenKingdom::FrozenKingdom(int line, bool isOwned, int unitId, int playerId)
 {
 	name = "Frozen Kingdom";
 	description = "Kingdom";
-	maxHealth = 2000;
+	maxHealth = 1600;
 	currentHealth = maxHealth;
-	baseAttack = 90;
-	baseDefense = 75;
+	baseAttack = 40;
+	baseDefense = 100;
 	baseAttackSpeed = 30;
 	range = 400;
 	baseRegeneration = 1;
@@ -16,11 +16,9 @@ FrozenKingdom::FrozenKingdom(int line, bool isOwned, int unitId, int playerId)
 	upgradeGoldCost = 200;
 	upgradeKnowledgeCost = 3;
 
-	this->UpdateIngameInfo("Sprites/Frozen Kingdom/default.png", unitId, playerId, isOwned, "Frozen Kingdom", line);
-	if (this->isOwned) this->root->setPosition(Vec2(50, 50));
+	this->UpdateIngameInfo("Sprites/Frozen Kingdom/default_315x300.png", unitId, playerId, isOwned, "Frozen Kingdom", line);
+	if (this->isOwned) this->root->setPosition(Vec2(-50, 50));
 	else this->root->setPosition(Vec2(3050,50));
-
-	Tool::setNodeSize(this->sprite, 315, 300);
 }
 
 FrozenKingdom::~FrozenKingdom()
@@ -42,10 +40,10 @@ void FrozenKingdom::Update()
 	for (auto unit : BaseUnitClass::AllIngameUnit_Vector) {
 		if (unit->isOwned == this->isOwned
 			&& unit->isAlive && unit->action != "Die") {
-			if (unit->root->getPositionX() < 0)
-				unit->root->runAction(MoveTo::create(0.2, Vec2(50, unit->root->getPositionY())));
-			if (unit->root->getPositionX() > 3000)
-				unit->root->runAction(MoveTo::create(0.2, Vec2(2950, unit->root->getPositionY())));
+			if (unit->root->getPositionX() < -100)
+				unit->root->runAction(MoveTo::create(0.2, Vec2(0, unit->root->getPositionY())));
+			if (unit->root->getPositionX() > 3100)
+				unit->root->runAction(MoveTo::create(0.2, Vec2(3000, unit->root->getPositionY())));
 		}
 	}
 
@@ -164,10 +162,10 @@ void FrozenKingdom::Upgrade()
 		float currentHealthPercent = (float)currentHealth / maxHealth;
 		name = "Frozen Kingdom 2";
 		description = "Kingdom";
-		maxHealth = 1750;
+		maxHealth = 1800;
 		currentHealth = maxHealth * currentHealthPercent;
-		baseAttack = 115;
-		baseDefense = 100;
+		baseAttack = 64;
+		baseDefense = 150;
 		baseAttackSpeed = 30;
 		range = 500;
 		baseRegeneration = 2;
@@ -186,10 +184,10 @@ void FrozenKingdom::Upgrade()
 		float currentHealthPercent = (float)currentHealth / maxHealth;
 		name = "Frozen Kingdom 3";
 		description = "Kingdom";
-		maxHealth = 1500;
+		maxHealth = 2000;
 		currentHealth = maxHealth * currentHealthPercent;
-		baseAttack = 140;
-		baseDefense = 150;
+		baseAttack = 90;
+		baseDefense = 200;
 		baseAttackSpeed = 30;
 		range = 600;
 		baseRegeneration = 3;

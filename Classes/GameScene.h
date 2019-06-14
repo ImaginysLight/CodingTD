@@ -10,6 +10,7 @@
 #include"Ingame Object/Skill/BaseSkillClass.h"
 #include"Global Class/Player.h"
 #include"Global Class/Trophy.h"
+#include"ResultScene.h"
 USING_NS_CC;
 class GameScene : public cocos2d::Scene
 {
@@ -31,9 +32,6 @@ public:
 		float wrongAnswerGoldRate = 1.0;
 		float defeatGoldRate = 0.1;
 		float defeatEnergyRate = 0;
-		int numOfCorrectQuestion = 0;
-		int numOfWrongQuestion = 0;
-		int numOfEnemyDefeated = 0;
 		Sprite* sp_Background;
 		Label* lbl_PlayerName;
 		Label* lbl_Gold;
@@ -85,6 +83,7 @@ public:
 
 	//Endgame
 	void Endgame(bool isVictorious);
+	void ClearAllVariables();
 
 	//Xem thông tin unit khi click
 	BaseUnitClass* choosingUnit = new BaseUnitClass();
@@ -124,6 +123,7 @@ public:
 	void onReceiveEvent_ExcuteSkill(SIOClient* client, const std::string& data);
 	void onReceiveEvent_SendMessage(SIOClient* client, const std::string& data);
 	void onReceiveEvent_UpgradeKingdom(SIOClient* client, const std::string& data);
+	void onReceiveEvent_AnswerResult(SIOClient* client, const std::string& data);
 
 	//Setup trong init
 	void SetupCamera();

@@ -28,5 +28,6 @@ public:
 	void onClick(Ref *pSender, cocos2d::ui::Button::Widget::TouchEventType type);
 	vector<Label*> vecLabel;
 	vector<Sprite*> vecSprite;
+	vector<string> labelContent;
 	Button* btn_Back, *btn_Next, *btn_Exit;
 };

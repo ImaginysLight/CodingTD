@@ -21,7 +21,7 @@ public:
 	virtual void onError(SIOClient* client, const std::string& data);
 	
 	//void Check_Login();
-	SIOClient* _client = SocketIO::connect("http://127.0.0.1:3000", *this);
+	SIOClient* _client = SocketIO::connect("", *this);
 };
 
 #endif // __SOCKETCLIENT_SCENE_H__
