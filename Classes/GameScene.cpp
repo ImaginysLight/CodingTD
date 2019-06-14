@@ -21,9 +21,6 @@ bool GameScene::init()
 	{
 		return false;
 	}
-
-	Player::currentPlayer->elementName = "Ice";
-	Player::opponentPlayer->elementName = "Ice";
 	
 	visibleSize = Director::getInstance()->getVisibleSize();
 
@@ -382,6 +379,10 @@ void GameScene::btn_Click(Ref * pSender, cocos2d::ui::Button::Widget::TouchEvent
 			Player::currentPlayer->total_correctAnswer += ResultScene::numOfCorrectAnswer;
 			Player::currentPlayer->total_wrongAnswer += ResultScene::numOfWrongAnswer;
 			Player::currentPlayer->total_kill += ResultScene::numOfEnemyDefeated;
+			float questionPoint = (ResultScene::numOfCorrectAnswer + ResultScene::numOfWrongAnswer)*(0.5 + ResultScene::numOfCorrectAnswer / (float)(ResultScene::numOfWrongAnswer + ResultScene::numOfCorrectAnswer) * 2);
+			float battlePoint = ResultScene::goldReceived *0.01;
+			int bonusExp = (questionPoint + battlePoint) * (ResultScene::isVictorious ? 1.3 : 0.8);
+			Player::currentPlayer->experience += bonusExp;
 			ResultScene::isVictorious ? (Player::currentPlayer->total_win++) : (Player::currentPlayer->total_lose++);
 			Player::UploadPlayerInfo(Player::currentPlayer);
 			Director::getInstance()->replaceScene(ResultScene::createScene());
