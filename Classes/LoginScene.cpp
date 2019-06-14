@@ -95,11 +95,11 @@ void LoginScene::SetupGUI()
 {
 	{
 		auto btn = Tool::CreateButtonWithoutSprite("btn_Connect", "Connect");
-		btn->setPosition(Vec2(visibleSize.width*0.1, visibleSize.height*0.1));
+		btn->setPosition(Vec2(visibleSize.width*0.5, visibleSize.height*0.1));
 		btn->addTouchEventListener(CC_CALLBACK_2(LoginScene::btn_Click, this));
 		this->addChild(btn);
 		editBox_Domain = ui::EditBox::create(Size(visibleSize.width / 3, 30), "", "");
-		editBox_Domain->setPosition(Vec2(visibleSize.width*0.5, visibleSize.height*0.1));
+		editBox_Domain->setPosition(Vec2(visibleSize.width*0.5, visibleSize.height*0.2));
 		editBox_Domain->setTextHorizontalAlignment(TextHAlignment::CENTER);
 		editBox_Domain->setFontSize(Tool::defaultTextSize);
 		editBox_Domain->setFontColor(Color3B(175, 225, 200));
