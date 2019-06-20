@@ -51,6 +51,34 @@ void Player::UploadPlayerInfo(PlayerInfo * player)
 	+ "}");
 }
 
+cocos2d::Node * Player::CreatePlayerOutgameInfoGUI()
+{
+	Node* result = Node::create();
+	auto lbl_PlayerName = Tool::CreateLabel(Player::currentPlayer->username, Tool::defaultTextSize*1.5);
+	result->addChild(lbl_PlayerName);
+
+	auto levelInfo = Player::CalculateLevel(Player::currentPlayer->experience);
+
+	auto lbl_Level = Tool::CreateLabel("Level: " + to_string(levelInfo.first));
+	lbl_Level->setPosition(Vec2(lbl_PlayerName->getBoundingBox().size.width, 0));
+	result->addChild(lbl_Level);
+
+	auto lbl_Exp = Tool::CreateLabel("Experience");
+	lbl_Exp->setPosition(Vec2(lbl_Level->getPositionX() +  175, 12));
+	result->addChild(lbl_Exp);
+
+	auto expBar = Tool::CreateBar(to_string(Player::currentPlayer->experience) + " / " + to_string(levelInfo.second), Color4B::RED, Size(200, 25), Color3B(250, 250, 200));
+	((ProgressTimer*)expBar->getChildByName("Front Bar"))->setPercentage((Player::currentPlayer->experience / (float)levelInfo.second *100.0));
+	expBar->setPosition(Vec2(lbl_Level->getPositionX() + 175, -12));
+	result->addChild(expBar);
+
+	auto lbl_Friendship = Tool::CreateLabel("Friendship: " + to_string(Player::currentPlayer->friendshipPoint));
+	lbl_Friendship->setPosition(Vec2(lbl_Level->getPositionX() + 350, 0));
+	lbl_Friendship->setName("lbl_Friendship");
+	result->addChild(lbl_Friendship);
+	return result;
+}
+
 void Player::ClearOpponentInfo()
 {
 	Player::opponentPlayer = new PlayerInfo();
@@ -68,7 +96,6 @@ void Player::GetCurrentPLayerInfo(int id)
 string Player::GetFriendshipLevelString(PlayerInfo * player)
 {
 	string result = "";
-	if (player->friendshipLevel.size() != 14) return "";
 	for (auto card : player->friendshipLevel) {
 		result += card.first + ":" + to_string(card.second) + ",";
 	}

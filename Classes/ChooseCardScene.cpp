@@ -3,7 +3,9 @@
 #include "json\rapidjson.h"
 #include <network/SocketIO.h>
 #include "Global Class/Tool.h"
+#include"Global Class/Audio.h"
 USING_NS_CC;
+using namespace CocosDenshion;
 
 //Quy trình: lượt 1: cấm 2 lá; lượt 2: chọn 4 lá.
 //Trong btn_Click: cần gửi thêm id thằng bị cấm bài
@@ -54,11 +56,10 @@ void ChooseCardScene::onReceive_PickCard(SIOClient* client, const std::string& d
 	{
 		string cardName = document["cardName"].GetString();
 		auto sp_Card = Sprite::create("Sprites/" + cardName + "/card.png");
-		Tool::setNodeSize(sp_Card, 90, 90);
 		this->addChild(sp_Card);
 		if (Player::currentPlayer->id == Tool::ConvertStringToInt(document["Id"].GetString())) {
 			Player::currentPlayer->picked_units.push_back(cardName);
-			ChooseCardScene::currentPlayerPosition -= Vec2(0, visibleSize.height*0.15);
+			ChooseCardScene::currentPlayerPosition -= Vec2(0, visibleSize.height*0.155);
 			sp_Card->setPosition(ChooseCardScene::currentPlayerPosition);
 		}
 		else {
@@ -105,7 +106,7 @@ void ChooseCardScene::onReceiveEvent_GetInfoPlayer(SIOClient * client, const std
 		Player::currentPlayer->total_kill = document["total_kill"].GetInt();
 		Player::currentPlayer->friendshipPoint = document["friendship_point"].GetInt();
 		Player::GetFriendshipLevel(Player::currentPlayer,document["friendship_level"].GetString());
-		Player::currentPlayer->room_name = document["room_name"].GetString();
+		//Player::currentPlayer->room_name = document["room_name"].GetString();
 		Player::currentPlayer->submit_available = document["submit_available"].GetInt();
 
 		ChooseCardScene::lbl_CurrentPlayerName->setString(Player::currentPlayer->username);
@@ -121,7 +122,7 @@ void ChooseCardScene::onReceiveEvent_GetInfoPlayer(SIOClient * client, const std
 		Player::opponentPlayer->total_kill = document["total_kill"].GetInt();
 		Player::opponentPlayer->friendshipPoint = document["friendship_point"].GetInt();
 		Player::GetFriendshipLevel(Player::opponentPlayer, document["friendship_level"].GetString());
-		Player::opponentPlayer->room_name = document["room_name"].GetString();
+		//Player::opponentPlayer->room_name = document["room_name"].GetString();
 		Player::opponentPlayer->submit_available = document["submit_available"].GetInt();
 
 		ChooseCardScene::lbl_OpponentPlayerName->setString(Player::opponentPlayer->username);
@@ -135,6 +136,8 @@ void ChooseCardScene::btn_BanCard_Click(Ref *pSender, cocos2d::ui::Button::Widge
 	{
 	case Widget::TouchEventType::ENDED:
 	{
+		auto audio = SimpleAudioEngine::getInstance();
+		audio->playEffect(Audio::GetButtonClickAudio().c_str(), false);
 		term = (Button*)pSender;
 		term->addTouchEventListener(CC_CALLBACK_2(ChooseCardScene::btn_Click, this));
 		string card = term->getName();
@@ -293,16 +296,19 @@ void ChooseCardScene::ChangeTurn() {
 				btn_Card->setName(cardName[i]);
 				btn_Card->addTouchEventListener(CC_CALLBACK_2(ChooseCardScene::btn_BanCard_Click, this));
 				this->addChild(btn_Card);
+				auto lbl_Gold = Tool::CreateLabel(to_string(ObjectConstructor::InitializeObject(cardName[i] + " 1", 0, 1, 0, -1)->goldCost), Tool::defaultTextSize*0.8, Color4B::YELLOW);
+				lbl_Gold->setPosition(Vec2(40,112));
+				btn_Card->addChild(lbl_Gold);
 				vecButton.push_back(btn_Card);
 			}
-			vecButton[0]->setPosition(Vec2(visibleSize.width*0.35, visibleSize.height*0.7));
-			vecButton[1]->setPosition(Vec2(visibleSize.width*0.5, visibleSize.height*0.7));
-			vecButton[2]->setPosition(Vec2(visibleSize.width*0.65, visibleSize.height*0.7));
-			vecButton[3]->setPosition(Vec2(visibleSize.width*0.35, visibleSize.height*0.45));
-			vecButton[4]->setPosition(Vec2(visibleSize.width*0.65, visibleSize.height*0.45));
-			vecButton[5]->setPosition(Vec2(visibleSize.width*0.35, visibleSize.height*0.2));
-			vecButton[6]->setPosition(Vec2(visibleSize.width*0.5, visibleSize.height*0.2));
-			vecButton[7]->setPosition(Vec2(visibleSize.width*0.65, visibleSize.height*0.2)); 
+			vecButton[0]->setPosition(Vec2(visibleSize.width*0.35, visibleSize.height*0.6));
+			vecButton[1]->setPosition(Vec2(visibleSize.width*0.45, visibleSize.height*0.6));
+			vecButton[2]->setPosition(Vec2(visibleSize.width*0.55, visibleSize.height*0.6));
+			vecButton[3]->setPosition(Vec2(visibleSize.width*0.65, visibleSize.height*0.6));
+			vecButton[4]->setPosition(Vec2(visibleSize.width*0.35, visibleSize.height*0.3));
+			vecButton[5]->setPosition(Vec2(visibleSize.width*0.45, visibleSize.height*0.3));
+			vecButton[6]->setPosition(Vec2(visibleSize.width*0.55, visibleSize.height*0.3));
+			vecButton[7]->setPosition(Vec2(visibleSize.width*0.65, visibleSize.height*0.3)); 
 		}
 		counter = 2;
 		ChooseCardScene::lbl_Turn->setString("Select 2 cards to BAN");

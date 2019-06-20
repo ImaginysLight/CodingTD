@@ -2,6 +2,8 @@
 #include<iostream>
 #include<unordered_map>
 #include<string>
+#include"cocos2d.h"
+USING_NS_CC;
 using namespace std;
 
 extern struct PlayerInfo {
@@ -41,9 +43,11 @@ extern struct PlayerInfo {
 	//Phần trong gameplay
 	string elementName = "";
 	vector<string> picked_units;
+	bool betNegative = false;
+	bool betPositive = false;
 };
 
-static class Player {
+class Player {
 public:
 	static PlayerInfo *currentPlayer, *opponentPlayer, oldPlayerInfo;
 	static void ClearOpponentInfo();
@@ -53,4 +57,5 @@ public:
 	static void GetFriendshipLevel(PlayerInfo* player, string friendship);
 	static pair<int, int> CalculateLevel(int exp);
 	static void UploadPlayerInfo(PlayerInfo *player);
+	static Node* CreatePlayerOutgameInfoGUI();
 };

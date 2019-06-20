@@ -3,7 +3,6 @@
 #include"..\..\Global Class\Tool.h"
 #include"BaseUnitClass.h"
 #include"../Skill/FrostNova.h"
-#include"FrostWyvern.h"
 
 USING_NS_CC;
 using namespace std;

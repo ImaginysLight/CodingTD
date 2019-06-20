@@ -20,5 +20,5 @@ public:
 	static pair<string, Animate*> CreateAnimateWithKey(string characterName, string action, int numBegin, int numEnd);
 	static unordered_map<string, Animate*> animate;
 	static string GetKingdomByElement(string element);
-	
+	static int GetNumOfLevel(string name);
 };

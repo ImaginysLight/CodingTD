@@ -35,10 +35,11 @@ public:
 	static int ConvertStringToInt(string a);
 
 	//Các hàm tạo node tổng quát
-	static Label* CreateLabel(string content, int size = Tool::defaultTextSize, Color4B color = Color4B::WHITE, CCTextAlignment align = CCTextAlignment::LEFT);
+	static Label* CreateLabel(string content, int size = Tool::defaultTextSize, Color4B color = Color4B::WHITE, TextHAlignment align = TextHAlignment::LEFT);
 	static Button* CreateButtonWithoutSprite(string name, string titleText, int size = Tool::defaultTextSize, Color3B color = Color3B::WHITE);
-	static pair<ProgressTimer*, DrawNode*> CreateBar(int width, int height, Color3B frontColor, Color4F backColor = Color4F(0.69, 0.69, 0.69, 0.33));
+	static Node* CreateBar(string content = "", Color4B textColor = Color4B::WHITE, Size size = Size(200,25), Color3B frontColor = Color3B::WHITE, Color4F backColor = Color4F(0.69, 0.69, 0.69, 0.33));
 	static Node* CreateNotificationTable(string lblContent, string btnRightContent, string btnLeftContent = "", Size tableSize = Size(384,135));
+	
 
 	//Xử lý size
 	static void setNodeSize(Node* node, int width, int height);

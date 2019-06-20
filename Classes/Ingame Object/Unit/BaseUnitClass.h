@@ -49,7 +49,7 @@ public:
 	string name = "";
 	string description = "";
 	int goldCost = 0;
-	int levelRequired = 0;
+	int levelRequired = 1;
 	int maxHealth = 0;
 	int currentHealth = maxHealth;
 	float baseAttack = 0;

@@ -5,7 +5,7 @@ CrazyWolf_2::CrazyWolf_2(int line, bool isOwned, int unitId, int playerId)
 	name = "Crazy Wolf 2";
 	description = "A crazy beast with great resillience.";
 	goldCost = 150;
-	levelRequired = 2;
+	levelRequired = 1;
 	maxHealth = 400;
 	currentHealth = maxHealth;
 	baseAttack = 50;

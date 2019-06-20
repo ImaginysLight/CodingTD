@@ -11,13 +11,13 @@ void IngameObject::loadIngameObjectStaticVariables() {
 	IngameObject::elementColor.insert({ "Nature",Color3B(0,200,100) });
 
 	//Map dài 3000, mỗi 1 speed là 10pixel / s => trung bình = 10 speed cần 30s để đi tới nhà team kia
-	IngameObject::spawnPoint.insert({ "1_1",Vec2(0,115) });
-	IngameObject::spawnPoint.insert({ "1_2",Vec2(0,260) });
-	IngameObject::spawnPoint.insert({ "1_3",Vec2(0,403) });
+	IngameObject::spawnPoint.insert({ "1_1",Vec2(50,115) });
+	IngameObject::spawnPoint.insert({ "1_2",Vec2(50,260) });
+	IngameObject::spawnPoint.insert({ "1_3",Vec2(50,403) });
 
-	IngameObject::spawnPoint.insert({ "2_1",Vec2(3000,115) });
-	IngameObject::spawnPoint.insert({ "2_2",Vec2(3000,260) });
-	IngameObject::spawnPoint.insert({ "2_3",Vec2(3000,403) });
+	IngameObject::spawnPoint.insert({ "2_1",Vec2(3050,115) });
+	IngameObject::spawnPoint.insert({ "2_2",Vec2(3050,260) });
+	IngameObject::spawnPoint.insert({ "2_3",Vec2(3050,403) });
 
 }
 
@@ -114,4 +114,21 @@ string IngameObject::GetKingdomByElement(string element)
 	if (element == "Nature") return "Blessed Kingdom";
 }
 
+int IngameObject::GetNumOfLevel(string name)
+{
+	if (name == "Frost Wyvern") return 3;
+	if (name == "Polar Bear") return 3;
+	if (name == "Volcarona") return 2;
+	if (name == "Enraged Ursa") return 2;
+	if (name == "Poisonous Butterfly") return 2;
+	if (name == "Vampire Dragon") return 2;
+	if (name == "Hotheaded Gunner") return 3;
+	if (name == "UFO Driver") return 4;
+	if (name == "Winged Orc") return 3;
+	if (name == "Helicopter") return 2;
+	if (name == "Crazy Wolf") return 3;
+	if (name == "Dead Walker") return 3;
+	if (name == "Liquid Assassin") return 3;
+	if (name == "Elemental Alien") return 4;
+}
 

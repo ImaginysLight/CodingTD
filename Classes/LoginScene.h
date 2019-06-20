@@ -9,7 +9,7 @@ using namespace cocos2d::network;
 using namespace cocos2d::ui;
 
 USING_NS_CC;
-class LoginScene : public cocos2d::Scene //, public SocketIO::SIODelegate
+class LoginScene : public cocos2d::Scene
 {
 public:
 	static cocos2d::Scene* createScene();

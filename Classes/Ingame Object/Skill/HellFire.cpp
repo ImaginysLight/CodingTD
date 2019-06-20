@@ -6,7 +6,7 @@ HellFire::HellFire(int playerId)
 	this->name = "Hell Fire";
 	this->description = "burn down all enemies with hell fire, dealt damage proportional to your army's Attack each second.";
 	this->nextTriggerTime = Tool::currentIngameTime + 0.96;
-	this->expiredTime = Tool::currentIngameTime + 5;
+	this->expiredTime = Tool::currentIngameTime + 4;
 	this->isAddedChild = true;
 	BaseSkillClass::AllIngameSkill_Vector.push_back(this);
 	IngameObject::animate["Hell Fire_fire"]->setDuration(2.3);
@@ -44,7 +44,7 @@ void HellFire::Update()
 		this->damage = 0;
 		for (auto ally : BaseUnitClass::AllIngameUnit_Vector) {
 			if (this->playerId == ally->ownerPlayerId) {
-				damage += (ally->attack*0.8);
+				damage += (ally->attack*1.1);
 				count++;
 			}
 		}

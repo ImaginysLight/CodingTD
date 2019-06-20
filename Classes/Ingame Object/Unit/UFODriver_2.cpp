@@ -4,7 +4,7 @@ UFODriver_2::UFODriver_2(int line, bool isOwned, int unitId, int playerId)
 {
 	name = "UFO Driver 2";
 	description = "An absent-minded driver, sometimes pressing the wrong button.";
-	goldCost = 75;
+	goldCost = 100;
 	levelRequired = 1;
 	maxHealth = 180;
 	currentHealth = maxHealth;

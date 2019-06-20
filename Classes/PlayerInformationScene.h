@@ -2,6 +2,7 @@
 #include"Global Class/Trophy.h"
 #include"Global Class/Player.h"
 #include"Global Class/Tool.h"
+#include"LobbyScene.h"
 #include"CardScene.h"
 #include"cocos2d.h"
 using namespace cocos2d::ui;

@@ -1,4 +1,5 @@
 ﻿#include"ResultScene.h"
+#include"Global Class/Audio.h"
 
 USING_NS_CC;
 int ResultScene::numOfCorrectAnswer = 0;
@@ -26,6 +27,12 @@ void ResultScene::menuCloseCallback(Ref* pSender)
 
 void ResultScene::SetupGUI()
 {
+	if (Player::CalculateLevel(Player::oldPlayerInfo.experience).first < Player::CalculateLevel(Player::currentPlayer->experience).first) {
+		auto nodeLevelUp = Tool::CreateNotificationTable("LEVEL UP!!!\nYou receive 1 Friendship Point", "");
+		this->addChild(nodeLevelUp);
+		nodeLevelUp->setPosition(visibleSize / 2);
+	}
+
 	auto lbl_Title = Tool::CreateLabel("", Tool::defaultTextSize * 2);
 	lbl_Title->setPosition(Vec2(visibleSize.width*0.5, visibleSize.height*0.9));
 	this->addChild(lbl_Title);

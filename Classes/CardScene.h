@@ -18,6 +18,13 @@ extern struct UnitDetailsTable {
 	Label* lbl_MoveSpeed;
 	Label* lbl_Range;
 	Label* lbl_Regeneration;
+	Sprite* sp_Health;
+	Sprite* sp_Attack;
+	Sprite* sp_Defense;
+	Sprite* sp_AttackSpeed;
+	Sprite* sp_MoveSpeed;
+	Sprite* sp_Range;
+	Sprite* sp_Regeneration;
 	Sprite* sp_Background;
 	UnitDetailsTable(BaseUnitClass object, Vec2 position);
 };
@@ -41,10 +48,8 @@ public:
 
 	Size visibleSize;
 	static Node* GetUnitInfo(BaseUnitClass* unit);
-	Node* friendshipNode, *detailNode_Before, *detailNode_After, *spriteNode, *skillNode, *processUpgradeNode;
-	Button* btn_Process, *btn_Cancel;
-	Label* lbl_Notify, *lbl_ConfirmUpgrade,*lbl_Friendship;
-	ui::ScrollView* scroll_Navigator;
+	Node* friendshipNode, *detailNode_Before, *detailNode_After, *spriteNode, *skillNode, *dynamicUI, *playerInfoNode;
+	ui::ScrollView* scroll_Navigator, *scroll_UI;
 	unordered_map<string, Button*> vec_Card;
 	void btn_UpFriendship_Click(Ref *pSender, cocos2d::ui::Button::Widget::TouchEventType type);
 	void btn_DownFriendship_Click(Ref *pSender, cocos2d::ui::Button::Widget::TouchEventType type);

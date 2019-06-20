@@ -52,7 +52,7 @@ int Tool::ConvertStringToInt(string a) {
 	return result;
 }
 
-Label * Tool::CreateLabel(string content, int size, Color4B color, CCTextAlignment align)
+Label * Tool::CreateLabel(string content, int size, Color4B color, TextHAlignment align)
 {
 	auto lbl_Result = Label::create(content, "fonts/arial.ttf", size);
 	lbl_Result->setTextColor(color);
@@ -68,6 +68,40 @@ Button * Tool::CreateButtonWithoutSprite(string name, string titleText, int size
 	btn_Result->setTitleFontSize(size);
 	btn_Result->setTitleColor(color);
 	return btn_Result;
+}
+
+Node * Tool::CreateBar(string content, Color4B textColor, Size size, Color3B frontColor, Color4F backColor)
+{
+	Node* result = Node::create();
+	auto frontBar = ProgressTimer::create(Sprite::create("Sprites/Health Bar.png"));
+	frontBar->setType(ProgressTimer::Type::BAR);
+	frontBar->setBarChangeRate(Vec2(1, 0));
+	frontBar->setMidpoint(Vec2(0, 0));
+	frontBar->setPercentage(100);
+	frontBar->setAnchorPoint(Vec2(0, 0));
+	frontBar->setColor(frontColor);
+	Tool::setNodeSize(frontBar, size.width, size.height);
+	frontBar->setName("Front Bar");
+	frontBar->setAnchorPoint(Vec2(0.5, 0.5));
+	result->addChild(frontBar);
+
+	auto background = DrawNode::create();
+	background->clear();
+	Vec2 rectangle[4];
+	rectangle[0] = Vec2(0, 0);
+	rectangle[1] = Vec2(0, frontBar->getBoundingBox().size.height);
+	rectangle[2] = Vec2(frontBar->getBoundingBox().size.width, frontBar->getBoundingBox().size.height);
+	rectangle[3] = Vec2(frontBar->getBoundingBox().size.width, 0);
+	background->drawPolygon(rectangle, 4, backColor, 1, backColor);
+	background->setName("Background");
+	background->setPosition(-Vec2(frontBar->getBoundingBox().size.width / 2, frontBar->getBoundingBox().size.height / 2));
+	result->addChild(background, -1);
+
+	auto lbl_Content = Tool::CreateLabel(content, Tool::defaultTextSize, Color4B::WHITE, TextHAlignment::CENTER);
+	lbl_Content->setName("Content");
+	lbl_Content->setTextColor(textColor);
+	result->addChild(lbl_Content, 1);
+	return result;
 }
 
 void Tool::Button_ChangeState(Button *& btn, bool isShow, float fadeTime)
@@ -89,36 +123,15 @@ int Tool::CreateRandomNumber(int begin, int end)
 	return rand() % (end - begin + 1) + begin;
 }
 
-pair<ProgressTimer*, DrawNode*> Tool::CreateBar(int width, int height, Color3B frontColor, Color4F backColor)
-{
-	auto frontBar = ProgressTimer::create(Sprite::create("Sprites/Health Bar.png"));
-	frontBar->setType(ProgressTimer::Type::BAR);
-	frontBar->setBarChangeRate(Vec2(1, 0));
-	frontBar->setMidpoint(Vec2(0, 0));
-	frontBar->setPercentage(100);
-	frontBar->setAnchorPoint(Vec2(0, 0));
-	frontBar->setColor(frontColor);
-	Tool::setNodeSize(frontBar, width, height);
-
-	auto background = DrawNode::create();
-	background->clear();
-	Vec2 rectangle[4];
-	rectangle[0] = Vec2(0, 0);
-	rectangle[1] = Vec2(0, frontBar->getBoundingBox().size.height);
-	rectangle[2] = Vec2(frontBar->getBoundingBox().size.width, frontBar->getBoundingBox().size.height);
-	rectangle[3] = Vec2(frontBar->getBoundingBox().size.width, 0);
-	background->drawPolygon(rectangle, 4, backColor, 1, backColor);
-	return { frontBar,background };
-}
 
 Node * Tool::CreateNotificationTable(string lblContent, string btnRightContent, string btnLeftContent, Size tableSize)
 {
 	Node* result = Node::create();
-	Sprite* sp_Background = Sprite::create("UI/Unit Details Background.png");
+	Sprite* sp_Background = Sprite::create("UI/NotifyBackground.png");
 	Tool::setNodeSize(sp_Background, tableSize.width, tableSize.height);
 	result->addChild(sp_Background,-1);
 
-	Label* lbl_Content = Tool::CreateLabel(lblContent,Tool::defaultTextSize,Color4B::WHITE,CCTextAlignment::CENTER);
+	Label* lbl_Content = Tool::CreateLabel(lblContent,Tool::defaultTextSize,Color4B::WHITE, TextHAlignment::CENTER);
 	lbl_Content->setName("lbl_Content");
 	lbl_Content->setAnchorPoint(Vec2(0.5, 0));
 	lbl_Content->setMaxLineWidth(tableSize.width - 10);
@@ -128,6 +141,7 @@ Node * Tool::CreateNotificationTable(string lblContent, string btnRightContent, 
 	btn_Right->addTouchEventListener([&](Ref *pSender, cocos2d::ui::Button::Widget::TouchEventType type) {
 		((Node*)pSender)->getParent()->runAction(RemoveSelf::create());
 	});
+	btn_Right->setTitleColor(Color3B::RED);
 	result->addChild(btn_Right);
 
 	if (btnLeftContent == "") {
@@ -137,6 +151,7 @@ Node * Tool::CreateNotificationTable(string lblContent, string btnRightContent, 
 		btn_Right->setPosition(Vec2(tableSize.width / 4, -tableSize.height / 4));
 		Button* btn_Left = Tool::CreateButtonWithoutSprite("btn_Left", btnLeftContent);
 		btn_Left->setPosition(Vec2(-tableSize.width / 4, -tableSize.height / 4));
+		btn_Left->setTitleColor(Color3B::GREEN);
 		result->addChild(btn_Left);
 	}
 

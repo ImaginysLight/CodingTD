@@ -17,6 +17,10 @@ CoolBlooded::CoolBlooded(int targetId)
 		target->ReprocessAllStatus("Attack");
 		target->ReprocessAllStatus("Defense");
 		target->ReprocessAllStatus("MoveSpeed");
+		auto sp_Icon = Sprite::create("Skill/Cold Blooded.png");
+		sp_Icon->setPosition(target->sprite->getBoundingBox().size / 2);
+		Tool::setNodeSize(sp_Icon, 32, 32);
+		target->sprite->addChild(sp_Icon);
 	}
 }
 

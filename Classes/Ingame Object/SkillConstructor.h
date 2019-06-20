@@ -1,3 +1,4 @@
+#pragma once
 #include"Skill/BaseSkillClass.h"
 #include"Skill/CoolBlooded.h"
 #include"Skill/IceAge.h"

@@ -24,10 +24,10 @@ public:
 	CREATE_FUNC(TutorialScene);
 
 	Size visibleSize;
-	int currentPage = 0;
-	void onClick(Ref *pSender, cocos2d::ui::Button::Widget::TouchEventType type);
 	vector<Label*> vecLabel;
 	vector<Sprite*> vecSprite;
 	vector<string> labelContent;
-	Button* btn_Back, *btn_Next, *btn_Exit;
+	Button *btn_Exit;
+	ui::ScrollView *ScrollView_TutorialList;
+	void btn_Click(Ref *pSender, cocos2d::ui::Button::Widget::TouchEventType type);
 };

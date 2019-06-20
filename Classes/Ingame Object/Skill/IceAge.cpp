@@ -8,8 +8,8 @@ IceAge::IceAge(int userId)
 
 	for (auto unit : BaseUnitClass::AllIngameUnit_Vector) {
 		if (unit->ownerPlayerId != this->userId) {
-			float damage = 200 + (60 - unit->attackSpeed + unit->attack * 0.15) * 8;
-			if (damage < 200) damage = 200;
+			float damage = 80 + (60 - unit->attackSpeed + unit->attack * 0.4) * 4;
+			if (damage < 80) damage = 80;
 			unit->damageReceive.push_back(DamageReceive(0, damage, Tool::currentIngameTime, "Ice Age_ice",""));
 			unit->hardEffect.push_back(HardEffect("Stun", Tool::currentIngameTime, Tool::currentIngameTime + 4));
 		}

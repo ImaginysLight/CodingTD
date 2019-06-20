@@ -326,7 +326,13 @@ io.sockets.on('connection', function(socket){
 	//kết quả trả lời câu hỏi
 	socket.on('Answer_Result', function(data){
 		var mes = JSON.parse(data)
-		io.sockets.emit('Answer_Result', {Room: mes.Room, id: mes.id, result: mes.result, time: mes.time});
+		io.sockets.emit('Answer_Result', {Room: mes.Room, id: mes.id, result: mes.result, gold: mes.gold});
+	});
+	
+	//đặt cược
+	socket.on('Active_Bet', function(data){
+		var mes = JSON.parse(data)
+		io.sockets.emit('Active_Bet', {Room: mes.Room, id: mes.id, betStatus: mes.betStatus});
 	});
 	//Cập nhật thông tin player vào csdl
 	socket.on('Upload_Player_Info', function(data){
@@ -351,7 +357,7 @@ io.sockets.on('connection', function(socket){
 	});
 
 	//lấy câu hỏi theo level
-	socket.on('_Level_', function(data){
+	socket.on('Get_Question', function(data){
 		var mes = JSON.parse(data)
 		console.log("Level: " + mes.Level);
 	//truy vấn
@@ -362,7 +368,7 @@ io.sockets.on('connection', function(socket){
 	function (error, result, fields) {
     if (error) throw error;
 	//get result to client
-	io.sockets.emit('_Question_is_', {Room: mes.Room,
+	io.sockets.emit('Receive_Question', {Room: mes.Room,
 									id: results[0].id, 
 									content: results[0].content, 
 									level: results[0].level, 

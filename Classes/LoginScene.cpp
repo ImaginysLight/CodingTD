@@ -3,8 +3,9 @@
 #include "json\rapidjson.h"
 #include <network/SocketIO.h>
 #include "Global Class/Tool.h"
+#include"Global Class/Audio.h"
 USING_NS_CC;
-
+using namespace CocosDenshion;
 
 
 Scene* LoginScene::createScene()
@@ -15,7 +16,7 @@ Scene* LoginScene::createScene()
 bool LoginScene::init()
 {
 	visibleSize = Director::getInstance()->getVisibleSize();
-
+	Audio::audio->playEffect("Audio/The seasons - june (barcarolle).mp3", true);
 	SetupGUI();
 	
 	//_client = SocketIO::connect("http://127.0.0.1:3000", *this);
@@ -63,6 +64,7 @@ void LoginScene::btn_Click(Ref *pSender, cocos2d::ui::Button::Widget::TouchEvent
 	{
 	case Widget::TouchEventType::ENDED:
 	{
+		Audio::audio->playEffect(Audio::GetButtonClickAudio().c_str(), false);
 		term = (Button*)pSender;
 		if (term->getName() == "btn_Login") {
 			if (editBox_Username->getText() == "" || editBox_Password->getText() == "")

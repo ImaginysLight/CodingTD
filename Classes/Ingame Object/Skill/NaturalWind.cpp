@@ -11,6 +11,10 @@ NaturalWind::NaturalWind(int targetId)
 	if (target != nullptr && target->isAlive && target->action != "Die") {
 		target->baseAttackSpeed += 10;
 		target->ReprocessAllStatus("AttackSpeed");
+		auto sp_Icon = Sprite::create("Skill/Natural Wind.png");
+		Tool::setNodeSize(sp_Icon, 32, 32);
+		sp_Icon->setPosition(target->sprite->getBoundingBox().size / 2);
+		target->sprite->addChild(sp_Icon);
 	}
 	else return;
 

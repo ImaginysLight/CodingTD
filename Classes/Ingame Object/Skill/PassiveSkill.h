@@ -15,6 +15,9 @@ public:
 	static float Bonus_Health;
 	static float Bonus_Regeneration;
 	static float Bonus_AttackSpeed;
+	static int fireLevel;
+	static int iceLevel;
+	static int natureLevel;
 
 	static void IcySoul(BaseUnitClass*& unit);
 	static void FierySprit(BaseUnitClass*& unit);

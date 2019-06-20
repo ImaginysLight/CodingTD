@@ -1,4 +1,6 @@
 ﻿#include"GameScene.h"
+#include"Global Class/Audio.h"
+using namespace CocosDenshion;
 USING_NS_CC;
 
 
@@ -21,7 +23,15 @@ bool GameScene::init()
 	{
 		return false;
 	}
-	
+
+	Player::currentPlayer->elementName = Player::opponentPlayer->elementName = "Fire";
+	Player::currentPlayer->picked_units.push_back("Elemental Alien");
+	Player::currentPlayer->picked_units.push_back("Elemental Alien");
+	Player::currentPlayer->picked_units.push_back("Elemental Alien");
+	Player::currentPlayer->username = "ImaginysLight";
+
+	Audio::audio->stopAllEffects();
+
 	visibleSize = Director::getInstance()->getVisibleSize();
 
 	IngameObject::loadIngameObjectStaticVariables();
@@ -44,14 +54,16 @@ bool GameScene::init()
 	Tool::Socket_Client->_client->on("Create_Unit", CC_CALLBACK_2(GameScene::onReceiveEvent_InitializeIngameObject, this));
 	Tool::Socket_Client->_client->on("Use_Skill", CC_CALLBACK_2(GameScene::onReceiveEvent_ExcuteSkill, this));
 	Tool::Socket_Client->_client->on("Send_Message", CC_CALLBACK_2(GameScene::onReceiveEvent_SendMessage, this));
-	Tool::Socket_Client->_client->on("_Question_is_", CC_CALLBACK_2(GameScene::onReceiveEvent_Question, this));
+	Tool::Socket_Client->_client->on("Receive_Question", CC_CALLBACK_2(GameScene::onReceiveEvent_Question, this));
 	Tool::Socket_Client->_client->on("_Upgrade_Kingdom_", CC_CALLBACK_2(GameScene::onReceiveEvent_UpgradeKingdom, this));
 	Tool::Socket_Client->_client->on("Answer_Result", CC_CALLBACK_2(GameScene::onReceiveEvent_AnswerResult, this));
+	Tool::Socket_Client->_client->on("Active_Bet", CC_CALLBACK_2(GameScene::onReceiveEvent_ActiveBet, this));
 	Tool::Socket_Client->_client->on("Upload_Player_Info", nullptr);
 
 	this->schedule(schedule_selector(GameScene::UpdateIngameObject), 1/60);
 	this->schedule(schedule_selector(GameScene::UpdateQuestionInfo), 0.25);
 	this->schedule(schedule_selector(GameScene::UpdatePlayerResourcePerSecond), 1);
+	this->schedule(schedule_selector(GameScene::UpdateAudio), 1);
 	this->scheduleUpdate();
 
 	return true;
@@ -61,36 +73,72 @@ bool GameScene::init()
 void GameScene::LoadIngamePlayerInfo() {
 
 	//Set label các loại bên góc trái trên
-	ingamePlayerInfo.sp_Background = Sprite::create("UI/GameScene/Ingame Player Info.png");
-	ingamePlayerInfo.sp_Background->setAnchorPoint(Vec2(0, 1));
-	ingamePlayerInfo.sp_Background->setPosition(Vec2(15,visibleSize.height-15));
-	staticUI->addChild(ingamePlayerInfo.sp_Background, -1);
+	
 
-	ingamePlayerInfo.lbl_PlayerName = Tool::CreateLabel(Player::currentPlayer->username,Tool::defaultTextSize*0.75);
+	ingamePlayerInfo.root = Node::create();
+	staticUI->addChild(ingamePlayerInfo.root);
+
+	ingamePlayerInfo.sp_Background = Sprite::create("UI/GameScene/Player Info Background.png");
+	Tool::setNodeSize(ingamePlayerInfo.sp_Background, 250, 150);
+	ingamePlayerInfo.sp_Background->setAnchorPoint(Vec2(0, 1));
+	ingamePlayerInfo.sp_Background->setPosition(Vec2(visibleSize.width*0.02, visibleSize.height*0.98));
+	ingamePlayerInfo.root->addChild(ingamePlayerInfo.sp_Background);
+
+	ingamePlayerInfo.lbl_PlayerName = Tool::CreateLabel(Player::currentPlayer->username,Tool::defaultTextSize*0.95);
 	ingamePlayerInfo.lbl_PlayerName->enableBold();
 	ingamePlayerInfo.lbl_PlayerName->setAnchorPoint(Vec2(0, 0.5));
-	ingamePlayerInfo.lbl_PlayerName->setPosition(Vec2(122, 122));
-	ingamePlayerInfo.sp_Background->addChild(ingamePlayerInfo.lbl_PlayerName, 1);
+	ingamePlayerInfo.lbl_PlayerName->setPosition(Vec2(visibleSize.width*0.03, visibleSize.height*0.92));
+	ingamePlayerInfo.root->addChild(ingamePlayerInfo.lbl_PlayerName, 1);
 
-	ingamePlayerInfo.lbl_KingdomLevel = Tool::CreateLabel(to_string(ingamePlayerInfo.kingdomLevel), Tool::defaultTextSize, Color4B::GREEN, CCTextAlignment::LEFT);
+	ingamePlayerInfo.sp_KingdomLevel = Sprite::create("UI/GameScene/kingdomLevel.png");
+	Tool::setNodeSize(ingamePlayerInfo.sp_KingdomLevel, 32, 32);
+	ingamePlayerInfo.sp_KingdomLevel->setPosition(Vec2(visibleSize.width*0.2, visibleSize.height*0.92));
+	ingamePlayerInfo.root->addChild(ingamePlayerInfo.sp_KingdomLevel, 1);
+
+	ingamePlayerInfo.lbl_KingdomLevel = Tool::CreateLabel(to_string(ingamePlayerInfo.kingdomLevel), Tool::defaultTextSize, Color4B::GREEN, TextHAlignment::LEFT);
 	ingamePlayerInfo.lbl_KingdomLevel->setAnchorPoint(Vec2(0, 0.5));
-	ingamePlayerInfo.lbl_KingdomLevel->setPosition(Vec2(62, 103));
-	ingamePlayerInfo.sp_Background->addChild(ingamePlayerInfo.lbl_KingdomLevel,1);
+	ingamePlayerInfo.lbl_KingdomLevel->setPosition(Vec2(visibleSize.width*0.22, visibleSize.height*0.92));
+	ingamePlayerInfo.root->addChild(ingamePlayerInfo.lbl_KingdomLevel,1);
 
-	ingamePlayerInfo.lbl_Gold = Tool::CreateLabel(to_string(ingamePlayerInfo.gold), Tool::defaultTextSize, Color4B::YELLOW, CCTextAlignment::LEFT);
+	ingamePlayerInfo.sp_Gold = Sprite::create("UI/GameScene/gold.png");
+	Tool::setNodeSize(ingamePlayerInfo.sp_Gold, 32, 32);
+	ingamePlayerInfo.sp_Gold->setPosition(Vec2(visibleSize.width*0.05, visibleSize.height*0.85));
+	ingamePlayerInfo.root->addChild(ingamePlayerInfo.sp_Gold, 1);
+
+	ingamePlayerInfo.lbl_Gold = Tool::CreateLabel(to_string(ingamePlayerInfo.gold), Tool::defaultTextSize, Color4B::YELLOW, TextHAlignment::LEFT);
 	ingamePlayerInfo.lbl_Gold->setAnchorPoint(Vec2(0, 0.5));
-	ingamePlayerInfo.lbl_Gold->setPosition(Vec2(62, 82));
-	ingamePlayerInfo.sp_Background->addChild(ingamePlayerInfo.lbl_Gold);
+	ingamePlayerInfo.lbl_Gold->setPosition(Vec2(visibleSize.width*0.07, visibleSize.height*0.85));
+	ingamePlayerInfo.root->addChild(ingamePlayerInfo.lbl_Gold);
 
-	ingamePlayerInfo.lbl_Energy = Tool::CreateLabel(to_string(ingamePlayerInfo.energy), Tool::defaultTextSize, Color4B(Color3B(175, 225, 250), 255), CCTextAlignment::LEFT);
+	ingamePlayerInfo.sp_Energy = Sprite::create("UI/GameScene/energy.png");
+	Tool::setNodeSize(ingamePlayerInfo.sp_Energy, 32, 32);
+	ingamePlayerInfo.sp_Energy->setPosition(Vec2(visibleSize.width*0.15, visibleSize.height*0.85));
+	ingamePlayerInfo.root->addChild(ingamePlayerInfo.sp_Energy, 1);
+
+	ingamePlayerInfo.lbl_Energy = Tool::CreateLabel(to_string(ingamePlayerInfo.energy), Tool::defaultTextSize, Color4B(Color3B(175, 225, 250), 255), TextHAlignment::LEFT);
 	ingamePlayerInfo.lbl_Energy->setAnchorPoint(Vec2(0, 0.5));
-	ingamePlayerInfo.lbl_Energy->setPosition(Vec2(62, 58));
-	ingamePlayerInfo.sp_Background->addChild(ingamePlayerInfo.lbl_Energy);
+	ingamePlayerInfo.lbl_Energy->setPosition(Vec2(visibleSize.width*0.17, visibleSize.height*0.85));
+	ingamePlayerInfo.root->addChild(ingamePlayerInfo.lbl_Energy);
 
-	ingamePlayerInfo.lbl_Knowledge = Tool::CreateLabel(to_string(ingamePlayerInfo.knowledge), Tool::defaultTextSize, Color4B(Color3B(175, 225, 200), 255), CCTextAlignment::LEFT);
+	ingamePlayerInfo.sp_Knowledge = Sprite::create("UI/GameScene/knowledge.png");
+	Tool::setNodeSize(ingamePlayerInfo.sp_Knowledge, 32, 32);
+	ingamePlayerInfo.sp_Knowledge->setPosition(Vec2(visibleSize.width*0.05, visibleSize.height*0.78));
+	ingamePlayerInfo.root->addChild(ingamePlayerInfo.sp_Knowledge, 1);
+
+	ingamePlayerInfo.lbl_Knowledge = Tool::CreateLabel(to_string(ingamePlayerInfo.knowledge), Tool::defaultTextSize, Color4B(Color3B(175, 225, 200), 255), TextHAlignment::LEFT);
 	ingamePlayerInfo.lbl_Knowledge->setAnchorPoint(Vec2(0, 0.5));
-	ingamePlayerInfo.lbl_Knowledge->setPosition(Vec2(62, 33));
-	ingamePlayerInfo.sp_Background->addChild(ingamePlayerInfo.lbl_Knowledge);
+	ingamePlayerInfo.lbl_Knowledge->setPosition(Vec2(visibleSize.width*0.07, visibleSize.height*0.78));
+	ingamePlayerInfo.root->addChild(ingamePlayerInfo.lbl_Knowledge);
+
+	ingamePlayerInfo.sp_Food = Sprite::create("UI/GameScene/food.png");
+	Tool::setNodeSize(ingamePlayerInfo.sp_Food, 25, 25);
+	ingamePlayerInfo.sp_Food->setPosition(Vec2(visibleSize.width*0.15, visibleSize.height*0.78));
+	ingamePlayerInfo.root->addChild(ingamePlayerInfo.sp_Food, 1);
+
+	ingamePlayerInfo.lbl_Food = Tool::CreateLabel("0 / 5", Tool::defaultTextSize, Color4B::RED);
+	ingamePlayerInfo.lbl_Food->setAnchorPoint(Vec2(0, 0.5));
+	ingamePlayerInfo.lbl_Food->setPosition(Vec2(visibleSize.width*0.17, visibleSize.height*0.78));
+	ingamePlayerInfo.root->addChild(ingamePlayerInfo.lbl_Food);
 
 	//Lấy effect Trophy
 	auto knowledge = Trophy::CalculateKnowledgeTrophy(Player::currentPlayer->total_correctAnswer);
@@ -105,26 +153,67 @@ void GameScene::LoadIngamePlayerInfo() {
 
 	//Tạo 2 skill
 	if (Player::currentPlayer->elementName == "Ice") {
-		ingamePlayerInfo.btn_Skill1 = Tool::CreateButtonWithoutSprite("Cool Blooded", "Cool Blooded", Tool::defaultTextSize*1.25, Color3B(0, 255, 255));
-		ingamePlayerInfo.btn_Skill2 = Tool::CreateButtonWithoutSprite("Ice Age", "Ice Age", Tool::defaultTextSize*1.25, Color3B(0, 255, 255));
+		ingamePlayerInfo.btn_Skill1 = Button::create("Skill/Cold Blooded.png");
+		ingamePlayerInfo.btn_Skill1->setName("Cool Blooded");
+		ingamePlayerInfo.btn_Skill1->setTitleText("Cold Blooded: Give an ally a power of Ice, halved their Move Speed and Attack but double Health and Defense. 20 Energy");
+
+		ingamePlayerInfo.btn_Skill2 = Button::create("Skill/Cold Blooded.png");
+		ingamePlayerInfo.btn_Skill2->setName("Icy Soul");
+		ingamePlayerInfo.btn_Skill2->setTitleText("Icy Soul: Level 0: +5% Health and 5% Defense");
+
+		ingamePlayerInfo.btn_Skill3 = Button::create("Skill/Ice Age.png");
+		ingamePlayerInfo.btn_Skill3->setName("Ice Age");
+		ingamePlayerInfo.btn_Skill3->setTitleText("Ice Age: Freeze all enemies in Ice, stun them for 4 seconds and deal damage inversely proportional to their Attack Speed and proportional to their Attack. 100 Energy");
+
 	}
 	else if (Player::currentPlayer->elementName == "Fire") {
-		ingamePlayerInfo.btn_Skill1 = Tool::CreateButtonWithoutSprite("Burning Enthusiasm", "Burning Enthusiasm", Tool::defaultTextSize*1.25, Color3B::RED);
-		ingamePlayerInfo.btn_Skill2 = Tool::CreateButtonWithoutSprite("Hell Fire", "Hell Fire", Tool::defaultTextSize*1.25, Color3B::RED);
+		ingamePlayerInfo.btn_Skill1 = Button::create("Skill/Burning Enthusiasm.png");
+		ingamePlayerInfo.btn_Skill1->setName("Burning Enthusiasm");
+		ingamePlayerInfo.btn_Skill1->setTitleText("Burning Enthusiasm: Give an ally a power of Fire, double their Attack but receive pure damage equal to 10% of that bonus each second. 15 Energy");
+
+		ingamePlayerInfo.btn_Skill2 = Button::create("Skill/Burning Enthusiasm.png");
+		ingamePlayerInfo.btn_Skill2->setName("Fiery Spirit");
+		ingamePlayerInfo.btn_Skill2->setTitleText("Fiery Spirit: Level 0: +17% Attack");
+
+		ingamePlayerInfo.btn_Skill3 = Button::create("Skill/Hell Fire.png");
+		ingamePlayerInfo.btn_Skill3->setName("Hell Fire");
+		ingamePlayerInfo.btn_Skill3->setTitleText("Hell Fire: Burn down all enemies with hell fire, dealt damage proportional to your army's Attack each second for 4 seconds. 90 Energy");
+
 	}
 	else if (Player::currentPlayer->elementName == "Nature") {
-		ingamePlayerInfo.btn_Skill1 = Tool::CreateButtonWithoutSprite("Natural Wind", "Natural Wind", Tool::defaultTextSize*1.25, Color3B::GREEN);
-		ingamePlayerInfo.btn_Skill2 = Tool::CreateButtonWithoutSprite("Heaven Bless", "Heaven Bless", Tool::defaultTextSize*1.25, Color3B::GREEN);
+		ingamePlayerInfo.btn_Skill1 = Button::create("Skill/Natural Wind.png");
+		ingamePlayerInfo.btn_Skill1->setName("Natural Wind");
+		ingamePlayerInfo.btn_Skill1->setTitleText("Natural Wind: Give an ally a power of Nature, immediately increase Attack Speed by 10, then increase by 1 each second for 20 seconds. 15 Energy");
+
+		ingamePlayerInfo.btn_Skill2 = Button::create("Skill/Natural Wind.png");
+		ingamePlayerInfo.btn_Skill2->setName("Pure Heart");
+		ingamePlayerInfo.btn_Skill2->setTitleText("Pure Heart: Level 0: +2 Regeneration and 8 Attack Speed");
+
+		ingamePlayerInfo.btn_Skill3 = Button::create("Skill/Heaven Bless.png");
+		ingamePlayerInfo.btn_Skill3->setName("Heaven Bless");
+		ingamePlayerInfo.btn_Skill3->setTitleText("Heaven Bless: Encourage all allies with a bless from heaven, increase current Health and max Health by 250. 80 Energy");
 	}
-	ingamePlayerInfo.btn_Skill1->setPosition(Vec2(visibleSize.width*0.02, visibleSize.height*0.7));
+	ingamePlayerInfo.btn_Skill1->setPosition(Vec2(visibleSize.width*0.03, visibleSize.height*0.6));
 	ingamePlayerInfo.btn_Skill1->setAnchorPoint(Vec2(0, 0.5));
+	ingamePlayerInfo.btn_Skill1->setTitleFontSize(0);
+	Tool::setNodeSize(ingamePlayerInfo.btn_Skill1, 50, 50);
 	ingamePlayerInfo.btn_Skill1->addTouchEventListener(CC_CALLBACK_2(GameScene::btn_ExecuteSkill_Click, this));
 	staticUI->addChild(ingamePlayerInfo.btn_Skill1);
 
-	ingamePlayerInfo.btn_Skill2->setPosition(Vec2(visibleSize.width*0.02, visibleSize.height*0.65));
+	ingamePlayerInfo.btn_Skill2->setPosition(Vec2(visibleSize.width*0.03, visibleSize.height*0.5));
 	ingamePlayerInfo.btn_Skill2->setAnchorPoint(Vec2(0, 0.5));
-	ingamePlayerInfo.btn_Skill2->addTouchEventListener(CC_CALLBACK_2(GameScene::btn_ExecuteSkill_Click, this));
+	ingamePlayerInfo.btn_Skill2->setTitleFontSize(0);
+	Tool::setNodeSize(ingamePlayerInfo.btn_Skill2, 50, 50);
 	staticUI->addChild(ingamePlayerInfo.btn_Skill2);
+
+	ingamePlayerInfo.btn_Skill3->setPosition(Vec2(visibleSize.width*0.03, visibleSize.height*0.4));
+	ingamePlayerInfo.btn_Skill3->setAnchorPoint(Vec2(0, 0.5));
+	ingamePlayerInfo.btn_Skill3->setTitleFontSize(0);
+	Tool::setNodeSize(ingamePlayerInfo.btn_Skill3, 50, 50);
+	ingamePlayerInfo.btn_Skill3->addTouchEventListener(CC_CALLBACK_2(GameScene::btn_ExecuteSkill_Click, this));
+	staticUI->addChild(ingamePlayerInfo.btn_Skill3);
+
+	
 
 	//Tạo Kingdom
 	GameScene::InitializeIngameObject(IngameObject::GetKingdomByElement(Player::currentPlayer->elementName), 1, Player::currentPlayer->id);
@@ -149,7 +238,7 @@ void GameScene::LoadIngamePlayerInfo() {
 
 	//Tạo thanh mua lính
 	for (int i = 0; i < Player::currentPlayer->picked_units.size(); i++) {
-		List_BuyableUnit.push_back(Item_BuyableUnit(Player::currentPlayer->picked_units[i]));
+		List_BuyableUnit.push_back(Item_BuyableUnit(Player::currentPlayer->picked_units[i] + " 1"));
 	}
 	GameScene::CreateBuyingBar();
 	
@@ -206,12 +295,27 @@ void GameScene::UpdatePlayerResourcePerSecond(float time) {
 	UpdateIngamePlayerInfo();
 }
 
+void GameScene::UpdateAudio(float time)
+{
+	if (!Audio::audio->isBackgroundMusicPlaying()) {
+		Audio::audio->playBackgroundMusic(Audio::GetBackgroundAudio().c_str(), false);
+	}
+}
+
 void GameScene::UpdateQuestionInfo(float time) {
 	if (destinationTime < Tool::currentIngameTime){
-		questionAvailable = false;
-		isAllowedToChooseQuestion = !isAllowedToChooseQuestion;
-		GameScene::ChangeQuestionTableState(questionAvailable);
-		destinationTime += 10;
+		if (questionAvailable || questionContent == "") {
+			questionAvailable = false;
+			isAllowedToChooseQuestion = !isAllowedToChooseQuestion;
+			GameScene::ChangeQuestionTableState(questionAvailable);
+			destinationTime += 10;
+			lbl_Level->setString("???");
+		}
+		else {
+			questionAvailable = true;
+			GameScene::ChangeQuestionTableState(true);
+			destinationTime = 10 + 10 * currentQuestionLevel + Tool::currentIngameTime;
+		}
 	}
 	if (questionAvailable) {
 		btn_DropDownQuestionTable->setTitleText("Question Ready (" + to_string((int)(destinationTime - Tool::currentIngameTime)) + ")");
@@ -232,7 +336,10 @@ void GameScene::ChangeQuestionTableState(bool questionAvailable) {
 	Tool::Button_ChangeState(btn_Answer3, false, 0.5);
 	Tool::Button_ChangeState(btn_Answer4, false, 0.5);
 	if (questionAvailable) { //Nếu có câu hỏi: hiện đáp án
-		
+		txt_Question->setString(questionContent);
+		lv_QuestionContent->requestDoLayout();
+		questionContent = "";
+
 		btn_Answer1->setTitleColor(Color3B::WHITE);
 		btn_Answer2->setTitleColor(Color3B::WHITE);
 		btn_Answer3->setTitleColor(Color3B::WHITE);
@@ -263,11 +370,17 @@ void GameScene::ChangeQuestionTableState(bool questionAvailable) {
 
 void GameScene::InitializeIngameObject(string objectName, int line, int playerId)
 {
+	//Play nhạc
+	Audio::audio->playEffect(Audio::GetSpawnAudio().c_str(), false);
+
 	//Tạo lính
 	bool isOwned = playerId == Player::currentPlayer->id ? true : false;
 	BaseUnitClass* object = ObjectConstructor::InitializeObject(objectName, line, isOwned, playerId, ++BaseUnitClass::Unit_Id_Counter);
 	BaseUnitClass::AllIngameUnit_Vector.push_back(object);
 	this->addChild(object->root, 4 - object->line);
+
+	//Thêm food
+	if (isOwned) { ingamePlayerInfo.food++; GameScene::UpdateIngamePlayerInfo(); }
 
 	//Set vị trí random
 	if (BaseUnitClass::AllIngameUnit_Vector.size() % 2)
@@ -309,6 +422,28 @@ void GameScene::Endgame(bool isVictorious)
 		lbl_Result->setString("You are Defeated");
 		lbl_Result->setTextColor(Color4B::RED);
 	}
+
+	Player::oldPlayerInfo = *Player::currentPlayer;
+	Player::currentPlayer->total_correctAnswer += ResultScene::numOfCorrectAnswer;
+	Player::currentPlayer->total_wrongAnswer += ResultScene::numOfWrongAnswer;
+	Player::currentPlayer->total_kill += ResultScene::numOfEnemyDefeated;
+	float questionPoint = (ResultScene::numOfCorrectAnswer + ResultScene::numOfWrongAnswer)*(0.5 + ResultScene::numOfCorrectAnswer / (float)(ResultScene::numOfWrongAnswer + ResultScene::numOfCorrectAnswer) * 2);
+	if (questionPoint != questionPoint) questionPoint = 0;
+	float battlePoint = ResultScene::goldReceived *0.01;
+	int bonusExp = (questionPoint + battlePoint) * (ResultScene::isVictorious ? 1.3 : 0.8);
+	Player::currentPlayer->experience += bonusExp;
+	ResultScene::isVictorious ? (Player::currentPlayer->total_win++) : (Player::currentPlayer->total_lose++);
+
+	if (Player::CalculateLevel(Player::oldPlayerInfo.experience).first < Player::CalculateLevel(Player::currentPlayer->experience).first)
+		Player::currentPlayer->friendshipPoint++;
+
+	Player::UploadPlayerInfo(Player::currentPlayer);
+
+	//Play nhạc
+	Audio::audio->stopAllEffects();
+	if (isVictorious) Audio::audio->playBackgroundMusic(Audio::GetBrightAudio().c_str(), false);
+	else Audio::audio->playBackgroundMusic(Audio::GetSadAudio().c_str(), false);
+	
 }
 
 void GameScene::ClearAllVariables()
@@ -318,6 +453,7 @@ void GameScene::ClearAllVariables()
 	Player::opponentPlayer = new PlayerInfo();
 	Player::currentPlayer->elementName = "";
 	Player::currentPlayer->picked_units.clear();
+	Player::currentPlayer->room_name = "";
 }
 
 void GameScene::onReceiveEvent_InitializeIngameObject(SIOClient* client, const std::string& data)
@@ -344,48 +480,36 @@ void GameScene::btn_Click(Ref * pSender, cocos2d::ui::Button::Widget::TouchEvent
 		}
 
 		else if (name == "btn_Level1" || name == "btn_Level2" || name == "btn_Level3") {
-			//if (isAllowedToChooseQuestion) {
-				nextQuestionLevel = name.substr(name.size() - 1, 1);
-				std::string Send_Level;
-				if (name == "btn_Level1") {
-					Send_Level = "{\"Room\":\"" + Player::currentPlayer->room_name + "\" ,\"Level\":\"1\"}";
-					CCLOG("Easy");
-				}
-				if (name == "btn_Level2") {
-					Send_Level = "{\"Room\":\"" + Player::currentPlayer->room_name + "\" ,\"Level\":\"2\"}";
-					CCLOG("Medium");
-				}
-				if (name == "btn_Level3")
-				{
-					Send_Level = "{\"Room\":\"" + Player::currentPlayer->room_name + "\" ,\"Level\":\"3\"}";
-					CCLOG("Hard");
-				}
-				Tool::Socket_Client->_client->emit("_Level_", Send_Level);
-				nextQuestionLevel = name.substr(name.size() - 1, 1);
+				auto level = name.substr(name.size() - 1, 1);
+				Tool::Socket_Client->_client->emit("Get_Question", "{\"Room\":\"" + Player::currentPlayer->room_name + "\" ,\"Level\":\"" + level + "\"}");
 				((Button*)pSender)->setTitleColor(Color3B::GREEN);
-			//}
 		}
-		else if (name == "btn_Mode") {
-			if (btn_Mode->getTitleText() == "Buy") btn_Mode->setTitleText("Upgrade");
-			else if (btn_Mode->getTitleText() == "Upgrade")btn_Mode->setTitleText("View");
-			else if (btn_Mode->getTitleText() == "View")btn_Mode->setTitleText("Buy");
-		}
-		else if (name == "btn_CloseViewDetail") {
-			GameScene::sc_ViewDetail->runAction(RemoveSelf::create());
-			Tool::Button_ChangeState(btn_CloseViewDetail, false, 0);
+		else if (name == "btn_TurnOnUpgrade") {
+			if (GameScene::BuyingBarMode == "Buy") BuyingBarMode = "Upgrade";
+			else BuyingBarMode = "Buy";
+			GameScene::ChangeUpgradeState();
 		}
 		else if (name == "btn_Confirm") {
-			Player::oldPlayerInfo = *Player::currentPlayer;
-			Player::currentPlayer->total_correctAnswer += ResultScene::numOfCorrectAnswer;
-			Player::currentPlayer->total_wrongAnswer += ResultScene::numOfWrongAnswer;
-			Player::currentPlayer->total_kill += ResultScene::numOfEnemyDefeated;
-			float questionPoint = (ResultScene::numOfCorrectAnswer + ResultScene::numOfWrongAnswer)*(0.5 + ResultScene::numOfCorrectAnswer / (float)(ResultScene::numOfWrongAnswer + ResultScene::numOfCorrectAnswer) * 2);
-			float battlePoint = ResultScene::goldReceived *0.01;
-			int bonusExp = (questionPoint + battlePoint) * (ResultScene::isVictorious ? 1.3 : 0.8);
-			Player::currentPlayer->experience += bonusExp;
-			ResultScene::isVictorious ? (Player::currentPlayer->total_win++) : (Player::currentPlayer->total_lose++);
-			Player::UploadPlayerInfo(Player::currentPlayer);
 			Director::getInstance()->replaceScene(ResultScene::createScene());
+		}
+		else if (name == "btn_PositiveBet" || name == "btn_NegativeBet") {
+			if (Player::currentPlayer->betNegative || Player::currentPlayer->betPositive) {
+				RunActionNotify("You activated bet already!");
+				return;
+			}
+			if (ingamePlayerInfo.gold >= 100) {
+				if (name == "btn_PositiveBet") {
+					Tool::Socket_Client->_client->emit("Active_Bet", "{\"Room\":\"" + Player::currentPlayer->room_name + "\" ,\"id\":\"" + to_string(Player::currentPlayer->id) + "\",\"betStatus\":\"" + "Positive" + "\"}");
+					Player::currentPlayer->betPositive = true;
+				}
+				if (name == "btn_NegativeBet") {
+					Tool::Socket_Client->_client->emit("Active_Bet", "{\"Room\":\"" + Player::currentPlayer->room_name + "\" ,\"id\":\"" + to_string(Player::currentPlayer->id) + "\",\"betStatus\":\"" + "Negative" + "\"}");
+					Player::currentPlayer->betNegative = true;
+				}
+				ingamePlayerInfo.gold -= 100;
+			}
+			else RunActionNotify("Not enough Gold");
+			GameScene::UpdateIngamePlayerInfo();
 		}
 	}
 }
@@ -396,7 +520,6 @@ void GameScene::btn_ExecuteSkill_Click(Ref * pSender, cocos2d::ui::Button::Widge
 		string name = ((Node*)pSender)->getName();
 		auto btn = (Button*)pSender;
 		if (GameScene::CheckSkillCondition(name)) {
-			//SkillConstructor::InitializeSkill(name, 0, 0, Player::currentPlayer->id, GameScene::choosingUnit->unitId);
 			Tool::Socket_Client->_client->emit("Use_Skill", "{\"Room\":\"" + Player::currentPlayer->room_name + "\", \"name\":\"" + name + "\", \"id\":\"" + to_string(Player::currentPlayer->id) + "\", \"unitId\":\"" + to_string(GameScene::choosingUnit->unitId) + "\"}");
 		}
 	}
@@ -480,6 +603,38 @@ void GameScene::onTouchEnded(Touch* touch, Event* event) {
 	
 }
 
+void GameScene::onMouseMove(Event * event)
+{
+	EventMouse* e = (EventMouse*)event;
+	Vec2 point = Vec2(e->getCursorX(), e->getCursorY());
+	string tooltipContent = "";
+	if (ingamePlayerInfo.btn_Skill1->getBoundingBox().containsPoint(point)) tooltipContent = ingamePlayerInfo.btn_Skill1->getTitleText();
+	else if (ingamePlayerInfo.btn_Skill2->getBoundingBox().containsPoint(point)) tooltipContent = ingamePlayerInfo.btn_Skill2->getTitleText();
+	else if (ingamePlayerInfo.btn_Skill3->getBoundingBox().containsPoint(point)) tooltipContent = ingamePlayerInfo.btn_Skill3->getTitleText();
+	else if (ingamePlayerInfo.sp_KingdomLevel->getBoundingBox().containsPoint(point)) tooltipContent = "Kingdom Level";
+	else if (ingamePlayerInfo.sp_Gold->getBoundingBox().containsPoint(point)) tooltipContent = "Gold";
+	else if (ingamePlayerInfo.sp_Energy->getBoundingBox().containsPoint(point)) tooltipContent = "Energy";
+	else if (ingamePlayerInfo.sp_Knowledge->getBoundingBox().containsPoint(point)) tooltipContent = "Knowledge";
+	else if (ingamePlayerInfo.sp_Food->getBoundingBox().containsPoint(point)) tooltipContent = "Food";
+
+	if (tooltipContent != "") {
+		GameScene::tooltip->removeAllChildrenWithCleanup(true);
+		Label* lbl = Tool::CreateLabel(tooltipContent,Tool::defaultTextSize*0.9);
+		if (point.x < visibleSize.width*0.5) {
+			lbl->setAnchorPoint(Vec2(0, 0.5));
+			lbl->setPositionX(25);
+		}
+		else {
+			lbl->setAnchorPoint(Vec2(1, 0.5));
+			lbl->setPositionX(-25);
+		}
+		lbl->setMaxLineWidth(350);
+		tooltip->addChild(lbl);
+		tooltip->setPosition(point);
+	}
+	else GameScene::tooltip->removeAllChildrenWithCleanup(true);
+}
+
 void GameScene::SetupCamera() {
 	auto cameraSprite = Sprite::create();
 	this->addChild(cameraSprite);
@@ -488,11 +643,19 @@ void GameScene::SetupCamera() {
 	touchListener->onTouchMoved = (CC_CALLBACK_2(GameScene::onTouchMoved, this));
 	touchListener->onTouchEnded = (CC_CALLBACK_2(GameScene::onTouchEnded, this));
 	this->getEventDispatcher()->addEventListenerWithSceneGraphPriority(touchListener, cameraSprite);
+
+	auto _mouseListener = EventListenerMouse::create();
+	_mouseListener->onMouseMove = CC_CALLBACK_1(GameScene::onMouseMove, this);
+	_eventDispatcher->addEventListenerWithSceneGraphPriority(_mouseListener, this);
+
 }
 
 void GameScene::SetupGUI() {
 	staticUI = Node::create();
 	this->addChild(staticUI,5);
+
+	GameScene::tooltip = Node::create();
+	staticUI->addChild(tooltip, 2);
 
 	unitDetails = Node::create();
 	staticUI->addChild(unitDetails);
@@ -505,12 +668,6 @@ void GameScene::SetupGUI() {
 	auto _background = Sprite::create("UI/GameScene/static background.png");
 	_background->setPosition(visibleSize/2);
 	staticUI->addChild(_background, -1);
-
-	lbl_Notify =Label::createWithTTF("", "fonts/arial.ttf", Tool::defaultTextSize);
-	lbl_Notify->setTextColor(Color4B::RED);
-	lbl_Notify->runAction(FadeOut::create(0));
-	lbl_Notify->setPosition(Vec2(visibleSize/2));
-	staticUI->addChild(lbl_Notify);
 
 	btn_DropDownQuestionTable = Button::create();
 	btn_DropDownQuestionTable->setTitleText("Waiting For Next Question (" + to_string((int)(destinationTime-Tool::currentIngameTime)) + ")");
@@ -528,42 +685,48 @@ void GameScene::CreateBuyingBar() {
 	buyingBar = Node::create();
 	staticUI->addChild(buyingBar,1);
 
-	auto sp_Background = Sprite::create("UI/GameScene/Buying Bar Background.png");
-	buyingBar->addChild(sp_Background, -1);
-	sp_Background->setPositionX(visibleSize.width / 2);
-	sp_Background->setAnchorPoint(Vec2(0.5, 0));
+	GameScene::btn_TurnOnUpgrade = Tool::CreateButtonWithoutSprite("btn_TurnOnUpgrade", Tool::ConvertUTF16ToString(L"↑Upgrade↑"),Tool::defaultTextSize*1.4,Color3B::RED);
+	btn_TurnOnUpgrade->setPosition(Vec2(visibleSize.width*0.1, visibleSize.height*0.3));
+	btn_TurnOnUpgrade->addTouchEventListener(CC_CALLBACK_2(GameScene::btn_Click, this));
+	buyingBar->addChild(btn_TurnOnUpgrade,2);
 
-	GameScene::btn_Mode = Tool::CreateButtonWithoutSprite("btn_Mode", "Buy");
-	btn_Mode->setPosition(Vec2(visibleSize.width*0.24, visibleSize.height*0.05));
-	btn_Mode->addTouchEventListener(CC_CALLBACK_2(GameScene::btn_Click, this));
-	buyingBar->addChild(btn_Mode,2);
+	GameScene::btn_UpgradeFarm = Tool::CreateButtonWithoutSprite("btn_UpgradeFarm", Tool::ConvertUTF16ToString(L"↑ Farm ↑"), Tool::defaultTextSize*1.4, Color3B(100, 225, 255));
+	btn_UpgradeFarm->setPosition(Vec2(visibleSize.width*0.5, visibleSize.height*0.3));
+	btn_UpgradeFarm->addTouchEventListener([&](Ref *pSender, cocos2d::ui::Button::Widget::TouchEventType type) {
+		if (type == Widget::TouchEventType::ENDED) {
+			GameScene::CreateUpgradeTable(((Button*)pSender)->getName());
+			GameScene::BuyingBarMode = "Buy";
+			GameScene::ChangeUpgradeState();
+		}
+	});
+	buyingBar->addChild(btn_UpgradeFarm);
+	Tool::Button_ChangeState(btn_UpgradeFarm, false, 0);
 
-	GameScene::btn_CloseViewDetail = Tool::CreateButtonWithoutSprite("btn_CloseViewDetail", "Close", Tool::defaultTextSize, Color3B::RED);
-	btn_CloseViewDetail->setPosition(visibleSize*0.85);
-	Tool::Button_ChangeState(btn_CloseViewDetail, false, 0);
-	btn_CloseViewDetail->addTouchEventListener(CC_CALLBACK_2(GameScene::btn_Click, this));
-	staticUI->addChild(btn_CloseViewDetail,1);
+	GameScene::btn_UpgradeKingdom = Tool::CreateButtonWithoutSprite(IngameObject::GetKingdomByElement(Player::currentPlayer->elementName), Tool::ConvertUTF16ToString(L"↑ Kingdom ↑"),Tool::defaultTextSize*1.4,Color3B(100,255,200));
+	btn_UpgradeKingdom->setPosition(Vec2(visibleSize.width*0.3, visibleSize.height*0.3));
+	btn_UpgradeKingdom->addTouchEventListener([&](Ref *pSender, cocos2d::ui::Button::Widget::TouchEventType type) {
+		if (type == Widget::TouchEventType::ENDED) {
+			GameScene::CreateUpgradeTable(((Button*)pSender)->getName());
+			GameScene::BuyingBarMode = "Buy";
+			GameScene::ChangeUpgradeState();
+		}
+	});
+	buyingBar->addChild(btn_UpgradeKingdom);
+	Tool::Button_ChangeState(btn_UpgradeKingdom, false, 0);
 
-	ingamePlayerInfo.btn_UpgradeKingdom = Tool::CreateButtonWithoutSprite(IngameObject::GetKingdomByElement(Player::currentPlayer->elementName), Tool::ConvertUTF16ToString(L"Up ↑"));
-	ingamePlayerInfo.btn_UpgradeKingdom->setPosition(Vec2(visibleSize.width*0.755, visibleSize.height*0.05));
-	ingamePlayerInfo.btn_UpgradeKingdom->addTouchEventListener(CC_CALLBACK_2(GameScene::btn_UpgradeKingdom, this));
-	buyingBar->addChild(ingamePlayerInfo.btn_UpgradeKingdom);
 	this->buyingBar->addChild(ghostItem);
 	for (int i = 0; i < List_BuyableUnit.size(); i++) {
 		this->buyingBar->addChild(List_BuyableUnit[i].root);
 		List_BuyableUnit[i].btn_Icon->addTouchEventListener(CC_CALLBACK_2(GameScene::btn_BuyUnit_Click, this));
 		AddDragAndDropItem(List_BuyableUnit[i].root);
 	}
-	List_BuyableUnit[0].root->setPosition(Vec2(visibleSize.width*0.305, visibleSize.height*0.05));
-	List_BuyableUnit[1].root->setPosition(Vec2(visibleSize.width*0.37, visibleSize.height*0.05));
-	if (List_BuyableUnit.size() > 2)
-		List_BuyableUnit[2].root->setPosition(Vec2(visibleSize.width*0.435, visibleSize.height*0.05));
-	if (List_BuyableUnit.size() > 3)
-		List_BuyableUnit[3].root->setPosition(Vec2(visibleSize.width*0.56, visibleSize.height*0.05));
-	if (List_BuyableUnit.size() > 4)
-		List_BuyableUnit[4].root->setPosition(Vec2(visibleSize.width*0.625, visibleSize.height*0.05));
-	if (List_BuyableUnit.size() > 5)
-		List_BuyableUnit[5].root->setPosition(Vec2(visibleSize.width*0.69, visibleSize.height*0.05));
+	//List_BuyableUnit[0].root->setPosition(Vec2(visibleSize.width*(0.55 - 0.05*List_BuyableUnit.size()), visibleSize.height*0.05));
+	List_BuyableUnit[0].root->setPosition(Vec2(visibleSize.width*0.15, visibleSize.height*0.05));
+	List_BuyableUnit[0].oldRootPos = List_BuyableUnit[0].root->getPosition();
+	for (int i = 1; i < List_BuyableUnit.size(); i++) {
+		List_BuyableUnit[i].root->setPosition(List_BuyableUnit[i - 1].root->getPosition() + Vec2(visibleSize.width*0.1,0));
+		List_BuyableUnit[i].oldRootPos = List_BuyableUnit[i].root->getPosition();
+	}
 	
 }
 
@@ -586,7 +749,7 @@ void GameScene::AddDragAndDropItem(Node*& root) {
 }
 
 void GameScene::onCardMoved(Touch* touch, Event* event) {
-	if (GameScene::choosingBuyableUnit != nullptr &&  GameScene::btn_Mode->getTitleText() == "Buy") {
+	if (GameScene::choosingBuyableUnit != nullptr) {
 		choosingBuyableUnit->root->setPosition(Vec2(touch->getLocation()));
 	}
 }
@@ -596,7 +759,6 @@ void GameScene::btn_BuyUnit_Click(Ref *pSender, cocos2d::ui::Button::Widget::Tou
 		for (int i = 0; i < List_BuyableUnit.size(); i++) {
 			if (List_BuyableUnit[i].btn_Icon->getName() == ((Button*)pSender)->getName()) {
 				choosingBuyableUnit = &List_BuyableUnit[i];
-				oldRootPos = choosingBuyableUnit->root->getPosition();
 				break;
 			}
 		}
@@ -606,7 +768,7 @@ void GameScene::btn_BuyUnit_Click(Ref *pSender, cocos2d::ui::Button::Widget::Tou
 		choosingBuyableUnit = nullptr;
 	}
 	if (type == Widget::TouchEventType::ENDED) {
-		if (GameScene::btn_Mode->getTitleText() == "Buy") {
+		if (GameScene::BuyingBarMode == "Buy") {
 			float heightPos = choosingBuyableUnit->root->getPositionY();
 			CCLOG("%f", heightPos);
 			if (heightPos < IngameObject::spawnPoint["1_1"].y + 50 && heightPos > IngameObject::spawnPoint["1_1"].y - 50) {
@@ -618,15 +780,12 @@ void GameScene::btn_BuyUnit_Click(Ref *pSender, cocos2d::ui::Button::Widget::Tou
 			else if (heightPos < IngameObject::spawnPoint["1_3"].y + 50 && heightPos > IngameObject::spawnPoint["1_3"].y - 50) {
 				GameScene::BuyUnit(choosingBuyableUnit->btn_Icon->getName(), 3);
 			}
-			choosingBuyableUnit->root->setPosition(oldRootPos);
+			choosingBuyableUnit->root->setPosition(choosingBuyableUnit->oldRootPos);
 		}
-		else if (GameScene::btn_Mode->getTitleText() == "Upgrade") {
+		else if (GameScene::BuyingBarMode == "Upgrade") {
 			GameScene::CreateUpgradeTable(((Button*)pSender)->getName());
-		}
-		else if (GameScene::btn_Mode->getTitleText() == "View") {
-			sc_ViewDetail = ObjectConstructor::GetSpecificUnitDetails(((Button*)pSender)->getName(), visibleSize);
-			staticUI->addChild(sc_ViewDetail);
-			Tool::Button_ChangeState(GameScene::btn_CloseViewDetail, true, 0.5);
+			GameScene::BuyingBarMode = "Buy";
+			GameScene::ChangeUpgradeState();
 		}
 		choosingBuyableUnit = nullptr;
 	}
@@ -641,8 +800,10 @@ void GameScene::BuyUnit(string name, int line) {
 	else if (ingamePlayerInfo.gold < unitDetail->goldCost) {
 		RunActionNotify("Not enough gold!");
 	}
+	else if (ingamePlayerInfo.food >= ingamePlayerInfo.foodLimit) {
+		RunActionNotify("Not enough food!");
+	}
 	else {
-		//GameScene::InitializeIngameObject(name, line, Player::currentPlayer->id);
 		Tool::Socket_Client->_client->emit("Create_Unit", "{\"Room\":\"" + Player::currentPlayer->room_name + "\", \"name\":\"" + name + "\", \"line\":\"" + to_string(line) + "\", \"id\":\"" + to_string(Player::currentPlayer->id) + "\"}");
 		ingamePlayerInfo.gold -= unitDetail->goldCost;
 		GameScene::UpdateIngamePlayerInfo();
@@ -651,6 +812,17 @@ void GameScene::BuyUnit(string name, int line) {
 }
 
 void GameScene::CreateUpgradeTable(string name) {
+	if (name == "btn_UpgradeFarm") {
+		auto upgradeTable = Tool::CreateNotificationTable("Upgrade Farm cost " + to_string(100 + ((int)ingamePlayerInfo.foodLimit - 5) * 20) + " Gold", "Cancel", "Process", Size(visibleSize.width*0.5, visibleSize.height*0.4));
+		upgradeTable->setPosition(visibleSize / 2);
+		staticUI->addChild(upgradeTable, 1);
+
+		upgradeTable->getChildByName("btn_Left")->setColor(Color3B(175, 225, 200));
+		((Button*)upgradeTable->getChildByName("btn_Left"))->addTouchEventListener(CC_CALLBACK_2(GameScene::btn_Upgrade_Click, this));
+		upgradeTable->getChildByName("btn_Right")->setColor(Color3B::RED);
+		upgradeTable->getChildByName("btn_Left")->setName(name);
+		return;
+	}
 	BaseUnitClass unitDetails;
 	if(name.find("Kingdom") != std::string::npos){
 		unitDetails = *ingamePlayerInfo.kingdom;
@@ -662,32 +834,28 @@ void GameScene::CreateUpgradeTable(string name) {
 		RunActionNotify("This unit reached max level");
 		return;
 	}
-	upgradeTable = Node::create();
-	staticUI->addChild(upgradeTable, 1);
+	string upgradeInfo = unitDetails.name + Tool::ConvertUTF16ToString(L"\n↓\n") + unitDetails.upgradeName + "\n"
+		+ to_string(unitDetails.upgradeGoldCost) + " Gold     " + to_string(unitDetails.upgradeKnowledgeCost) + " Knowledge";
+
+	auto upgradeTable = Tool::CreateNotificationTable(upgradeInfo,"Cancel","Process",Size(visibleSize.width*0.5,visibleSize.height*0.4));
 	upgradeTable->setPosition(visibleSize / 2);
+	staticUI->addChild(upgradeTable, 1);
 
-	
-	lbl_UpgradeInfo = Tool::CreateLabel(unitDetails.name + Tool::ConvertUTF16ToString(L"\n↓\n") + unitDetails.upgradeName + "\n"
-	+ to_string(unitDetails.upgradeGoldCost) + " Gold     " + to_string(unitDetails.upgradeKnowledgeCost) + " Knowledge");
-	lbl_UpgradeInfo->setAlignment(TextHAlignment::CENTER);
-	lbl_UpgradeInfo->setPositionY(visibleSize.height*0.05);
-	upgradeTable->addChild(lbl_UpgradeInfo);
-
-	btn_ProcessUpgrade = Tool::CreateButtonWithoutSprite(name, "Process", Tool::defaultTextSize*1.3,Color3B::GREEN);
-	btn_ProcessUpgrade->setPosition(Vec2(visibleSize*-0.1));
-	btn_ProcessUpgrade->addTouchEventListener(CC_CALLBACK_2(GameScene::btn_Upgrade_Click, this));
-	upgradeTable->addChild(btn_ProcessUpgrade);
-
-	btn_CancelUpgrade = Tool::CreateButtonWithoutSprite(name, "Cancel", Tool::defaultTextSize*1.3, Color3B::RED);
-	btn_CancelUpgrade->setPosition(Vec2(visibleSize.width*0.1,visibleSize.height*-0.1));
-	btn_CancelUpgrade->addTouchEventListener(CC_CALLBACK_2(GameScene::btn_Upgrade_Click, this));
-	upgradeTable->addChild(btn_CancelUpgrade);
+	upgradeTable->getChildByName("btn_Left")->setColor(Color3B(175,225,200));
+	((Button*)upgradeTable->getChildByName("btn_Left"))->addTouchEventListener(CC_CALLBACK_2(GameScene::btn_Upgrade_Click, this));
+	upgradeTable->getChildByName("btn_Right")->setColor(Color3B::RED);
+	upgradeTable->getChildByName("btn_Left")->setName(name);
 	
 }
 
 void GameScene::UpgradeUnit(string name) {
 	BaseUnitClass unitDetails;
-	if (name.find("Kingdom") != std::string::npos) {
+	if (name == "btn_UpgradeFarm") {
+		unitDetails.upgradeLevelRequired = 1;
+		unitDetails.upgradeGoldCost = 100 + ((int)ingamePlayerInfo.foodLimit - 5) * 20;
+		unitDetails.upgradeKnowledgeCost = 0;
+	}
+	else if (name.find("Kingdom") != std::string::npos) {
 		unitDetails = *ingamePlayerInfo.kingdom;
 	}
 	else unitDetails = *ObjectConstructor::InitializeObject(name, 0, 0, 0,-1);
@@ -699,7 +867,11 @@ void GameScene::UpgradeUnit(string name) {
 	}
 	else {
 		//Upgrade Kingdom
-		if (unitDetails.description == "Kingdom") {
+		if (name == "btn_UpgradeFarm") {
+			ingamePlayerInfo.foodLimit++;
+			GameScene::UpdateIngamePlayerInfo();
+		}
+		else if (unitDetails.description == "Kingdom") {
 			Tool::Socket_Client->_client->emit("_Upgrade_Kingdom_", "{\"Room\":\"" + Player::currentPlayer->room_name + "\", \"Id\":\"" + to_string(Player::currentPlayer->id) + "\"}");
 		}
 		//Upgrade Unit
@@ -723,16 +895,22 @@ void GameScene::UpgradeUnit(string name) {
 	}
 }
 
-void GameScene::btn_UpgradeKingdom(Ref * pSender, cocos2d::ui::Button::Widget::TouchEventType type)
+
+void GameScene::ChangeUpgradeState()
 {
-	if (type == Widget::TouchEventType::ENDED) {
-		if (GameScene::btn_Mode->getTitleText() == "View") {
-			sc_ViewDetail = ObjectConstructor::GetSpecificUnitDetails(((Button*)pSender)->getName(), visibleSize);
-			staticUI->addChild(sc_ViewDetail);
-			Tool::Button_ChangeState(GameScene::btn_CloseViewDetail, true, 0.5);
+	if (GameScene::BuyingBarMode == "Upgrade") {
+		Tool::Button_ChangeState(btn_UpgradeKingdom, true, 0.5);
+		Tool::Button_ChangeState(btn_UpgradeFarm, true, 0.5);
+		for (int i = 0; i < List_BuyableUnit.size(); i++) {
+			if (List_BuyableUnit[i].unitInfo->upgradeName != "" && List_BuyableUnit[i].unitInfo->upgradeLevelRequired <= ingamePlayerInfo.kingdomLevel)
+				List_BuyableUnit[i].root->runAction(MoveBy::create(0.25, Vec2(0, 175)));
 		}
-		else {
-			GameScene::CreateUpgradeTable(((Button*)pSender)->getName());
+	}
+	else {
+		Tool::Button_ChangeState(btn_UpgradeKingdom, false, 0);
+		Tool::Button_ChangeState(btn_UpgradeFarm, false, 0);
+		for (int i = 0; i < List_BuyableUnit.size(); i++) {
+			List_BuyableUnit[i].root->runAction(MoveTo::create(0.25, List_BuyableUnit[i].oldRootPos));
 		}
 	}
 }
@@ -740,13 +918,8 @@ void GameScene::btn_UpgradeKingdom(Ref * pSender, cocos2d::ui::Button::Widget::T
 void GameScene::btn_Upgrade_Click(Ref *pSender, cocos2d::ui::Button::Widget::TouchEventType type) {
 	if (type == Widget::TouchEventType::ENDED) {
 		Button* btn = (Button*)pSender;
-		if (btn->getTitleText() == "Process") {
-			GameScene::UpgradeUnit(btn->getName());
-			upgradeTable->runAction(RemoveSelf::create());
-		}
-		else if (btn->getTitleText() == "Cancel") {
-			upgradeTable->runAction(RemoveSelf::create());
-		}
+		GameScene::UpgradeUnit(btn->getName());
+		btn->getParent()->runAction(RemoveSelf::create());
 	}
 }
 
@@ -757,36 +930,35 @@ GameScene::Item_BuyableUnit::Item_BuyableUnit(string name)
 	if (unitInfo != nullptr) {
 		this->btn_Icon = Button::create("Sprites/" + this->unitInfo->animateName + "/card.png");
 		this->btn_Icon->setName(unitInfo->name);
-		Tool::setNodeSize(btn_Icon, 80, 80);
-		this->btn_Icon->setPositionY(18);
+		this->btn_Icon->setPositionY(55);
 
 		this->lbl_Cost = Tool::CreateLabel(to_string(unitInfo->goldCost), Tool::defaultTextSize*0.8, Color4B::YELLOW);
 		this->lbl_Cost->enableBold();
-		this->lbl_Cost->setPositionY(-18);
+		this->lbl_Cost->setPosition(Vec2(45, 112));
+		this->btn_Icon->addChild(lbl_Cost);
 
 		this->root->addChild(btn_Icon);
-		this->root->addChild(lbl_Cost);
 	}
 }
 
 void GameScene::CreateChatbox() {
-	
+
 	GameScene::sc_ChatBox = ui::ScrollView::create();
-	sc_ChatBox->setContentSize(Size(visibleSize.width*0.285, visibleSize.height*0.25));
+	sc_ChatBox->setContentSize(Size(visibleSize.width*0.285, visibleSize.height*0.45));
 	sc_ChatBox->setInnerContainerSize(Size(1000, 200));
-	sc_ChatBox->setPosition(Vec2(visibleSize.width*0.985,visibleSize.height*0.25));
+	sc_ChatBox->setPosition(Vec2(visibleSize.width*0.985, visibleSize.height*0.08));
 	sc_ChatBox->setAnchorPoint(Vec2(1, 0));
 	sc_ChatBox->setBounceEnabled(true);
-	staticUI->addChild(sc_ChatBox,10);
+	staticUI->addChild(sc_ChatBox, 10);
 
 	auto sp_ChatBox = Sprite::create("UI/GameScene/bgchat.png");
 	sp_ChatBox->setPosition(sc_ChatBox->getPosition());
 	sp_ChatBox->setAnchorPoint(Vec2(1, 0));
-	Tool::setNodeSize(sp_ChatBox, 285, 135);
+	Tool::setNodeSize(sp_ChatBox, 285, 243);
 	staticUI->addChild(sp_ChatBox, 9);
 
 	GameScene::EditBox_Chat = ui::EditBox::create(Size(visibleSize.width*0.255, visibleSize.height*0.06), "", "");
-	EditBox_Chat->setPosition(Vec2(visibleSize.width*0.95,visibleSize.height*0.2));
+	EditBox_Chat->setPosition(Vec2(visibleSize.width*0.95, visibleSize.height*0.03));
 	EditBox_Chat->setAnchorPoint(Vec2(1, 0));
 	EditBox_Chat->setTextHorizontalAlignment(TextHAlignment::LEFT);
 	EditBox_Chat->setInputMode(EditBox::InputMode::ANY);
@@ -795,22 +967,22 @@ void GameScene::CreateChatbox() {
 	EditBox_Chat->setPlaceHolder("Message");
 	EditBox_Chat->setPlaceholderFontColor(Color3B::GRAY);
 	EditBox_Chat->setMaxLength(100);
-	staticUI->addChild(EditBox_Chat,10);
+	staticUI->addChild(EditBox_Chat, 10);
 
 	auto sp_EditBox = Sprite::create("UI/GameScene/bgEditBox.png");
 	sp_EditBox->setPosition(EditBox_Chat->getPosition());
 	sp_EditBox->setAnchorPoint(Vec2(1, 0));
 	Tool::setNodeSize(sp_EditBox, EditBox_Chat->getBoundingBox().size.width, EditBox_Chat->getBoundingBox().size.height);
 	staticUI->addChild(sp_EditBox, 9);
-	
+
 
 	GameScene::btn_SendMessage = Button::create("UI/GameScene/Send Message.png");
 	btn_SendMessage->setAnchorPoint(Vec2(1, 0));
-	btn_SendMessage->setPosition(Vec2(visibleSize.width*0.98, visibleSize.height*0.2));
+	btn_SendMessage->setPosition(Vec2(visibleSize.width*0.98, visibleSize.height*0.03));
 	btn_SendMessage->addTouchEventListener(CC_CALLBACK_2(GameScene::btn_SendMessage_Click, this));
 	staticUI->addChild(btn_SendMessage);
 
-	chatBoxContent.push_back("ImaginysLight and AnhQuyetVo welcome you to Coding TD !");
+	chatBoxContent.push_back({"ImaginysLight and AnhQuyetVo welcome you to Coding TD !", 0});
 	UpdateChatbox();
 	
 
@@ -821,7 +993,7 @@ void GameScene::UpdateChatbox() {
 	sc_ChatBox->removeAllChildrenWithCleanup(true);
 	sc_ChatBox->scrollToBottom(0, false);
 	for (int i = 0; i < chatBoxContent.size(); i++) {
-		Label* lbl_Content = Tool::CreateLabel(chatBoxContent[i],Tool::defaultTextSize*0.8);
+		Label* lbl_Content = Tool::CreateLabel(chatBoxContent[i].first,Tool::defaultTextSize*0.8);
 		lbl_Content->setMaxLineWidth(sc_ChatBox->getContentSize().width*0.9);
 		currentHeight += (lbl_Content->getBoundingBox().size.height / 2);
 		labelHeight.push_back(currentHeight);
@@ -829,10 +1001,13 @@ void GameScene::UpdateChatbox() {
 	}
 	sc_ChatBox->setInnerContainerSize(Size(1000, currentHeight + 20));
 	for (int i = 0; i < chatBoxContent.size(); i++) {
-		Label* lbl_Content = Tool::CreateLabel(chatBoxContent[i], Tool::defaultTextSize*0.8);
+		Label* lbl_Content = Tool::CreateLabel(chatBoxContent[i].first, Tool::defaultTextSize*0.8);
 		lbl_Content->setMaxLineWidth(sc_ChatBox->getContentSize().width*0.9);
 		lbl_Content->setPosition(Vec2(10,sc_ChatBox->getInnerContainerSize().height - labelHeight[i]));
 		lbl_Content->setAnchorPoint(Vec2(0, 0.5));
+		if (chatBoxContent[i].second == 1) lbl_Content->setTextColor(Color4B::GREEN);
+		else if (chatBoxContent[i].second == 2) lbl_Content->setTextColor(Color4B::RED);
+		else if (chatBoxContent[i].second == 3) lbl_Content->setTextColor(Color4B(175,225,250,255));
 		sc_ChatBox->addChild(lbl_Content);
 	}
 }
@@ -847,7 +1022,7 @@ void GameScene::btn_SendMessage_Click(Ref *pSender, cocos2d::ui::Button::Widget:
 				content[i] = '/';
 			}
 		}
-		Tool::Socket_Client->_client->emit("Send_Message", "{\"Room\":\"" + Player::currentPlayer->room_name + "\", \"content\":\"" + content + "\"}");
+		Tool::Socket_Client->_client->emit("Send_Message", "{\"Room\":\"" + Player::currentPlayer->room_name + "\", \"content\":\"" + content + "\", \"id\":\"" + to_string(Player::currentPlayer->id) + "\"}");
 		GameScene::EditBox_Chat->setText("");
 	}
 }
@@ -857,7 +1032,7 @@ void GameScene::onReceiveEvent_SendMessage(SIOClient* client, const std::string&
 	document.Parse<0>(data.c_str());
 	if (document["Room"].GetString() == Player::currentPlayer->room_name)
 	{
-		GameScene::chatBoxContent.push_back(document["content"].GetString());
+		GameScene::chatBoxContent.push_back({ document["content"].GetString(), Player::currentPlayer->id == Tool::ConvertStringToInt(document["id"].GetString()) ? 1 : 2 });
 		GameScene::UpdateChatbox();
 	}
 }
@@ -868,11 +1043,13 @@ void GameScene::onReceiveEvent_UpgradeKingdom(SIOClient * client, const std::str
 	document.Parse<0>(data.c_str());
 	if (document["Room"].GetString() == Player::currentPlayer->room_name)
 	{
+		auto audio = SimpleAudioEngine::getInstance();
+		audio->playEffect("Audio/Level Up.wav", false);
 		if (Player::currentPlayer->id == Tool::ConvertStringToInt(document["Id"].GetString())) {
 			ingamePlayerInfo.kingdom->Upgrade();
 			ingamePlayerInfo.kingdomLevel++;
 			ingamePlayerInfo.lbl_KingdomLevel->setString(to_string(ingamePlayerInfo.kingdomLevel));
-			ingamePlayerInfo.btn_UpgradeKingdom->setName(ingamePlayerInfo.kingdom->name);
+			GameScene::btn_UpgradeKingdom->setName(ingamePlayerInfo.kingdom->name);
 			ingamePlayerInfo.energyCap += 25;
 		}
 		else {
@@ -888,23 +1065,58 @@ void GameScene::onReceiveEvent_AnswerResult(SIOClient * client, const std::strin
 	if (document["Room"].GetString() == Player::currentPlayer->room_name)
 	{
 		string content;
+		string result = document["result"].GetString();
 		if (Player::currentPlayer->id == Tool::ConvertStringToInt(document["id"].GetString())) {
 			content = Player::currentPlayer->username;
-			PassiveSkill::Improve(Player::currentPlayer->elementName);
+			if (result == "Correct Answer")
+				PassiveSkill::Improve(Player::currentPlayer->elementName);
+			Player::currentPlayer->betPositive = false;
+			Player::opponentPlayer->betNegative = false;
 		}
 		else {
 			content = Player::opponentPlayer->username;
-			PassiveSkill::Improve(Player::opponentPlayer->elementName);
+			if (result == "Correct Answer")
+				PassiveSkill::Improve(Player::opponentPlayer->elementName);
+			Player::currentPlayer->betNegative = false;
+			Player::opponentPlayer->betPositive = false;
 		}
-		content += " made a ";
-		content += document["result"].GetString();
-		content += " in ";
-		content += document["time"].GetString();
-		content += " seconds remain.";
-		chatBoxContent.push_back(content);
-		GameScene::UpdateChatbox();
+		if (Player::currentPlayer->elementName == "Fire")
+			ingamePlayerInfo.btn_Skill2->setTitleText((string)"Fiery Spirit: Level " + to_string(PassiveSkill::fireLevel) + ": +" + CCString::createWithFormat("%.1f", PassiveSkill::Bonus_Attack*100)->getCString() +"% Attack");
+		else if(Player::currentPlayer->elementName == "Ice")
+			ingamePlayerInfo.btn_Skill2->setTitleText((string)"Icy Soul: Level " + to_string(PassiveSkill::iceLevel) + ": +" + CCString::createWithFormat("%.1f", PassiveSkill::Bonus_Health * 100)->getCString() + "% Health and " + CCString::createWithFormat("%.1f", PassiveSkill::Bonus_Defense * 100)->getCString() + "% Defense");
+		else if (Player::currentPlayer->elementName == "Nature")
+			ingamePlayerInfo.btn_Skill2->setTitleText((string)"Pure Heart: Level " + to_string(PassiveSkill::natureLevel) + ": +" + to_string((int)PassiveSkill::Bonus_AttackSpeed) + " Attack Speed and " + to_string((int)PassiveSkill::Bonus_Regeneration) + " Regeneration");
 
-		
+
+		content += " received ";
+		content += document["gold"].GetString();
+		content += " Gold for their ";
+		content += result;
+		chatBoxContent.push_back({ content,0 });
+		GameScene::UpdateChatbox();
+	}
+}
+
+void GameScene::onReceiveEvent_ActiveBet(SIOClient * client, const std::string & data)
+{
+	rapidjson::Document document;
+	document.Parse<0>(data.c_str());
+	if (document["Room"].GetString() == Player::currentPlayer->room_name)
+	{
+		string content;
+		if (Player::currentPlayer->id == Tool::ConvertStringToInt(document["id"].GetString())) {
+			content = Player::currentPlayer->username;
+		}
+		else {
+			content = Player::opponentPlayer->username;
+			if (document["betStatus"].GetString() == "Positive") Player::opponentPlayer->betPositive = true;
+			else Player::opponentPlayer->betNegative = true;
+		}
+		content += " activated a ";
+		content += document["betStatus"].GetString();
+		content += " Bet !!";
+		chatBoxContent.push_back({ content,3 });
+		GameScene::UpdateChatbox();
 	}
 }
 
@@ -1003,6 +1215,18 @@ void GameScene::CreateQuestionTable()
 		lbl_Level->setPosition(Vec2(0, visibleSize.height *.35));
 		questionTable->addChild(lbl_Level, 1);
 	}
+	//button đặt cược
+	{
+		btn_PositiveBet = Tool::CreateButtonWithoutSprite("btn_PositiveBet", "Positive Bet", Tool::defaultTextSize*1.25, Color3B::GREEN);
+		btn_PositiveBet->setPosition(Vec2(visibleSize.width*-0.25, visibleSize.height*0.3));
+		btn_PositiveBet->addTouchEventListener(CC_CALLBACK_2(GameScene::btn_Click, this));
+		questionTable->addChild(btn_PositiveBet, 1);
+
+		btn_NegativeBet = Tool::CreateButtonWithoutSprite("btn_NegativeBet", "Negative Bet", Tool::defaultTextSize*1.25, Color3B::RED);
+		btn_NegativeBet->setPosition(Vec2(visibleSize.width*0.25, visibleSize.height*0.3));
+		btn_NegativeBet->addTouchEventListener(CC_CALLBACK_2(GameScene::btn_Click, this));
+		questionTable->addChild(btn_NegativeBet, 1);
+	}
 }
 
 void GameScene::btn_AnswerClick(Ref *pSender, cocos2d::ui::Button::Widget::TouchEventType type) {
@@ -1037,9 +1261,7 @@ void GameScene::onReceiveEvent_Question(SIOClient* client, const std::string& da
 			if (document.HasMember("id")) { CCLOG("id: %d ", document["id"].GetInt()); }
 			if (document.HasMember("content")) {
 				CCLOG("content: %s ", document["content"].GetString());
-				//questionContent = document["content"].GetString();
-				txt_Question->setString(document["content"].GetString());
-				lv_QuestionContent->requestDoLayout();
+				questionContent = document["content"].GetString();
 			}
 			if (document.HasMember("level")) {
 				CCLOG("level: %s ", document["level"].GetString());
@@ -1075,9 +1297,6 @@ void GameScene::onReceiveEvent_Question(SIOClient* client, const std::string& da
 				btn_Answer4->setTitleText(document["answer4"].GetString());
 				
 			}
-			questionAvailable = true;
-			GameScene::ChangeQuestionTableState(true);
-			destinationTime = 20 * currentQuestionLevel + Tool::currentIngameTime;
 		}
 	}
 };
@@ -1085,51 +1304,66 @@ void GameScene::onReceiveEvent_Question(SIOClient* client, const std::string& da
 
 void GameScene::RunActionNotify(string content)
 {
-	lbl_Notify->setString(content);
-	lbl_Notify->runAction(Sequence::create(FadeIn::create(0.5), DelayTime::create(1), FadeOut::create(0.5), nullptr));
+	auto lbl_Notify = Tool::CreateLabel(content, Tool::defaultTextSize, Color4B::MAGENTA);
+	lbl_Notify->setPosition(visibleSize / 2);
+	staticUI->addChild(lbl_Notify, 10);
+	lbl_Notify->runAction(Sequence::create(FadeOut::create(0), FadeIn::create(0.5), DelayTime::create(1), FadeOut::create(0.5), RemoveSelf::create(), nullptr));
+
 }
 
 void GameScene::UpdateIngamePlayerInfo()
 {
 	ingamePlayerInfo.lbl_Gold->setString(to_string((int)ingamePlayerInfo.gold));
 	ingamePlayerInfo.lbl_Knowledge->setString(to_string((int)ingamePlayerInfo.knowledge));
-	auto temp = CCString::createWithFormat("%.1f", ingamePlayerInfo.energy);
+	ingamePlayerInfo.lbl_Food->setString(to_string((int)ingamePlayerInfo.food) + " / " + to_string((int)ingamePlayerInfo.foodLimit));
+	auto temp = CCString::createWithFormat("%.1f / %d", ingamePlayerInfo.energy,(int)ingamePlayerInfo.energyCap);
 	ingamePlayerInfo.lbl_Energy->setString(temp->getCString());
+
+	for (auto card : GameScene::List_BuyableUnit) {
+		if (card.unitInfo->goldCost > ingamePlayerInfo.gold)
+			card.btn_Icon->setEnabled(false);
+		else
+			card.btn_Icon->setEnabled(true);
+	}
 }
 
 void GameScene::CorrectAnswer()
 {
 	ResultScene::numOfCorrectAnswer++;
 
-	//( 1 + TimeRemaining % / 1.5) * QuestionLevel * 100 ) Gold và 1 Knowledge cho câu đúng,
+	//( 1 + TimeRemaining % / 1.5) * (0.5 + 0.5 * QuestionLevel) * 150 Gold và 1 Knowledge cho câu đúng
+	//Positive Bet (cost 100g): Nếu người cược trả lời đúng ở câu trả lời tiếp theo sẽ nhận gấp 1.8 lần Gold.
 	auto TimeRemaining = destinationTime - Tool::currentIngameTime;
-	auto QuestionTime = currentQuestionLevel * 20;
+	auto QuestionTime = currentQuestionLevel * 10 + 10;
 	auto TimeRemainingPercent = TimeRemaining / QuestionTime;
-	ingamePlayerInfo.gold += (1 + TimeRemainingPercent / 1.8)*currentQuestionLevel * 100 * ingamePlayerInfo.correctAnswerGoldRate;
+	auto goldReceive = (1 + (TimeRemainingPercent / 1.5)) * (0.5 + 0.5 * currentQuestionLevel) * 150 * ingamePlayerInfo.correctAnswerGoldRate;
+	if (Player::currentPlayer->betPositive) goldReceive *= 1.8;
+	ingamePlayerInfo.gold += goldReceive;
 	ingamePlayerInfo.knowledge += 1;
 	GameScene::UpdateIngamePlayerInfo();
 
-	Tool::Socket_Client->_client->emit("Answer_Result", "{\"Room\":\"" + Player::currentPlayer->room_name + "\", \"id\":\"" + to_string(Player::currentPlayer->id) + "\", \"result\":\"" + "Correct Answer" + "\", \"time\":\"" + to_string((int)(destinationTime - Tool::currentIngameTime)) + "\"}");
+	Tool::Socket_Client->_client->emit("Answer_Result", "{\"Room\":\"" + Player::currentPlayer->room_name + "\", \"id\":\"" + to_string(Player::currentPlayer->id) + "\", \"result\":\"" + "Correct Answer" + "\", \"gold\":\"" + to_string((int)goldReceive) + "\"}");
 }
 
 void GameScene::WrongAnswer()
 {
 	ResultScene::numOfWrongAnswer++;
 
-	//( 1 + TimeRemaining % / 1.5) * QuestionLevel * 100 ) * Rand[0.2 , 0.6] Gold cho câu sai.
-	auto TimeRemaining = destinationTime - Tool::currentIngameTime;
-	auto QuestionTime = currentQuestionLevel * 20;
-	auto TimeRemainingPercent = TimeRemaining / QuestionTime;
-	auto randomNumber = Tool::CreateRandomNumber(2, 6) / 10.0;
-	ingamePlayerInfo.gold += (1 + TimeRemainingPercent / 1.8)*currentQuestionLevel * 100 * randomNumber * ingamePlayerInfo.wrongAnswerGoldRate;
+	// (0.5 + 0.5 * QuestionLevel) * 100 * Rand[0.4 , 0.7] Gold cho câu sai.
+	//Negative Bet (cost 100g): Nếu đối phương trả lời sai ở câu trả lời tiếp theo sẽ không được nhận Gold và bị trừ 50 Gold.
+	auto randomNumber = Tool::CreateRandomNumber(4, 7) / 10.0;
+	auto goldReceive = (0.5 + 0.5 * currentQuestionLevel) * 100 * randomNumber * ingamePlayerInfo.wrongAnswerGoldRate;
+	if (Player::opponentPlayer->betNegative) goldReceive = -50;
+	ingamePlayerInfo.gold += goldReceive;
+	if (ingamePlayerInfo.gold < 0) ingamePlayerInfo.gold = 0;
 	GameScene::UpdateIngamePlayerInfo();
 
-	Tool::Socket_Client->_client->emit("Answer_Result", "{\"Room\":\"" + Player::currentPlayer->room_name + "\", \"id\":\"" + to_string(Player::currentPlayer->id) + "\", \"result\":\"" + "Wrong Answer" + "\", \"time\":\"" + to_string((int)(destinationTime - Tool::currentIngameTime)) + "\"}");
+	Tool::Socket_Client->_client->emit("Answer_Result", "{\"Room\":\"" + Player::currentPlayer->room_name + "\", \"id\":\"" + to_string(Player::currentPlayer->id) + "\", \"result\":\"" + "Wrong Answer" + "\", \"gold\":\"" + to_string((int)goldReceive) + "\"}");
 }
 
 void GameScene::ShowUnitDetails()
 {
-	auto details = UnitDetailsTable(*GameScene::choosingUnit, Vec2(visibleSize.width*0.9, visibleSize.height*0.8));
+	auto details = UnitDetailsTable(*GameScene::choosingUnit, Vec2(visibleSize.width*0.87, visibleSize.height*0.79));
 	GameScene::unitDetails->removeAllChildrenWithCleanup(true);
 	GameScene::unitDetails->addChild(details.root);
 }

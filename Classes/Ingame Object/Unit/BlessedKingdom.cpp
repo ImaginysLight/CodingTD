@@ -6,20 +6,20 @@ BlessedKingdom::BlessedKingdom(int line, bool isOwned, int unitId, int playerId)
 	description = "Kingdom";
 	maxHealth = 2000;
 	currentHealth = maxHealth;
-	baseAttack = 30;
+	baseAttack = 15;
 	baseDefense = 50;
 	baseAttackSpeed = 60;
 	range = 600;
 	baseRegeneration = 2;
 
 	upgradeName = "Blessed Kingdom 2";
-	upgradeGoldCost = 200;
+	upgradeGoldCost = 400;
 	upgradeKnowledgeCost = 3;
 	upgradeLevelRequired = 0;
 
 	this->UpdateIngameInfo("Sprites/Blessed Kingdom/default_315x300.png", unitId, playerId, isOwned, "Blessed Kingdom", line);
-	if (this->isOwned) this->root->setPosition(Vec2(-50, 50));
-	else this->root->setPosition(Vec2(3050,50));
+	if (this->isOwned) this->root->setPosition(Vec2(0, 50));
+	else this->root->setPosition(Vec2(3100,50));
 }
 
 BlessedKingdom::~BlessedKingdom()
@@ -39,10 +39,10 @@ void BlessedKingdom::Update()
 {
 	for (auto unit : BaseUnitClass::AllIngameUnit_Vector) {
 		if (unit->isOwned == this->isOwned && unit->isAlive && unit->action != "Die") {
-			if (unit->root->getPositionX() < -100)
-				unit->root->runAction(MoveTo::create(0.2, Vec2(0, unit->root->getPositionY())));
+			if (unit->root->getPositionX() < 0)
+				unit->root->runAction(MoveTo::create(0.2, Vec2(50, unit->root->getPositionY())));
 			if (unit->root->getPositionX() > 3100)
-				unit->root->runAction(MoveTo::create(0.2, Vec2(3000, unit->root->getPositionY())));
+				unit->root->runAction(MoveTo::create(0.2, Vec2(3050, unit->root->getPositionY())));
 		}
 	}
 
@@ -162,7 +162,7 @@ void BlessedKingdom::Upgrade()
 		description = "Kingdom";
 		maxHealth = 2000;
 		currentHealth = maxHealth*currentHealthPercent;
-		baseAttack = 40;
+		baseAttack = 25;
 		baseDefense = 75;
 		baseAttackSpeed = 60;
 		range = 650;
@@ -184,7 +184,7 @@ void BlessedKingdom::Upgrade()
 		description = "Kingdom";
 		maxHealth = 2000;
 		currentHealth = maxHealth * currentHealthPercent;
-		baseAttack = 50;
+		baseAttack = 33;
 		baseDefense = 100;
 		baseAttackSpeed = 60;
 		range = 700;

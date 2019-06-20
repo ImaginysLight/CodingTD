@@ -6,11 +6,11 @@ unordered_map<string, SkillRequired> BaseSkillClass::SkillRequirement;
 void BaseSkillClass::LoadSkillRequirement()
 {
 	BaseSkillClass::SkillRequirement.insert({ "Cool Blooded",SkillRequired(20,1,true) });
-	BaseSkillClass::SkillRequirement.insert({ "Ice Age",SkillRequired(130,2,false) });
+	BaseSkillClass::SkillRequirement.insert({ "Ice Age",SkillRequired(100,2,false) });
 	BaseSkillClass::SkillRequirement.insert({ "Burning Enthusiasm",SkillRequired(15,1,true) });
-	BaseSkillClass::SkillRequirement.insert({ "Hell Fire",SkillRequired(115,2,false) });
+	BaseSkillClass::SkillRequirement.insert({ "Hell Fire",SkillRequired(90,2,false) });
 	BaseSkillClass::SkillRequirement.insert({ "Natural Wind",SkillRequired(15,1,true) });
-	BaseSkillClass::SkillRequirement.insert({ "Heaven Bless",SkillRequired(95,2,false) });
+	BaseSkillClass::SkillRequirement.insert({ "Heaven Bless",SkillRequired(80,2,false) });
 }
 
 void BaseSkillClass::Update()

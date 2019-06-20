@@ -8,6 +8,7 @@ extern struct KnowledegeTrophy {
 	int level = 0;
 	string name = "None";
 	int NumOfCorrectQuestion = 0;
+	int ExpToNext = 0;
 	int correctGoldRate = 0;
 	int wrongGoldRate = 0;
 	KnowledegeTrophy(int level, string name, int NumOfCorrectQuestion, int correctGoldRate, int wrongGoldRate);
@@ -18,6 +19,7 @@ extern struct BattleTrophy {
 	int level = 0;
 	string name = "None";
 	int NumOfKill = 0;
+	int ExpToNext = 0;
 	int defeatGoldRate = 0;
 	int defeatEnergyRate = 0;
 	BattleTrophy(int level, string name, int NumOfKill, int defeatGoldRate, int defeatEnergyRate);
@@ -28,9 +30,10 @@ extern struct ConquestTrophy {
 	int level = 0;
 	string name = "None";
 	int NumOfWin = 0;
-	int bonusGold = 0;
+	int ExpToNext = 0;
+	float bonusGold = 0;
 	float bonusEnergy = 0;
-	ConquestTrophy(int level, string name, int NumOfWin, int bonusGold, float bonusEnergy);
+	ConquestTrophy(int level, string name, int NumOfWin, float bonusGold, float bonusEnergy);
 	ConquestTrophy();
 };
 static class Trophy {

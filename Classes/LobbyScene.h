@@ -35,5 +35,6 @@ public:
 
 	void findTheOpponent(SIOClient* client, const std::string& data);
 	void onReceiveEvent_GetPlayerInfo(SIOClient* client, const std::string& data);
+	void UpdateAudio(float time);
 };
 

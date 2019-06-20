@@ -11,6 +11,10 @@ BurningEnthusiasm::BurningEnthusiasm(int targetId)
 		this->damage = target->baseAttack*0.1;
 		target->baseAttack *= 2;
 		target->ReprocessAllStatus("Attack");
+		auto sp_Icon = Sprite::create("Skill/Burning Enthusiasm.png");
+		Tool::setNodeSize(sp_Icon, 32, 32);
+		sp_Icon->setPosition(target->sprite->getBoundingBox().size / 2);
+		target->sprite->addChild(sp_Icon);
 	}
 	else return;
 	this->isAddedChild = true;

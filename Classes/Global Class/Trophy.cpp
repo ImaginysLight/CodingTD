@@ -10,6 +10,10 @@ KnowledegeTrophy Trophy::CalculateKnowledgeTrophy(int numOfCorrectQuestion)
 	vec.push_back(KnowledegeTrophy(5, "Profession", 800, 36, 15));
 	vec.push_back(KnowledegeTrophy(6, "Erudition", 1200, 42, 20));
 	vec.push_back(KnowledegeTrophy(7, "Transcendence", 2000, 50, 25));
+	for (int i = 0; i < vec.size() - 1; i++) {
+		vec[i].ExpToNext = vec[i + 1].NumOfCorrectQuestion;
+	}
+	vec[vec.size() - 1].ExpToNext = vec[vec.size() - 1].NumOfCorrectQuestion;
 	for (int i = 1; i < vec.size(); i++) {
 		if (numOfCorrectQuestion < vec[i].NumOfCorrectQuestion)
 			return vec[i - 1];
@@ -26,6 +30,10 @@ BattleTrophy Trophy::CalculateBattleTrophy(int numOfKill)
 	vec.push_back(BattleTrophy(3, "Brutal Assassin", 1000, 12, 5));
 	vec.push_back(BattleTrophy(4, "Serial Murderer", 3000, 15, 8));
 	vec.push_back(BattleTrophy(5, "Alexander Magnus", 5000, 20, 10));
+	for (int i = 0; i < vec.size() - 1; i++) {
+		vec[i].ExpToNext = vec[i + 1].NumOfKill;
+	}
+	vec[vec.size() - 1].ExpToNext = vec[vec.size() - 1].NumOfKill;
 	for (int i = 1; i < vec.size(); i++) {
 		if (numOfKill < vec[i].NumOfKill)
 			return vec[i - 1];
@@ -37,9 +45,16 @@ ConquestTrophy Trophy::CalculateConquestTrophy(int numOfWin)
 {
 	vector<ConquestTrophy> vec;
 	vec.push_back(ConquestTrophy(0, "None", 0, 0, 0));
-	vec.push_back(ConquestTrophy(1, "Wise Strategist", 40, 1, 0.5));
-	vec.push_back(ConquestTrophy(2, "Excellent King", 160, 3, 1));
-	vec.push_back(ConquestTrophy(3, "Immortal Emperor", 400, 5, 1.5));
+	vec.push_back(ConquestTrophy(1, "New Captain", 10, 0.5, 0.5));
+	vec.push_back(ConquestTrophy(2, "Experienced Leadership", 50, 1, 0.5));
+	vec.push_back(ConquestTrophy(3, "Excellent Commander", 100, 1.5, 1));
+	vec.push_back(ConquestTrophy(4, "Erudite Strategist", 170, 2.5, 1));
+	vec.push_back(ConquestTrophy(5, "Transcendence  King", 250, 4, 1));
+	vec.push_back(ConquestTrophy(6, "Immortal Emperor", 400, 5, 1.5));
+	for (int i = 0; i < vec.size() - 1; i++) {
+		vec[i].ExpToNext = vec[i + 1].NumOfWin;
+	}
+	vec[vec.size() - 1].ExpToNext = vec[vec.size() - 1].NumOfWin;
 	for (int i = 1; i < vec.size(); i++) {
 		if (numOfWin < vec[i].NumOfWin)
 			return vec[i - 1];
@@ -73,7 +88,7 @@ BattleTrophy::BattleTrophy()
 {
 }
 
-ConquestTrophy::ConquestTrophy(int level, string name, int NumOfWin, int bonusGold, float bonusEnergy)
+ConquestTrophy::ConquestTrophy(int level, string name, int NumOfWin, float bonusGold, float bonusEnergy)
 {
 	this->level = level;
 	this->name = name;
