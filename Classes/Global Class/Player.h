@@ -6,7 +6,7 @@
 USING_NS_CC;
 using namespace std;
 
-extern struct PlayerInfo {
+struct PlayerInfo {
 	//Phần lấy từ cơ sở dữ liệu
 	int id = 0;
 	string username = "";

@@ -9,7 +9,7 @@
 using namespace cocos2d::network;
 using namespace cocos2d::ui;
 
-static class SocketClient : public SocketIO::SIODelegate
+class SocketClient : public SocketIO::SIODelegate
 {
 public:
 	// socket.io even\vent listener

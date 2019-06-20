@@ -8,7 +8,7 @@
 using namespace cocos2d::ui;
 USING_NS_CC;
 
-extern struct UnitDetailsTable {
+struct UnitDetailsTable {
 	Node* root;
 	Label* lbl_Name;
 	Label* lbl_Health;
@@ -30,7 +30,7 @@ extern struct UnitDetailsTable {
 };
 
 //root = Vec2(0,1)
-extern struct FriendShipUpgrade {
+struct FriendShipUpgrade {
 	Node* root;
 	Button* btn_Up, *btn_Down;
 	Label* lbl_Level1, *lbl_Level2, *lbl_Level3, *lbl_Level4, *lbl_Level5;

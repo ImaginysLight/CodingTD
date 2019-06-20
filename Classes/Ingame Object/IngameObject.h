@@ -4,7 +4,7 @@
 USING_NS_CC;
 
 
-static class IngameObject {
+class IngameObject {
 public:
 	static void loadIngameObjectStaticVariables();
 	//Bảng màu skill cho từng element

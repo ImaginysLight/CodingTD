@@ -22,7 +22,7 @@ using namespace std;
 using namespace cocos2d::ui;
 
 
-static class Tool{
+class Tool{
 public:
 	//Các biến toàn cục
 	static SocketClient* Socket_Client;

@@ -6,7 +6,7 @@ USING_NS_CC;
 using namespace std;
 
 // Thể hiện đối tượng bất kỳ thuộc về 1 người chơi trong game scene
-extern struct SkillRequired {
+struct SkillRequired {
 	int energy;
 	int level;
 	bool needToSelect;

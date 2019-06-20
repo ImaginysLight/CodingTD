@@ -4,7 +4,7 @@
 #include<string>
 using namespace std;
 
-extern struct KnowledegeTrophy {
+struct KnowledegeTrophy {
 	int level = 0;
 	string name = "None";
 	int NumOfCorrectQuestion = 0;
@@ -15,7 +15,7 @@ extern struct KnowledegeTrophy {
 	KnowledegeTrophy();
 };
 
-extern struct BattleTrophy {
+struct BattleTrophy {
 	int level = 0;
 	string name = "None";
 	int NumOfKill = 0;
@@ -26,7 +26,7 @@ extern struct BattleTrophy {
 	BattleTrophy();
 };
 
-extern struct ConquestTrophy {
+struct ConquestTrophy {
 	int level = 0;
 	string name = "None";
 	int NumOfWin = 0;
@@ -36,7 +36,7 @@ extern struct ConquestTrophy {
 	ConquestTrophy(int level, string name, int NumOfWin, float bonusGold, float bonusEnergy);
 	ConquestTrophy();
 };
-static class Trophy {
+class Trophy {
 public:
 	static KnowledegeTrophy CalculateKnowledgeTrophy(int numOfCorrectQuestion);
 	static BattleTrophy CalculateBattleTrophy(int numOfKill);

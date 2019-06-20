@@ -8,7 +8,7 @@ using namespace std;
 
 //This class contain 3 passive skill of each element.
 
-static class PassiveSkill{
+class PassiveSkill{
 public:
 	static float Bonus_Attack;
 	static float Bonus_Defense;

@@ -7,7 +7,7 @@ class BaseSkillClass;
 USING_NS_CC;
 using namespace std;
 
-extern struct DamageReceive {
+struct DamageReceive {
 	int attackerId = 0;
 	float damage = 0;
 	float triggerTime = 0;
@@ -16,7 +16,7 @@ extern struct DamageReceive {
 	DamageReceive(int attackerId, float damage, float triggerTime, string animateName, string special);
 };
 
-extern struct StatusReceive {
+struct StatusReceive {
 	string statusName = "";
 	string statusInfluence = "";
 	float value = 0;
@@ -25,7 +25,7 @@ extern struct StatusReceive {
 	StatusReceive(string statusName, string statusInfluence, float value, float releaseStatusTime, int statusOrder);
 };
 
-extern struct HardEffect {
+struct HardEffect {
 	string effectName = "";
 	float triggerTime = 0;
 	float releaseTime = 0;
