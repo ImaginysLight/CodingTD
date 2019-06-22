@@ -1,11 +1,10 @@
 ﻿#pragma once
 #include "cocos2d.h"
-#include"Global Class/Tool.h"
-#include"Global Class/Player.h"
+#include"GlobalClass/Tool.h"
+#include"GlobalClass/Player.h"
 #include"LobbyScene.h"
 #include"GameScene.h"
-
-#include <network/SocketIO.h>
+#include"GlobalClass/Audio.h"
 using namespace cocos2d::network;
 using namespace cocos2d::ui;
 

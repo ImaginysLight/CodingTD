@@ -1,7 +1,8 @@
 #pragma once
-#include"Global Class/Trophy.h"
-#include"Global Class/Player.h"
-#include"Global Class/Tool.h"
+#include"GlobalClass/Trophy.h"
+#include"GlobalClass/Player.h"
+#include"GlobalClass/Tool.h"
+#include"GlobalClass/Audio.h"
 #include"LobbyScene.h"
 #include"CardScene.h"
 #include"cocos2d.h"

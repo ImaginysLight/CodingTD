@@ -1,12 +1,12 @@
 #pragma once
 #include "cocos2d.h"
-#include"Global Class/Tool.h"
-#include"LobbyScene.h"
-//#include "Object/SocketClient.h"
-
-#include <network/SocketIO.h>
-using namespace cocos2d::network;
+#include "GlobalClass/Tool.h"
+#include "GlobalClass/Audio.h"
+#include "LobbyScene.h"
+#include "ui/CocosGUI.h"
 using namespace cocos2d::ui;
+using namespace std;
+using namespace cocos2d::network;
 
 USING_NS_CC;
 class LoginScene : public cocos2d::Scene

@@ -1,15 +1,17 @@
 ﻿#pragma once
 #include "cocos2d.h"
 #include"CardScene.h"
-#include"Global Class/Tool.h"
+#include"GlobalClass/Tool.h"
+#include"GlobalClass/Player.h"
+#include"GlobalClass/Trophy.h"
+#include"GlobalClass/Audio.h"
 #include"network/HttpClient.h"
-#include"Ingame Object/IngameObject.h"
-#include"Ingame Object/Unit/BaseUnitClass.h"
-#include"Ingame Object/ObjectConstructor.h"
-#include"Ingame Object/SkillConstructor.h"
-#include"Ingame Object/Skill/BaseSkillClass.h"
-#include"Global Class/Player.h"
-#include"Global Class/Trophy.h"
+#include"IngameObject/IngameObject.h"
+#include"IngameObject/Unit/BaseUnitClass.h"
+#include"IngameObject/ObjectConstructor.h"
+#include"IngameObject/SkillConstructor.h"
+#include"IngameObject/Skill/BaseSkillClass.h"
+
 #include"ResultScene.h"
 USING_NS_CC;
 class GameScene : public cocos2d::Scene
@@ -79,7 +81,6 @@ public:
 	Button* btn_UpgradeKingdom, *btn_TurnOnUpgrade, * btn_UpgradeFarm;
 	void CreateUpgradeTable(string name);
 	void UpgradeUnit(string name);
-	//void btn_UpgradeKingdom(Ref *pSender, cocos2d::ui::Button::Widget::TouchEventType type);
 
 	//Khởi tạo object
 	void InitializeIngameObject(string objectName, int line, int playerId);
@@ -87,6 +88,7 @@ public:
 	//Endgame
 	void Endgame(bool isVictorious);
 	void ClearAllVariables();
+	Button* btn_Surrender;
 
 	//Xem thông tin unit khi click
 	BaseUnitClass* choosingUnit = new BaseUnitClass();
@@ -96,10 +98,11 @@ public:
 	vector<pair<string, int>> chatBoxContent;
 	ui::ScrollView *sc_ChatBox;
 	EditBox* EditBox_Chat;
-	Button* btn_SendMessage;
+	Button* btn_SendMessage, *btn_General, *btn_Notify, *btn_Chat, *btn_Hide;
 	void CreateChatbox();
+	string chatboxMode = "General";
 	void UpdateChatbox();
-	void btn_SendMessage_Click(Ref *pSender, cocos2d::ui::Button::Widget::TouchEventType type);
+	void btn_ChatBox_Click(Ref *pSender, cocos2d::ui::Button::Widget::TouchEventType type);
 
 	//Các vấn đề về bảng câu hỏi
 	Button *btn_DropDownQuestionTable, *btn_Answer1, *btn_Answer2, *btn_Answer3, *btn_Answer4,
@@ -128,6 +131,7 @@ public:
 	void onReceiveEvent_UpgradeKingdom(SIOClient* client, const std::string& data);
 	void onReceiveEvent_AnswerResult(SIOClient* client, const std::string& data);
 	void onReceiveEvent_ActiveBet(SIOClient* client, const std::string& data);
+	void onReceiveEvent_EndGame(SIOClient* client, const std::string& data);
 
 	//Setup trong init
 	void SetupCamera();
@@ -139,7 +143,7 @@ public:
 	void UpdateQuestionInfo(float time);
 	void UpdatePlayerResourcePerSecond(float time);
 	void UpdateAudio(float time);
-
+	Label* lbl_GameTime;
 
 	//Các hàm cơ bản
 	void btn_Click(Ref *pSender, cocos2d::ui::Button::Widget::TouchEventType type);

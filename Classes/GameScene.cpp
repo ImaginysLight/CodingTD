@@ -1,17 +1,8 @@
 ﻿#include"GameScene.h"
-#include"Global Class/Audio.h"
+
 using namespace CocosDenshion;
 USING_NS_CC;
 
-
-/*
-this
-	defaultCamera
-	staticUI
-		buyingBar
-		questionTable
-		unitDetails
-*/
 Scene* GameScene::createScene()
 {
 	return GameScene::create();
@@ -25,12 +16,14 @@ bool GameScene::init()
 	}
 
 	Player::currentPlayer->elementName = Player::opponentPlayer->elementName = "Fire";
+	Player::currentPlayer->picked_units.push_back("UFO Driver");
 	Player::currentPlayer->picked_units.push_back("Elemental Alien");
 	Player::currentPlayer->picked_units.push_back("Elemental Alien");
 	Player::currentPlayer->picked_units.push_back("Elemental Alien");
 	Player::currentPlayer->username = "ImaginysLight";
 
 	Audio::audio->stopAllEffects();
+	Audio::audio->stopBackgroundMusic();
 
 	visibleSize = Director::getInstance()->getVisibleSize();
 
@@ -59,6 +52,7 @@ bool GameScene::init()
 	Tool::Socket_Client->_client->on("Answer_Result", CC_CALLBACK_2(GameScene::onReceiveEvent_AnswerResult, this));
 	Tool::Socket_Client->_client->on("Active_Bet", CC_CALLBACK_2(GameScene::onReceiveEvent_ActiveBet, this));
 	Tool::Socket_Client->_client->on("Upload_Player_Info", nullptr);
+	Tool::Socket_Client->_client->on("End_Game", CC_CALLBACK_2(GameScene::onReceiveEvent_EndGame, this));
 
 	this->schedule(schedule_selector(GameScene::UpdateIngameObject), 1/60);
 	this->schedule(schedule_selector(GameScene::UpdateQuestionInfo), 0.25);
@@ -78,7 +72,7 @@ void GameScene::LoadIngamePlayerInfo() {
 	ingamePlayerInfo.root = Node::create();
 	staticUI->addChild(ingamePlayerInfo.root);
 
-	ingamePlayerInfo.sp_Background = Sprite::create("UI/GameScene/Player Info Background.png");
+	ingamePlayerInfo.sp_Background = Sprite::create("UI/GameScene/bgchat.png");
 	Tool::setNodeSize(ingamePlayerInfo.sp_Background, 250, 150);
 	ingamePlayerInfo.sp_Background->setAnchorPoint(Vec2(0, 1));
 	ingamePlayerInfo.sp_Background->setPosition(Vec2(visibleSize.width*0.02, visibleSize.height*0.98));
@@ -293,12 +287,16 @@ void GameScene::UpdatePlayerResourcePerSecond(float time) {
 	ingamePlayerInfo.gold += ingamePlayerInfo.Gps;
 	if(ingamePlayerInfo.energy < ingamePlayerInfo.energyCap) ingamePlayerInfo.energy += ingamePlayerInfo.Eps;
 	UpdateIngamePlayerInfo();
+
+	int minute = (int)Tool::currentIngameTime / 60;
+	int second = (int)Tool::currentIngameTime % 60;
+	GameScene::lbl_GameTime->setString(to_string(minute) + ":" + to_string(second));
 }
 
 void GameScene::UpdateAudio(float time)
 {
 	if (!Audio::audio->isBackgroundMusicPlaying()) {
-		Audio::audio->playBackgroundMusic(Audio::GetBackgroundAudio().c_str(), false);
+		Audio::audio->playBackgroundMusic(Audio::GetBattleAudio().c_str(), false);
 	}
 }
 
@@ -310,19 +308,15 @@ void GameScene::UpdateQuestionInfo(float time) {
 			GameScene::ChangeQuestionTableState(questionAvailable);
 			destinationTime += 10;
 			lbl_Level->setString("???");
+			btn_DropDownQuestionTable->setTitleText("Waiting For Next Question (" + to_string((int)destinationTime / 60) + ":" + to_string((int)destinationTime % 60) + ")");
+			btn_DropDownQuestionTable->setTitleColor(GameScene::isAllowedToChooseQuestion ? Color3B::GREEN : Color3B::RED);
 		}
 		else {
 			questionAvailable = true;
 			GameScene::ChangeQuestionTableState(true);
 			destinationTime = 10 + 10 * currentQuestionLevel + Tool::currentIngameTime;
+			btn_DropDownQuestionTable->setTitleText("Question Ready (" + to_string((int)destinationTime / 60) + ":" + to_string((int)destinationTime % 60) + ")");
 		}
-	}
-	if (questionAvailable) {
-		btn_DropDownQuestionTable->setTitleText("Question Ready (" + to_string((int)(destinationTime - Tool::currentIngameTime)) + ")");
-	}
-	else {
-		btn_DropDownQuestionTable->setTitleText("Waiting For Next Question (" + to_string((int)(destinationTime - Tool::currentIngameTime)) + ")");
-		btn_DropDownQuestionTable->setTitleColor(GameScene::isAllowedToChooseQuestion ? Color3B::GREEN : Color3B::RED);
 	}
 }
 
@@ -405,23 +399,15 @@ void GameScene::Endgame(bool isVictorious)
 	ResultScene::isVictorious = isVictorious;
 
 	this->pauseSchedulerAndActions();
-	auto lbl_Result = Tool::CreateLabel("", Tool::defaultTextSize*2.5);
-	lbl_Result->setPosition(Vec2(visibleSize.width*0.5,visibleSize.height*0.55));
-	staticUI->addChild(lbl_Result,69);
 
-	auto btn_Comfirm = Tool::CreateButtonWithoutSprite("btn_Confirm", "Confirm");
-	btn_Comfirm->setPosition(Vec2(visibleSize.width*0.5, visibleSize.height*0.45));
-	btn_Comfirm->addTouchEventListener(CC_CALLBACK_2(GameScene::btn_Click, this));
-	staticUI->addChild(btn_Comfirm,69);
+	auto endgameTable = Tool::CreateNotificationTable("", "Confirm");
+	endgameTable->setPosition(visibleSize / 2);
+	staticUI->addChild(endgameTable, 69);
 
-	if (isVictorious) {
-		lbl_Result->setString("You are Victorious!");
-		lbl_Result->setTextColor(Color4B(175,225,200,255));
-	}
-	else {
-		lbl_Result->setString("You are Defeated");
-		lbl_Result->setTextColor(Color4B::RED);
-	}
+	((Label*)endgameTable->getChildByName("lbl_Content"))->setString(isVictorious ? "You are Victorious!" : "You are Defeated");
+	((Label*)endgameTable->getChildByName("lbl_Content"))->setTextColor(isVictorious ? Color4B(175, 225, 200, 255) : Color4B::RED);
+	((Button*)endgameTable->getChildByName("btn_Right"))->addTouchEventListener(CC_CALLBACK_2(GameScene::btn_Click, this));
+	((Button*)endgameTable->getChildByName("btn_Right"))->setName("btn_Confirm");
 
 	Player::oldPlayerInfo = *Player::currentPlayer;
 	Player::currentPlayer->total_correctAnswer += ResultScene::numOfCorrectAnswer;
@@ -441,8 +427,9 @@ void GameScene::Endgame(bool isVictorious)
 
 	//Play nhạc
 	Audio::audio->stopAllEffects();
-	if (isVictorious) Audio::audio->playBackgroundMusic(Audio::GetBrightAudio().c_str(), false);
-	else Audio::audio->playBackgroundMusic(Audio::GetSadAudio().c_str(), false);
+	Audio::audio->stopBackgroundMusic();
+	if (isVictorious) Audio::audio->playEffect(Audio::GetBrightAudio().c_str(), false);
+	else Audio::audio->playEffect(Audio::GetSadAudio().c_str(), false);
 	
 }
 
@@ -510,6 +497,17 @@ void GameScene::btn_Click(Ref * pSender, cocos2d::ui::Button::Widget::TouchEvent
 			}
 			else RunActionNotify("Not enough Gold");
 			GameScene::UpdateIngamePlayerInfo();
+		}
+		else if (name == "btn_Surrender") {
+			auto surrenderTable = Tool::CreateNotificationTable("Do you want to Surrender?", "No", "Yes");
+			surrenderTable->setPosition(visibleSize / 2);
+			((Button*)surrenderTable->getChildByName("btn_Left"))->addTouchEventListener([&](Ref * pSender, cocos2d::ui::Button::Widget::TouchEventType type) {
+				if (type == Widget::TouchEventType::ENDED) {
+					Tool::Socket_Client->_client->emit("End_Game", "{\"Room\":\"" + Player::currentPlayer->room_name + "\" ,\"id\":\"" + to_string(Player::currentPlayer->id) + "\"}");
+					((Node*)pSender)->getParent()->runAction(RemoveSelf::create());
+				}
+			});
+			staticUI->addChild(surrenderTable, 10);
 		}
 	}
 }
@@ -588,6 +586,7 @@ bool GameScene::onTouchBegan(Touch* touch, Event* event) {
 			return true;
 		}
 	}
+	GameScene::choosingUnit = new BaseUnitClass();
 	return true;
 }
 void GameScene::onTouchMoved(Touch* touch, Event* event) {
@@ -657,6 +656,15 @@ void GameScene::SetupGUI() {
 	GameScene::tooltip = Node::create();
 	staticUI->addChild(tooltip, 2);
 
+	GameScene::lbl_GameTime = Tool::CreateLabel("", Tool::defaultTextSize, Color4B::BLUE);
+	lbl_GameTime->setPosition(visibleSize.width*0.5, visibleSize.height*0.945);
+	staticUI->addChild(lbl_GameTime, 100);
+
+	GameScene::btn_Surrender = Tool::CreateButtonWithoutSprite("btn_Surrender", "Surrender",Tool::defaultTextSize*1.2,Color3B(129,0,255));
+	btn_Surrender->setPosition(Vec2(visibleSize.width*0.12, visibleSize.height*0.69));
+	btn_Surrender->addTouchEventListener(CC_CALLBACK_2(GameScene::btn_Click, this));
+	staticUI->addChild(btn_Surrender, 1);
+
 	unitDetails = Node::create();
 	staticUI->addChild(unitDetails);
 
@@ -671,7 +679,7 @@ void GameScene::SetupGUI() {
 
 	btn_DropDownQuestionTable = Button::create();
 	btn_DropDownQuestionTable->setTitleText("Waiting For Next Question (" + to_string((int)(destinationTime-Tool::currentIngameTime)) + ")");
-	btn_DropDownQuestionTable->setPosition(Vec2(visibleSize.width / 2, visibleSize.height*0.95));
+	btn_DropDownQuestionTable->setPosition(Vec2(visibleSize.width / 2, visibleSize.height*0.905));
 	btn_DropDownQuestionTable->setTitleFontSize(Tool::defaultTextSize);
 	btn_DropDownQuestionTable->setName("btn_DropDownQuestionTable");
 	btn_DropDownQuestionTable->addTouchEventListener(CC_CALLBACK_2(GameScene::btn_Click, this));
@@ -870,6 +878,7 @@ void GameScene::UpgradeUnit(string name) {
 		if (name == "btn_UpgradeFarm") {
 			ingamePlayerInfo.foodLimit++;
 			GameScene::UpdateIngamePlayerInfo();
+			Audio::audio->playEffect("Audio/Upgrade.mp3");
 		}
 		else if (unitDetails.description == "Kingdom") {
 			Tool::Socket_Client->_client->emit("_Upgrade_Kingdom_", "{\"Room\":\"" + Player::currentPlayer->room_name + "\", \"Id\":\"" + to_string(Player::currentPlayer->id) + "\"}");
@@ -885,6 +894,7 @@ void GameScene::UpgradeUnit(string name) {
 					this->buyingBar->addChild(List_BuyableUnit[i].root);
 					List_BuyableUnit[i].btn_Icon->addTouchEventListener(CC_CALLBACK_2(GameScene::btn_BuyUnit_Click, this));
 					AddDragAndDropItem(List_BuyableUnit[i].root);
+					Audio::audio->playEffect("Audio/Upgrade.mp3");
 					break;
 				}
 			}
@@ -944,7 +954,7 @@ GameScene::Item_BuyableUnit::Item_BuyableUnit(string name)
 void GameScene::CreateChatbox() {
 
 	GameScene::sc_ChatBox = ui::ScrollView::create();
-	sc_ChatBox->setContentSize(Size(visibleSize.width*0.285, visibleSize.height*0.45));
+	sc_ChatBox->setContentSize(Size(visibleSize.width*0.285, visibleSize.height*0.4));
 	sc_ChatBox->setInnerContainerSize(Size(1000, 200));
 	sc_ChatBox->setPosition(Vec2(visibleSize.width*0.985, visibleSize.height*0.08));
 	sc_ChatBox->setAnchorPoint(Vec2(1, 0));
@@ -952,10 +962,9 @@ void GameScene::CreateChatbox() {
 	staticUI->addChild(sc_ChatBox, 10);
 
 	auto sp_ChatBox = Sprite::create("UI/GameScene/bgchat.png");
-	sp_ChatBox->setPosition(sc_ChatBox->getPosition());
-	sp_ChatBox->setAnchorPoint(Vec2(1, 0));
-	Tool::setNodeSize(sp_ChatBox, 285, 243);
-	staticUI->addChild(sp_ChatBox, 9);
+	Tool::setNodeSize(sp_ChatBox, 285, 216);
+	sp_ChatBox->setAnchorPoint(Vec2(0, 0));
+	sc_ChatBox->addChild(sp_ChatBox, -1);
 
 	GameScene::EditBox_Chat = ui::EditBox::create(Size(visibleSize.width*0.255, visibleSize.height*0.06), "", "");
 	EditBox_Chat->setPosition(Vec2(visibleSize.width*0.95, visibleSize.height*0.03));
@@ -970,16 +979,48 @@ void GameScene::CreateChatbox() {
 	staticUI->addChild(EditBox_Chat, 10);
 
 	auto sp_EditBox = Sprite::create("UI/GameScene/bgEditBox.png");
-	sp_EditBox->setPosition(EditBox_Chat->getPosition());
-	sp_EditBox->setAnchorPoint(Vec2(1, 0));
+	sp_EditBox->setAnchorPoint(Vec2(0, 0));
 	Tool::setNodeSize(sp_EditBox, EditBox_Chat->getBoundingBox().size.width, EditBox_Chat->getBoundingBox().size.height);
-	staticUI->addChild(sp_EditBox, 9);
+	EditBox_Chat->addChild(sp_EditBox, -1);
 
+	GameScene::btn_General = Button::create("UI/GameScene/Button Background.png");
+	btn_General->setTitleText("General");
+	btn_General->setTitleFontSize(32);
+	btn_General->setScale(0.52);
+	btn_General->setPosition(Vec2(visibleSize.width*0.73, visibleSize.height*0.5));
+	btn_General->addTouchEventListener(CC_CALLBACK_2(GameScene::btn_ChatBox_Click, this));
+	staticUI->addChild(btn_General, 10);
+
+	GameScene::btn_Notify = Button::create("UI/GameScene/Button Background.png");
+	btn_Notify->setTitleText("Notify");
+	btn_Notify->setTitleFontSize(32);
+	btn_Notify->setScale(0.52);
+	btn_Notify->setPosition(Vec2(visibleSize.width*0.8, visibleSize.height*0.5));
+	btn_Notify->addTouchEventListener(CC_CALLBACK_2(GameScene::btn_ChatBox_Click, this));
+	staticUI->addChild(btn_Notify, 10);
+
+	GameScene::btn_Chat = Button::create("UI/GameScene/Button Background.png");
+	btn_Chat->setTitleText("Chat");
+	btn_Chat->setTitleFontSize(32);
+	btn_Chat->setScale(0.52);
+	btn_Chat->setPosition(Vec2(visibleSize.width*0.87, visibleSize.height*0.5));
+	btn_Chat->addTouchEventListener(CC_CALLBACK_2(GameScene::btn_ChatBox_Click, this));
+	staticUI->addChild(btn_Chat, 10);
+
+	GameScene::btn_Hide = Button::create("UI/GameScene/Button Background.png");
+	btn_Hide->setTitleText("Hide");
+	btn_Hide->setName("btn_Hide");
+	btn_Hide->setTitleFontSize(32);
+	btn_Hide->setScale(0.52);
+	btn_Hide->setPosition(Vec2(visibleSize.width*0.94, visibleSize.height*0.5));
+	btn_Hide->addTouchEventListener(CC_CALLBACK_2(GameScene::btn_ChatBox_Click, this));
+	staticUI->addChild(btn_Hide, 10);
 
 	GameScene::btn_SendMessage = Button::create("UI/GameScene/Send Message.png");
+	btn_SendMessage->setName("btn_SendMessage");
 	btn_SendMessage->setAnchorPoint(Vec2(1, 0));
 	btn_SendMessage->setPosition(Vec2(visibleSize.width*0.98, visibleSize.height*0.03));
-	btn_SendMessage->addTouchEventListener(CC_CALLBACK_2(GameScene::btn_SendMessage_Click, this));
+	btn_SendMessage->addTouchEventListener(CC_CALLBACK_2(GameScene::btn_ChatBox_Click, this));
 	staticUI->addChild(btn_SendMessage);
 
 	chatBoxContent.push_back({"ImaginysLight and AnhQuyetVo welcome you to Coding TD !", 0});
@@ -988,42 +1029,74 @@ void GameScene::CreateChatbox() {
 
 }
 void GameScene::UpdateChatbox() {
+	vector<pair<string, int>> copyOfChatboxContent;
+	for (auto content : chatBoxContent) {
+		if (chatboxMode == "General") copyOfChatboxContent.push_back(content);
+		else if (chatboxMode == "Notify" && content.second != 1 && content.second != 2) copyOfChatboxContent.push_back(content);
+		else if (chatboxMode == "Chat"  && content.second == 1 && content.second == 2) copyOfChatboxContent.push_back(content);
+	}
 	vector<int> labelHeight;
 	int currentHeight = 10;
 	sc_ChatBox->removeAllChildrenWithCleanup(true);
 	sc_ChatBox->scrollToBottom(0, false);
-	for (int i = 0; i < chatBoxContent.size(); i++) {
-		Label* lbl_Content = Tool::CreateLabel(chatBoxContent[i].first,Tool::defaultTextSize*0.8);
+	for (int i = 0; i < copyOfChatboxContent.size(); i++) {
+		Label* lbl_Content = Tool::CreateLabel(copyOfChatboxContent[i].first,Tool::defaultTextSize*0.8);
 		lbl_Content->setMaxLineWidth(sc_ChatBox->getContentSize().width*0.9);
 		currentHeight += (lbl_Content->getBoundingBox().size.height / 2);
 		labelHeight.push_back(currentHeight);
 		currentHeight += (8 + lbl_Content->getBoundingBox().size.height / 2);
 	}
 	sc_ChatBox->setInnerContainerSize(Size(1000, currentHeight + 20));
-	for (int i = 0; i < chatBoxContent.size(); i++) {
-		Label* lbl_Content = Tool::CreateLabel(chatBoxContent[i].first, Tool::defaultTextSize*0.8);
+	for (int i = 0; i < copyOfChatboxContent.size(); i++) {
+		Label* lbl_Content = Tool::CreateLabel(copyOfChatboxContent[i].first, Tool::defaultTextSize*0.8);
 		lbl_Content->setMaxLineWidth(sc_ChatBox->getContentSize().width*0.9);
 		lbl_Content->setPosition(Vec2(10,sc_ChatBox->getInnerContainerSize().height - labelHeight[i]));
 		lbl_Content->setAnchorPoint(Vec2(0, 0.5));
-		if (chatBoxContent[i].second == 1) lbl_Content->setTextColor(Color4B::GREEN);
-		else if (chatBoxContent[i].second == 2) lbl_Content->setTextColor(Color4B::RED);
-		else if (chatBoxContent[i].second == 3) lbl_Content->setTextColor(Color4B(175,225,250,255));
+		if (copyOfChatboxContent[i].second == 1) lbl_Content->setTextColor(Color4B::GREEN);
+		else if (copyOfChatboxContent[i].second == 2) lbl_Content->setTextColor(Color4B::RED);
+		else if (copyOfChatboxContent[i].second == 3) lbl_Content->setTextColor(Color4B(175,225,250,255));
 		sc_ChatBox->addChild(lbl_Content);
 	}
 }
 
-void GameScene::btn_SendMessage_Click(Ref *pSender, cocos2d::ui::Button::Widget::TouchEventType type) {
+void GameScene::btn_ChatBox_Click(Ref *pSender, cocos2d::ui::Button::Widget::TouchEventType type) {
 	if (type == Widget::TouchEventType::ENDED) {
-		string content = GameScene::EditBox_Chat->getText();
-		if (content.size() < 1) return;
-		content = Player::currentPlayer->username + ": " + content;
-		for (int i = 0; i < content.size(); i++) {
-			if (content[i] == '\\') {
-				content[i] = '/';
+		if (((Button*)pSender)->getName() == "btn_SendMessage") {
+			string content = GameScene::EditBox_Chat->getText();
+			if (content.size() < 1) return;
+			content = Player::currentPlayer->username + ": " + content;
+			for (int i = 0; i < content.size(); i++) {
+				if (content[i] == '\\') {
+					content[i] = '/';
+				}
 			}
+			Tool::Socket_Client->_client->emit("Send_Message", "{\"Room\":\"" + Player::currentPlayer->room_name + "\", \"content\":\"" + content + "\", \"id\":\"" + to_string(Player::currentPlayer->id) + "\"}");
+			GameScene::EditBox_Chat->setText("");
 		}
-		Tool::Socket_Client->_client->emit("Send_Message", "{\"Room\":\"" + Player::currentPlayer->room_name + "\", \"content\":\"" + content + "\", \"id\":\"" + to_string(Player::currentPlayer->id) + "\"}");
-		GameScene::EditBox_Chat->setText("");
+		else if (((Button*)pSender)->getName() == "btn_Hide") {
+			EditBox_Chat->runAction(FadeOut::create(0.5));
+			sc_ChatBox->runAction(FadeOut::create(0.5));
+			btn_General->runAction(MoveBy::create(0.5, Vec2(0, -visibleSize.height *0.35)));
+			btn_Notify->runAction(MoveBy::create(0.5, Vec2(0, -visibleSize.height *0.35)));
+			btn_Chat->runAction(MoveBy::create(0.5, Vec2(0, -visibleSize.height *0.35)));
+			btn_Hide->runAction(MoveBy::create(0.5, Vec2(0, -visibleSize.height *0.35)));
+			btn_Hide->setName("btn_Show");
+			btn_Hide->setTitleText("Show");
+		}
+		else if (((Button*)pSender)->getName() == "btn_Show") {
+			EditBox_Chat->runAction(FadeIn::create(0.5));
+			sc_ChatBox->runAction(FadeIn::create(0.5));
+			btn_General->runAction(MoveBy::create(0.5, Vec2(0, visibleSize.height *0.35)));
+			btn_Notify->runAction(MoveBy::create(0.5, Vec2(0, visibleSize.height *0.35)));
+			btn_Chat->runAction(MoveBy::create(0.5, Vec2(0, visibleSize.height *0.35)));
+			btn_Hide->runAction(MoveBy::create(0.5, Vec2(0, visibleSize.height *0.35)));
+			btn_Hide->setName("btn_Hide");
+			btn_Hide->setTitleText("Hide");
+		}
+		else {
+			GameScene::chatboxMode = ((Button*)pSender)->getTitleText();
+			GameScene::UpdateChatbox();
+		}
 	}
 }
 void GameScene::onReceiveEvent_SendMessage(SIOClient* client, const std::string& data)
@@ -1117,6 +1190,25 @@ void GameScene::onReceiveEvent_ActiveBet(SIOClient * client, const std::string &
 		content += " Bet !!";
 		chatBoxContent.push_back({ content,3 });
 		GameScene::UpdateChatbox();
+	}
+}
+
+void GameScene::onReceiveEvent_EndGame(SIOClient * client, const std::string & data)
+{
+	rapidjson::Document document;
+	document.Parse<0>(data.c_str());
+	if (document["Room"].GetString() == Player::currentPlayer->room_name)
+	{
+		if (document["id"].GetString() == to_string(Player::currentPlayer->id)) {
+			chatBoxContent.push_back({Player::currentPlayer->username + " Surrender",0 });
+			UpdateChatbox();
+			Endgame(false);
+		}
+		else {
+			chatBoxContent.push_back({ Player::opponentPlayer->username + " Surrender",0 });
+			UpdateChatbox();
+			Endgame(true);
+		}
 	}
 }
 
@@ -1246,8 +1338,6 @@ void GameScene::btn_AnswerClick(Ref *pSender, cocos2d::ui::Button::Widget::Touch
 	}
 }
 
-
-
 void GameScene::onReceiveEvent_Question(SIOClient* client, const std::string& data) {
 
 	rapidjson::Document document;
@@ -1271,6 +1361,7 @@ void GameScene::onReceiveEvent_Question(SIOClient* client, const std::string& da
 					else if (currentQuestionLevel == 2) return "medium";
 					else if (currentQuestionLevel == 3) return "hard";
 					else if (currentQuestionLevel == 4) return "extreme";
+					return "unknown";
 				}());
 			}
 
@@ -1330,6 +1421,8 @@ void GameScene::UpdateIngamePlayerInfo()
 void GameScene::CorrectAnswer()
 {
 	ResultScene::numOfCorrectAnswer++;
+
+	Audio::audio->playEffect(Audio::GetCorrectAudio().c_str(), false);
 
 	//( 1 + TimeRemaining % / 1.5) * (0.5 + 0.5 * QuestionLevel) * 150 Gold và 1 Knowledge cho câu đúng
 	//Positive Bet (cost 100g): Nếu người cược trả lời đúng ở câu trả lời tiếp theo sẽ nhận gấp 1.8 lần Gold.

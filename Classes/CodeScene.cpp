@@ -1,9 +1,6 @@
 #include"CodeScene.h"
-#include "json\document.h"
-#include "json\rapidjson.h"
-#include <network/SocketIO.h>
-//#include "Object/SocketClient.h"
-#include "Global Class/Tool.h"
+
+
 USING_NS_CC;
 
 

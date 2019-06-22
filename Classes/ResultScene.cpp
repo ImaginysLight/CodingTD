@@ -1,5 +1,4 @@
 ﻿#include"ResultScene.h"
-#include"Global Class/Audio.h"
 
 USING_NS_CC;
 int ResultScene::numOfCorrectAnswer = 0;
@@ -49,10 +48,7 @@ void ResultScene::SetupGUI()
 	lbl_CurrentExperience->setPosition(Vec2(visibleSize.width*0.1, visibleSize.height*0.7));
 	lbl_CurrentExperience->setAnchorPoint(Vec2(0, 0.5));
 	this->addChild(lbl_CurrentExperience);
-	float questionPoint = (ResultScene::numOfCorrectAnswer + ResultScene::numOfWrongAnswer)*(0.5 + ResultScene::numOfCorrectAnswer / (float)(ResultScene::numOfWrongAnswer + ResultScene::numOfCorrectAnswer) * 2);
-	float battlePoint = ResultScene::goldReceived *0.01;
-	int bonusExp = (questionPoint + battlePoint) * (isVictorious ? 1.3 : 0.8);
-	Label* lbl_BonusExperience = Tool::CreateLabel("+" + to_string(bonusExp), Tool::defaultTextSize, Color4B(175, 225, 200, 255));
+	Label* lbl_BonusExperience = Tool::CreateLabel("+" + to_string((int)Player::currentPlayer->experience - Player::oldPlayerInfo.experience), Tool::defaultTextSize, Color4B(175, 225, 200, 255));
 	lbl_BonusExperience->setPosition(Vec2(visibleSize.width*0.3, visibleSize.height*0.7));
 	this->addChild(lbl_BonusExperience);
 

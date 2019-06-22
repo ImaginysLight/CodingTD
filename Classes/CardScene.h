@@ -1,8 +1,9 @@
 #pragma once
 
-#include"Ingame Object/ObjectConstructor.h"
-#include"Global Class/Player.h"
-#include"Global Class/Tool.h"
+#include"IngameObject/ObjectConstructor.h"
+#include"GlobalClass/Player.h"
+#include"GlobalClass/Tool.h"
+#include"GlobalClass/Audio.h"
 #include"cocos2d.h"
 #include"PlayerInformationScene.h"
 using namespace cocos2d::ui;

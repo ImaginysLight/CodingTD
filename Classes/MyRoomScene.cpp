@@ -1,7 +1,5 @@
 ﻿#include"MyRoomScene.h"
-#include "json\document.h"
-#include "json\rapidjson.h"
-#include <network/SocketIO.h>
+
 USING_NS_CC;
 
 Scene* MyRoomScene::createScene()

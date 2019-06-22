@@ -1,8 +1,5 @@
 #include"LobbyScene.h"
-#include "json\document.h"
-#include "json\rapidjson.h"
-#include <network/SocketIO.h>
-#include"Global Class/Audio.h"
+
 USING_NS_CC;
 using namespace CocosDenshion;
 
@@ -32,7 +29,7 @@ bool LobbyScene::init()
 	Tool::Socket_Client->_client->on("_Find_The_Opponent_",CC_CALLBACK_2(LobbyScene::findTheOpponent, this));
 	Tool::Socket_Client->_client->on("Get_Player_Info", CC_CALLBACK_2(LobbyScene::onReceiveEvent_GetPlayerInfo, this));
 	Tool::Socket_Client->_client->emit("Get_Player_Info", "{\"id\":\"" + to_string(Player::currentPlayer->id) + "\"}");
-	this->schedule(schedule_selector(LobbyScene::UpdateAudio,1));
+	this->schedule(CC_CALLBACK_1(LobbyScene::UpdateAudio, this), "Audio");
 	return true;
 }
 
@@ -97,9 +94,7 @@ void LobbyScene::onReceiveEvent_GetPlayerInfo(SIOClient * client, const std::str
 
 void LobbyScene::UpdateAudio(float time)
 {
-	if (!Audio::audio->isBackgroundMusicPlaying()) {
-		Audio::audio->playBackgroundMusic(Audio::GetBackgroundAudio().c_str(), false);
-	}
+	Audio::UpdateAudio();
 }
 
 void LobbyScene::SetupGUI()

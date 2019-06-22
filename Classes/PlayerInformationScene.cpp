@@ -1,5 +1,4 @@
 #include "PlayerInformationScene.h"
-#include"Global Class/Audio.h"
 using namespace CocosDenshion;
 USING_NS_CC;
 cocos2d::Scene * PlayerInformationScene::createScene()
@@ -89,9 +88,9 @@ bool PlayerInformationScene::init()
 		sp_Battle->setPosition(Vec2(visibleSize.width*0.8, visibleSize.height*0.45));
 		this->addChild(sp_Battle, 1);
 
-		auto lbl_Battle = Tool::CreateLabel(Tool::ConvertUTF16ToString(
-			L"+" + to_wstring(battle.defeatGoldRate) + L"% Gold when Defeat Enemy\n\n" +
-			L"+" + to_wstring(battle.defeatEnergyRate) + L"‰ Energy when Defeat Enemy"),
+		auto lbl_Battle = Tool::CreateLabel(
+			"+" + to_string(battle.defeatGoldRate) + "% Gold when Defeat Enemy\n\n" +
+			"+" + CCString::createWithFormat("%.1f",(float)battle.defeatEnergyRate/10)->getCString() + "% Energy when Defeat Enemy",
 			Tool::defaultTextSize*0.69, Color4B(175, 225, 250, 255), cocos2d::TextHAlignment::CENTER);
 		lbl_Battle->setPosition(Vec2(visibleSize.width*0.8, visibleSize.height*0.17));
 		lbl_Battle->enableBold();

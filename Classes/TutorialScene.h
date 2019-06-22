@@ -1,11 +1,9 @@
 #pragma once
 
 #include "cocos2d.h"
-#include "network/HttpClient.h"
-#include "extensions/cocos-ext.h"
 #include "ui\CocosGUI.h"
 #include <vector>
-#include "Global Class/Tool.h"
+#include "GlobalClass/Tool.h"
 #include "LobbyScene.h"
 USING_NS_CC;
 

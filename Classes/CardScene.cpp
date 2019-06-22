@@ -1,5 +1,5 @@
 ﻿#include "CardScene.h"
-#include"Global Class/Audio.h"
+
 using namespace CocosDenshion;
 USING_NS_CC;
 cocos2d::Scene * CardScene::createScene()
@@ -106,6 +106,7 @@ bool CardScene::init()
 	vec_Card["Hotheaded Gunner"]->setTitleColor(Color3B(175, 225, 200));
 	CardScene::RefreshScene("Hotheaded Gunner");
 
+	this->schedule(schedule_selector(LobbyScene::UpdateAudio), 1);
 	return true;
 }
 
