@@ -44,8 +44,7 @@ struct PlayerInfo {
 	//Phần trong gameplay
 	string elementName = "";
 	vector<string> picked_units;
-	bool betNegative = false;
-	bool betPositive = false;
+	bool activeChallenge = false;
 };
 
 class Player {

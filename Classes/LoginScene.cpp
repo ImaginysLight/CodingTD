@@ -112,7 +112,7 @@ void LoginScene::SetupGUI()
 	sp_SceneName->setPosition(Vec2(visibleSize.width * 0.5, visibleSize.height*0.9));
 	this->addChild(sp_SceneName);
 
-	auto sp_Background = Sprite::create("UI/GameScene/static background.png");
+	auto sp_Background = Sprite::create("UI/Background/Default Background 1.png");
 	sp_Background->setPosition(visibleSize / 2);
 	this->addChild(sp_Background, -1);
 
@@ -135,6 +135,7 @@ void LoginScene::SetupGUI()
 	editBox_Password->setPlaceHolder("Password");
 	editBox_Password->setPlaceholderFontColor(Color3B::GRAY);
 	editBox_Password->setMaxLength(20);
+	editBox_Password->setInputFlag(EditBox::InputFlag::PASSWORD);
 	editBox_Password->setText("Player001");
 	this->addChild(editBox_Password);
 
@@ -148,13 +149,13 @@ void LoginScene::SetupGUI()
 	Tool::setNodeSize(sp_EditBox_Password, editBox_Password->getBoundingBox().size.width, editBox_Password->getBoundingBox().size.height);
 	this->addChild(sp_EditBox_Password, -1);
 
-	btn_Login = Button::create("UI/LobbyScene/btn_Login_nomal.png","UI/LobbyScene/btn_Login_select.png");
+	btn_Login = Button::create("UI/LoginScene/btn_Login_nomal.png","UI/LoginScene/btn_Login_select.png");
 	btn_Login->setPosition(Vec2(visibleSize.width*0.4, visibleSize.height*0.3));
 	btn_Login->setName("btn_Login");
 	btn_Login->addTouchEventListener(CC_CALLBACK_2(LoginScene::btn_Click, this));
 	this->addChild(btn_Login);
 
-	btn_Register = Button::create("UI/LobbyScene/btn_Register_nomal.png", "UI/LobbyScene/btn_Register_select.png");
+	btn_Register = Button::create("UI/LoginScene/btn_Register_nomal.png", "UI/LoginScene/btn_Register_select.png");
 	btn_Register->setPosition(Vec2(visibleSize.width*0.6, visibleSize.height*0.3));
 	btn_Register->setName("btn_Register");
 	btn_Register->addTouchEventListener(CC_CALLBACK_2(LoginScene::btn_Click, this));

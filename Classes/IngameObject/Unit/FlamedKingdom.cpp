@@ -16,10 +16,9 @@ FlamedKingdom::FlamedKingdom(int line, bool isOwned, int unitId, int playerId)
 	upgradeGoldCost = 400;
 	upgradeKnowledgeCost = 3;
 
-	this->UpdateIngameInfo("Sprites/Flamed Kingdom/default_315x300.png", unitId, playerId, isOwned, "Flamed Kingdom", line);
+	this->UpdateIngameInfo("Sprites/Flamed Kingdom/default_small.png", unitId, playerId, isOwned, "Flamed Kingdom", line);
 	if (this->isOwned) this->root->setPosition(Vec2(0, 50));
 	else this->root->setPosition(Vec2(3100,50));
-
 }
 
 FlamedKingdom::~FlamedKingdom()

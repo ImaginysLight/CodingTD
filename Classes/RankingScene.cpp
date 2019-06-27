@@ -98,7 +98,7 @@ Node * RankingScene::CreateRow(string stt, string id, string name, string score,
 	lbl_total_question->setPositionX(600);
 	result->addChild(lbl_total_question);
 
-	auto line = Sprite::create("UI/BG/line.png");
+	auto line = Sprite::create("UI/Background/line.png");
 	line->setPositionX(visibleSize.width  *0.3f);
 	result->addChild(line);
 	
@@ -134,7 +134,7 @@ Node * RankingScene::CreateRow_Default()
 
 void RankingScene::SetupGUI()
 {
-	auto sp_Background = Sprite::create("UI/BG/background1.png");
+	auto sp_Background = Sprite::create("UI/Background/background1.png");
 	sp_Background->setPosition(visibleSize / 2);
 	this->addChild(sp_Background, -1);
 

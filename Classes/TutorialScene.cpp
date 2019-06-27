@@ -40,11 +40,14 @@ bool TutorialScene::init()
 	sp_Background->setPosition(visibleSize / 2);
 	this->addChild(sp_Background, -1);
 
-	btn_Exit = Button::create("UI/LobbyScene/btn_Exit_nomal.png", "UI/LobbyScene/btn_Exit_select.png");
+	btn_Exit = Tool::CreateButtonWithoutSprite("btn_Exit", " << Back To Lobby");
 	btn_Exit->setPosition(Vec2(visibleSize.width*0.15, visibleSize.height * 0.1));
 	btn_Exit->addTouchEventListener(CC_CALLBACK_2(TutorialScene::btn_Click, this));
-	btn_Exit->setName("btn_Exit");
-	this->addChild(btn_Exit);
+	btn_Exit->runAction(RepeatForever::create(Sequence::create(
+		MoveBy::create(1, Vec2(25, 0)),
+		MoveBy::create(1, Vec2(-25, 0)),
+		nullptr)));
+	this->addChild(btn_Exit,2);
 	
 
 	// Thông tin hướng dẫn

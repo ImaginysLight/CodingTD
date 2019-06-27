@@ -67,6 +67,19 @@ Button * Tool::CreateButtonWithoutSprite(string name, string titleText, int size
 	return btn_Result;
 }
 
+Button * Tool::CreateButtonWithSpirte(string name, string spritePath)
+{
+	Button* btn_Result;
+	try {
+		btn_Result = Button::create(spritePath);
+	}
+	catch (string error) {
+		btn_Result = Button::create();
+	}
+	btn_Result->setName(name);
+	return btn_Result;
+}
+
 Node * Tool::CreateBar(string content, Color4B textColor, Size size, Color3B frontColor, Color4F backColor)
 {
 	Node* result = Node::create();

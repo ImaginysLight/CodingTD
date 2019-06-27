@@ -166,15 +166,15 @@ void ChooseCardScene::btn_ChooseKingdom_Click(Ref * pSender, cocos2d::ui::Button
 
 void ChooseCardScene::SetupGUI()
 {
-	auto frame1 = Sprite::create("UI/BG/frame1.png");
+	auto frame1 = Sprite::create("UI/Background/frame1.png");
 	frame1->setPosition(Vec2(visibleSize.width * 0.5, visibleSize.height*0.5));
 	this->addChild(frame1);
 
-	auto frame2 = Sprite::create("UI/BG/frame2.png");
+	auto frame2 = Sprite::create("UI/Background/frame2.png");
 	frame2->setPosition(Vec2(visibleSize.width * 0.15f, visibleSize.height*0.5));
 	this->addChild(frame2);
 
-	auto frame3 = Sprite::create("UI/BG/frame2.png");
+	auto frame3 = Sprite::create("UI/Background/frame2.png");
 	frame3->setPosition(Vec2(visibleSize.width * 0.85f, visibleSize.height*0.5));
 	this->addChild(frame3);
 
@@ -210,7 +210,7 @@ void ChooseCardScene::SetupGUI()
 	sp_SceneName->setPosition(Vec2(visibleSize.width * 0.5, visibleSize.height*0.9));
 	this->addChild(sp_SceneName);*/
 
-	auto sp_Background = Sprite::create("UI/BG/background1.png");
+	auto sp_Background = Sprite::create("UI/Background/background1.png");
 	sp_Background->setPosition(visibleSize / 2);
 	this->addChild(sp_Background, -1);
 
@@ -250,7 +250,7 @@ void ChooseCardScene::ChangeTurn() {
 			for (int i = 0; i < 3; i++) {
 				auto btn_Kingdom = Button::create("Sprites/" + kingdomName[i].second + "/default.png");
 				btn_Kingdom->setName(kingdomName[i].first);
-				Tool::setNodeSize(btn_Kingdom, 200, 200);
+				Tool::setNodeSize(btn_Kingdom, 160, 170);
 				btn_Kingdom->addTouchEventListener(CC_CALLBACK_2(ChooseCardScene::btn_ChooseKingdom_Click, this));
 				this->addChild(btn_Kingdom);
 				vecButton.push_back(btn_Kingdom);

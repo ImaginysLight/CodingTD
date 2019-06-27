@@ -21,6 +21,17 @@ public:
 	Node* staticUI, *questionTable, *buyingBar, *unitDetails, *tooltip;
 	void RunActionNotify(string content);
 
+	//Nâng cấp quân đội
+	struct ArmyBonus {
+		int health = 0;
+		int attack = 0;
+		int defense = 0;
+		int attackSpeed = 0;
+	};
+	ArmyBonus army_CurrentPlayer, army_OpponentPlayer;
+	void ExcuteArmyEffect(BaseUnitClass* &object);
+	void CreateTableUpgradeArmy(Ref *pSender, cocos2d::ui::Button::Widget::TouchEventType type);
+	void btn_UpgradeArmy_Click(Ref *pSender, cocos2d::ui::Button::Widget::TouchEventType type);
 	//Thông số trong game của người chơi
 	struct IngamePlayer {
 		float gold = 200;
@@ -28,7 +39,7 @@ public:
 		float energyCap = 100;
 		int knowledge = 1;
 		float foodLimit = 5;
-		float food = 0;
+		float food = -1;
 		float Gps = 5;
 		float Eps = 1;
 		float correctAnswerGoldRate = 1.0;
@@ -43,7 +54,7 @@ public:
 		Label* lbl_KingdomLevel; Sprite* sp_KingdomLevel;
 		Label* lbl_Food; Sprite* sp_Food;
 		int kingdomLevel = 1;
-		Button *btn_Skill1, *btn_Skill2, *btn_Skill3;
+		Button *btn_Skill1, *btn_Skill2, *btn_Skill3, *btn_Army;
 		BaseUnitClass* kingdom, *opponentKingdom;
 		Node* root;
 	};
@@ -106,7 +117,7 @@ public:
 
 	//Các vấn đề về bảng câu hỏi
 	Button *btn_DropDownQuestionTable, *btn_Answer1, *btn_Answer2, *btn_Answer3, *btn_Answer4,
-		*btn_Level1, *btn_Level2, *btn_Level3, *btn_PositiveBet, *btn_NegativeBet;
+		*btn_Level1, *btn_Level2, *btn_Level3, *btn_ActiveChallenge;
 	ListView* lv_QuestionContent;
 	Text* txt_Question;
 	string questionContent = "";
@@ -130,7 +141,8 @@ public:
 	void onReceiveEvent_SendMessage(SIOClient* client, const std::string& data);
 	void onReceiveEvent_UpgradeKingdom(SIOClient* client, const std::string& data);
 	void onReceiveEvent_AnswerResult(SIOClient* client, const std::string& data);
-	void onReceiveEvent_ActiveBet(SIOClient* client, const std::string& data);
+	void onReceiveEvent_ActiveChallenge(SIOClient* client, const std::string& data);
+	void onReceiveEvent_UpgradeArmy(SIOClient* client, const std::string& data);
 	void onReceiveEvent_EndGame(SIOClient* client, const std::string& data);
 
 	//Setup trong init

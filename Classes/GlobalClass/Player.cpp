@@ -54,7 +54,28 @@ void Player::UploadPlayerInfo(PlayerInfo * player)
 cocos2d::Node * Player::CreatePlayerOutgameInfoGUI()
 {
 	Node* result = Node::create();
+
+	auto levelInfo = Player::CalculateLevel(Player::currentPlayer->experience);
+
+	auto sp_Level = Sprite::create("UI/LobbyScene/btn_Level.png");
+	sp_Level->setScale(1.25);
+	result->addChild(sp_Level);
+
+	auto lbl_Level = Tool::CreateLabel(to_string(levelInfo.first),Tool::defaultTextSize*0.8,Color4B::RED);
+	lbl_Level->enableBold();
+	result->addChild(lbl_Level);
+	
+	auto expBar = Tool::CreateBar(to_string(Player::currentPlayer->experience) + " / " + to_string(levelInfo.second), Color4B::WHITE, Size(200, 4), Color3B(175, 225, 250));
+	((ProgressTimer*)expBar->getChildByName("Front Bar"))->setPercentage((Player::currentPlayer->experience / (float)levelInfo.second *100.0));
+	((Label*)expBar->getChildByName("Content"))->setPositionY(12);
+	expBar->setPosition(Vec2(0, -50));
+	result->addChild(expBar);
+	
 	auto lbl_PlayerName = Tool::CreateLabel(Player::currentPlayer->username, Tool::defaultTextSize*1.5);
+	lbl_PlayerName->setPosition(Vec2(0, 75));
+	result->addChild(lbl_PlayerName);
+
+	/*auto lbl_PlayerName = Tool::CreateLabel(Player::currentPlayer->username, Tool::defaultTextSize*1.5);
 	result->addChild(lbl_PlayerName);
 
 	auto levelInfo = Player::CalculateLevel(Player::currentPlayer->experience);
@@ -75,7 +96,7 @@ cocos2d::Node * Player::CreatePlayerOutgameInfoGUI()
 	auto lbl_Friendship = Tool::CreateLabel("Friendship: " + to_string(Player::currentPlayer->friendshipPoint));
 	lbl_Friendship->setPosition(Vec2(lbl_Level->getPositionX() + 350, 0));
 	lbl_Friendship->setName("lbl_Friendship");
-	result->addChild(lbl_Friendship);
+	result->addChild(lbl_Friendship);*/
 	return result;
 }
 

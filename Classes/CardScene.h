@@ -59,4 +59,5 @@ public:
 	void RunActionNotify(string content);
 	vector<string> GetSkillDetail(string unitName);
 	void RefreshScene(string unitName);
+	void RefreshSceneKingdom(string unitName);
 };

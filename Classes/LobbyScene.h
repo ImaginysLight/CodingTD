@@ -26,7 +26,7 @@ public:
 	static string notify;
 	Size visibleSize;
 	Label* lbl_Notify;
-	Button *btn_Extend, *btn_Play, *btn_Rank, *btn_Tutorial, *btn_Logout,*btn_Info;
+	Button *btn_Room, *btn_Play, *btn_Rank, *btn_Tutorial, *btn_Logout,*btn_Achievement;
 
 	void SetupGUI();
 	void btn_Click(Ref *pSender, cocos2d::ui::Button::Widget::TouchEventType type);

@@ -15,13 +15,6 @@ bool GameScene::init()
 		return false;
 	}
 
-	Player::currentPlayer->elementName = Player::opponentPlayer->elementName = "Fire";
-	Player::currentPlayer->picked_units.push_back("UFO Driver");
-	Player::currentPlayer->picked_units.push_back("Elemental Alien");
-	Player::currentPlayer->picked_units.push_back("Elemental Alien");
-	Player::currentPlayer->picked_units.push_back("Elemental Alien");
-	Player::currentPlayer->username = "ImaginysLight";
-
 	Audio::audio->stopAllEffects();
 	Audio::audio->stopBackgroundMusic();
 
@@ -43,20 +36,20 @@ bool GameScene::init()
 
 	ChangeQuestionTableState(false);
 
-
 	Tool::Socket_Client->_client->on("Create_Unit", CC_CALLBACK_2(GameScene::onReceiveEvent_InitializeIngameObject, this));
 	Tool::Socket_Client->_client->on("Use_Skill", CC_CALLBACK_2(GameScene::onReceiveEvent_ExcuteSkill, this));
 	Tool::Socket_Client->_client->on("Send_Message", CC_CALLBACK_2(GameScene::onReceiveEvent_SendMessage, this));
 	Tool::Socket_Client->_client->on("Receive_Question", CC_CALLBACK_2(GameScene::onReceiveEvent_Question, this));
 	Tool::Socket_Client->_client->on("_Upgrade_Kingdom_", CC_CALLBACK_2(GameScene::onReceiveEvent_UpgradeKingdom, this));
 	Tool::Socket_Client->_client->on("Answer_Result", CC_CALLBACK_2(GameScene::onReceiveEvent_AnswerResult, this));
-	Tool::Socket_Client->_client->on("Active_Bet", CC_CALLBACK_2(GameScene::onReceiveEvent_ActiveBet, this));
+	Tool::Socket_Client->_client->on("Active_Challenge", CC_CALLBACK_2(GameScene::onReceiveEvent_ActiveChallenge, this));
 	Tool::Socket_Client->_client->on("Upload_Player_Info", nullptr);
+	Tool::Socket_Client->_client->on("Upgrade_Army", CC_CALLBACK_2(GameScene::onReceiveEvent_UpgradeArmy, this));
 	Tool::Socket_Client->_client->on("End_Game", CC_CALLBACK_2(GameScene::onReceiveEvent_EndGame, this));
 
-	this->schedule(schedule_selector(GameScene::UpdateIngameObject), 1/60);
-	this->schedule(schedule_selector(GameScene::UpdateQuestionInfo), 0.25);
-	this->schedule(schedule_selector(GameScene::UpdatePlayerResourcePerSecond), 1);
+	this->schedule(CC_CALLBACK_1(GameScene::UpdateIngameObject, this), 1 / 60, "Object Update");
+	this->schedule(CC_CALLBACK_1(GameScene::UpdateQuestionInfo, this), 0.25, "Question Update");
+	this->schedule(CC_CALLBACK_1(GameScene::UpdatePlayerResourcePerSecond, this), 1, "Resource Update");
 	this->schedule(schedule_selector(GameScene::UpdateAudio), 1);
 	this->scheduleUpdate();
 
@@ -189,33 +182,43 @@ void GameScene::LoadIngamePlayerInfo() {
 	}
 	ingamePlayerInfo.btn_Skill1->setPosition(Vec2(visibleSize.width*0.03, visibleSize.height*0.6));
 	ingamePlayerInfo.btn_Skill1->setAnchorPoint(Vec2(0, 0.5));
-	ingamePlayerInfo.btn_Skill1->setTitleFontSize(0);
+	ingamePlayerInfo.btn_Skill1->setTitleFontSize(1);
 	Tool::setNodeSize(ingamePlayerInfo.btn_Skill1, 50, 50);
 	ingamePlayerInfo.btn_Skill1->addTouchEventListener(CC_CALLBACK_2(GameScene::btn_ExecuteSkill_Click, this));
 	staticUI->addChild(ingamePlayerInfo.btn_Skill1);
 
 	ingamePlayerInfo.btn_Skill2->setPosition(Vec2(visibleSize.width*0.03, visibleSize.height*0.5));
 	ingamePlayerInfo.btn_Skill2->setAnchorPoint(Vec2(0, 0.5));
-	ingamePlayerInfo.btn_Skill2->setTitleFontSize(0);
+	ingamePlayerInfo.btn_Skill2->setTitleFontSize(1);
 	Tool::setNodeSize(ingamePlayerInfo.btn_Skill2, 50, 50);
 	staticUI->addChild(ingamePlayerInfo.btn_Skill2);
 
 	ingamePlayerInfo.btn_Skill3->setPosition(Vec2(visibleSize.width*0.03, visibleSize.height*0.4));
 	ingamePlayerInfo.btn_Skill3->setAnchorPoint(Vec2(0, 0.5));
-	ingamePlayerInfo.btn_Skill3->setTitleFontSize(0);
+	ingamePlayerInfo.btn_Skill3->setTitleFontSize(1);
 	Tool::setNodeSize(ingamePlayerInfo.btn_Skill3, 50, 50);
 	ingamePlayerInfo.btn_Skill3->addTouchEventListener(CC_CALLBACK_2(GameScene::btn_ExecuteSkill_Click, this));
 	staticUI->addChild(ingamePlayerInfo.btn_Skill3);
 
-	
+	ingamePlayerInfo.btn_Army = Tool::CreateButtonWithSpirte("btn_Army", "UI/GameScene/army.png");
+	ingamePlayerInfo.btn_Army->setPosition(Vec2(visibleSize.width*0.03, visibleSize.height*0.1));
+	ingamePlayerInfo.btn_Army->setAnchorPoint(Vec2(0, 0.5));
+	ingamePlayerInfo.btn_Army->setTitleText("Health: " + to_string(army_CurrentPlayer.health) + "%"
+		+ "\nAttack: " + to_string(army_CurrentPlayer.attack) + "%"
+		+ "\nDefense: " + to_string(army_CurrentPlayer.defense) + "%"
+		+ "\nAttack Speed: " + to_string(army_CurrentPlayer.attackSpeed) + "%");
+	ingamePlayerInfo.btn_Army->setTitleFontSize(1);
+	Tool::setNodeSize(ingamePlayerInfo.btn_Army, 50, 50);
+	ingamePlayerInfo.btn_Army->addTouchEventListener(CC_CALLBACK_2(GameScene::CreateTableUpgradeArmy, this));
+	staticUI->addChild(ingamePlayerInfo.btn_Army);
 
 	//Tạo Kingdom
 	GameScene::InitializeIngameObject(IngameObject::GetKingdomByElement(Player::currentPlayer->elementName), 1, Player::currentPlayer->id);
 	ingamePlayerInfo.kingdom = BaseUnitClass::AllIngameUnit_Vector[BaseUnitClass::AllIngameUnit_Vector.size() - 1];
-	ingamePlayerInfo.kingdom->root->setPosition(IngameObject::spawnPoint["1_1"]);
+	ingamePlayerInfo.kingdom->root->setPosition(Vec2(50,175));
 	GameScene::InitializeIngameObject(IngameObject::GetKingdomByElement(Player::opponentPlayer->elementName), 1, Player::opponentPlayer->id);
 	ingamePlayerInfo.opponentKingdom = BaseUnitClass::AllIngameUnit_Vector[BaseUnitClass::AllIngameUnit_Vector.size() - 1];
-	ingamePlayerInfo.opponentKingdom->root->setPosition(IngameObject::spawnPoint["2_1"]);
+	ingamePlayerInfo.opponentKingdom->root->setPosition(Vec2(2950, 175));
 
 	if(Player::currentPlayer->elementName == "Ice"){
 		Player::currentPlayer->picked_units.push_back("Frost Wyvern");
@@ -261,8 +264,9 @@ void GameScene::UpdateIngameObject(float time) {
 				ResultScene::goldReceived += BaseUnitClass::AllIngameUnit_Vector[i]->goldCost * ingamePlayerInfo.defeatGoldRate;
 				ingamePlayerInfo.gold += BaseUnitClass::AllIngameUnit_Vector[i]->goldCost * ingamePlayerInfo.defeatGoldRate;
 				ingamePlayerInfo.energy += BaseUnitClass::AllIngameUnit_Vector[i]->goldCost * ingamePlayerInfo.defeatEnergyRate;
-				GameScene::UpdateIngamePlayerInfo();
 			}
+			else ingamePlayerInfo.food--;
+			GameScene::UpdateIngamePlayerInfo();
 			BaseUnitClass::AllIngameUnit_Vector.erase(BaseUnitClass::AllIngameUnit_Vector.begin() + i);
 			continue;
 		}
@@ -285,12 +289,13 @@ void GameScene::UpdateIngameObject(float time) {
 
 void GameScene::UpdatePlayerResourcePerSecond(float time) {
 	ingamePlayerInfo.gold += ingamePlayerInfo.Gps;
-	if(ingamePlayerInfo.energy < ingamePlayerInfo.energyCap) ingamePlayerInfo.energy += ingamePlayerInfo.Eps;
+	if(ingamePlayerInfo.energy < (int)ingamePlayerInfo.energyCap) ingamePlayerInfo.energy += ingamePlayerInfo.Eps;
 	UpdateIngamePlayerInfo();
 
 	int minute = (int)Tool::currentIngameTime / 60;
 	int second = (int)Tool::currentIngameTime % 60;
 	GameScene::lbl_GameTime->setString(to_string(minute) + ":" + to_string(second));
+
 }
 
 void GameScene::UpdateAudio(float time)
@@ -354,7 +359,7 @@ void GameScene::ChangeQuestionTableState(bool questionAvailable) {
 			Tool::Button_ChangeState(btn_Level2, true, 0.5);
 			Tool::Button_ChangeState(btn_Level3, true, 0.5);
 
-			txt_Question->setString("Choose difficulty for the next question or it will be random");
+			txt_Question->setString("Choose difficulty for the next question or your turn will turn to your opponent");
 		}
 		else
 			txt_Question->setString("Wait your opponent choose difficulty for the next question");
@@ -389,6 +394,9 @@ void GameScene::InitializeIngameObject(string objectName, int line, int playerId
 	//Apply passive skill
 	if(object->isOwned) PassiveSkill::ApplyPassive(object->unitId, Player::currentPlayer->elementName);
 	else PassiveSkill::ApplyPassive(object->unitId, Player::opponentPlayer->elementName);
+
+	//Apply army bonus
+	GameScene::ExcuteArmyEffect(object);
 	
 }
 
@@ -479,24 +487,36 @@ void GameScene::btn_Click(Ref * pSender, cocos2d::ui::Button::Widget::TouchEvent
 		else if (name == "btn_Confirm") {
 			Director::getInstance()->replaceScene(ResultScene::createScene());
 		}
-		else if (name == "btn_PositiveBet" || name == "btn_NegativeBet") {
-			if (Player::currentPlayer->betNegative || Player::currentPlayer->betPositive) {
-				RunActionNotify("You activated bet already!");
-				return;
-			}
-			if (ingamePlayerInfo.gold >= 100) {
-				if (name == "btn_PositiveBet") {
-					Tool::Socket_Client->_client->emit("Active_Bet", "{\"Room\":\"" + Player::currentPlayer->room_name + "\" ,\"id\":\"" + to_string(Player::currentPlayer->id) + "\",\"betStatus\":\"" + "Positive" + "\"}");
-					Player::currentPlayer->betPositive = true;
+		else if (name == "btn_ActiveChallenge") {
+			auto confirmTable = Tool::CreateNotificationTable("Use 100 Gold to invite Challenge?", "Cancel", "Process", Size(visibleSize.width*0.5, visibleSize.height*0.4));
+			confirmTable->setPosition(visibleSize / 2);
+			staticUI->addChild(confirmTable, 100);
+			confirmTable->getChildByName("btn_Left")->setColor(Color3B(175, 225, 200));
+			((Button*)confirmTable->getChildByName("btn_Left"))->addTouchEventListener([&](Ref * pSender, cocos2d::ui::Button::Widget::TouchEventType type) {
+				if (type == Widget::TouchEventType::ENDED) {
+					if (ingamePlayerInfo.gold < 100) {
+						RunActionNotify("Not enough gold");
+					}
+					else {
+						Tool::Socket_Client->_client->emit("Active_Challenge", "{\"Room\":\"" + Player::currentPlayer->room_name + "\" ,\"id\":\"" + to_string(Player::currentPlayer->id) + "\",\"status\":\"" + "Invite Challenge" + "\"}");
+						ingamePlayerInfo.gold -= 100;
+						UpdateIngamePlayerInfo();
+						int disableTime = (int)Tool::currentIngameTime + 120;
+						btn_ActiveChallenge->runAction(Sequence::create(
+							CallFunc::create([&]() {	btn_ActiveChallenge->setName("Disable Until: " + to_string(disableTime / 60) + ":" + to_string(disableTime % 60));
+								btn_ActiveChallenge->setEnabled(false);
+							}),
+							DelayTime::create(120),
+							CallFunc::create([&]() {	btn_ActiveChallenge->setName("Invite Challenge");
+							btn_ActiveChallenge->setEnabled(true);
+							}),
+							nullptr
+						));
+					}
+					((Node*)pSender)->getParent()->runAction(RemoveSelf::create());
 				}
-				if (name == "btn_NegativeBet") {
-					Tool::Socket_Client->_client->emit("Active_Bet", "{\"Room\":\"" + Player::currentPlayer->room_name + "\" ,\"id\":\"" + to_string(Player::currentPlayer->id) + "\",\"betStatus\":\"" + "Negative" + "\"}");
-					Player::currentPlayer->betNegative = true;
-				}
-				ingamePlayerInfo.gold -= 100;
-			}
-			else RunActionNotify("Not enough Gold");
-			GameScene::UpdateIngamePlayerInfo();
+			});
+			confirmTable->getChildByName("btn_Right")->setColor(Color3B::RED);
 		}
 		else if (name == "btn_Surrender") {
 			auto surrenderTable = Tool::CreateNotificationTable("Do you want to Surrender?", "No", "Yes");
@@ -615,7 +635,7 @@ void GameScene::onMouseMove(Event * event)
 	else if (ingamePlayerInfo.sp_Energy->getBoundingBox().containsPoint(point)) tooltipContent = "Energy";
 	else if (ingamePlayerInfo.sp_Knowledge->getBoundingBox().containsPoint(point)) tooltipContent = "Knowledge";
 	else if (ingamePlayerInfo.sp_Food->getBoundingBox().containsPoint(point)) tooltipContent = "Food";
-
+	else if (ingamePlayerInfo.btn_Army->getBoundingBox().containsPoint(point)) tooltipContent = ingamePlayerInfo.btn_Army->getTitleText();
 	if (tooltipContent != "") {
 		GameScene::tooltip->removeAllChildrenWithCleanup(true);
 		Label* lbl = Tool::CreateLabel(tooltipContent,Tool::defaultTextSize*0.9);
@@ -821,7 +841,7 @@ void GameScene::BuyUnit(string name, int line) {
 
 void GameScene::CreateUpgradeTable(string name) {
 	if (name == "btn_UpgradeFarm") {
-		auto upgradeTable = Tool::CreateNotificationTable("Upgrade Farm cost " + to_string(100 + ((int)ingamePlayerInfo.foodLimit - 5) * 20) + " Gold", "Cancel", "Process", Size(visibleSize.width*0.5, visibleSize.height*0.4));
+		auto upgradeTable = Tool::CreateNotificationTable("Upgrade Farm cost " + to_string(100 + ((int)ingamePlayerInfo.foodLimit - 5) * 20) + " Gold and 1 Knowledge", "Cancel", "Process", Size(visibleSize.width*0.5, visibleSize.height*0.4));
 		upgradeTable->setPosition(visibleSize / 2);
 		staticUI->addChild(upgradeTable, 1);
 
@@ -861,7 +881,7 @@ void GameScene::UpgradeUnit(string name) {
 	if (name == "btn_UpgradeFarm") {
 		unitDetails.upgradeLevelRequired = 1;
 		unitDetails.upgradeGoldCost = 100 + ((int)ingamePlayerInfo.foodLimit - 5) * 20;
-		unitDetails.upgradeKnowledgeCost = 0;
+		unitDetails.upgradeKnowledgeCost = 1;
 	}
 	else if (name.find("Kingdom") != std::string::npos) {
 		unitDetails = *ingamePlayerInfo.kingdom;
@@ -902,6 +922,7 @@ void GameScene::UpgradeUnit(string name) {
 		ingamePlayerInfo.gold -= unitDetails.upgradeGoldCost;
 		ingamePlayerInfo.knowledge -= unitDetails.upgradeKnowledgeCost;
 		GameScene::UpdateIngamePlayerInfo();
+		RunActionNotify("Upgrade Successful!");
 	}
 }
 
@@ -961,11 +982,6 @@ void GameScene::CreateChatbox() {
 	sc_ChatBox->setBounceEnabled(true);
 	staticUI->addChild(sc_ChatBox, 10);
 
-	auto sp_ChatBox = Sprite::create("UI/GameScene/bgchat.png");
-	Tool::setNodeSize(sp_ChatBox, 285, 216);
-	sp_ChatBox->setAnchorPoint(Vec2(0, 0));
-	sc_ChatBox->addChild(sp_ChatBox, -1);
-
 	GameScene::EditBox_Chat = ui::EditBox::create(Size(visibleSize.width*0.255, visibleSize.height*0.06), "", "");
 	EditBox_Chat->setPosition(Vec2(visibleSize.width*0.95, visibleSize.height*0.03));
 	EditBox_Chat->setAnchorPoint(Vec2(1, 0));
@@ -981,7 +997,7 @@ void GameScene::CreateChatbox() {
 	auto sp_EditBox = Sprite::create("UI/GameScene/bgEditBox.png");
 	sp_EditBox->setAnchorPoint(Vec2(0, 0));
 	Tool::setNodeSize(sp_EditBox, EditBox_Chat->getBoundingBox().size.width, EditBox_Chat->getBoundingBox().size.height);
-	EditBox_Chat->addChild(sp_EditBox, -1);
+	EditBox_Chat->addChild(sp_EditBox, 1);
 
 	GameScene::btn_General = Button::create("UI/GameScene/Button Background.png");
 	btn_General->setTitleText("General");
@@ -1039,6 +1055,13 @@ void GameScene::UpdateChatbox() {
 	int currentHeight = 10;
 	sc_ChatBox->removeAllChildrenWithCleanup(true);
 	sc_ChatBox->scrollToBottom(0, false);
+
+	auto sp_ChatBoxBackground = Sprite::create("UI/GameScene/bgchat.png");
+	Tool::setNodeSize(sp_ChatBoxBackground, 300, 216);
+	sp_ChatBoxBackground->setPositionX(-30);
+	sp_ChatBoxBackground->setAnchorPoint(Vec2(0, 0));
+	sc_ChatBox->addChild(sp_ChatBoxBackground, -1);
+
 	for (int i = 0; i < copyOfChatboxContent.size(); i++) {
 		Label* lbl_Content = Tool::CreateLabel(copyOfChatboxContent[i].first,Tool::defaultTextSize*0.8);
 		lbl_Content->setMaxLineWidth(sc_ChatBox->getContentSize().width*0.9);
@@ -1139,20 +1162,18 @@ void GameScene::onReceiveEvent_AnswerResult(SIOClient * client, const std::strin
 	{
 		string content;
 		string result = document["result"].GetString();
+		
 		if (Player::currentPlayer->id == Tool::ConvertStringToInt(document["id"].GetString())) {
 			content = Player::currentPlayer->username;
 			if (result == "Correct Answer")
 				PassiveSkill::Improve(Player::currentPlayer->elementName);
-			Player::currentPlayer->betPositive = false;
-			Player::opponentPlayer->betNegative = false;
 		}
 		else {
 			content = Player::opponentPlayer->username;
 			if (result == "Correct Answer")
 				PassiveSkill::Improve(Player::opponentPlayer->elementName);
-			Player::currentPlayer->betNegative = false;
-			Player::opponentPlayer->betPositive = false;
 		}
+
 		if (Player::currentPlayer->elementName == "Fire")
 			ingamePlayerInfo.btn_Skill2->setTitleText((string)"Fiery Spirit: Level " + to_string(PassiveSkill::fireLevel) + ": +" + CCString::createWithFormat("%.1f", PassiveSkill::Bonus_Attack*100)->getCString() +"% Attack");
 		else if(Player::currentPlayer->elementName == "Ice")
@@ -1162,34 +1183,102 @@ void GameScene::onReceiveEvent_AnswerResult(SIOClient * client, const std::strin
 
 
 		content += " received ";
+		if (result == "Correct Answer") content += "1 Knowledge and ";
 		content += document["gold"].GetString();
 		content += " Gold for their ";
 		content += result;
+		if (result == "Correct Answer" && Player::currentPlayer->activeChallenge) {
+			Player::currentPlayer->activeChallenge = false;
+			Player::opponentPlayer->activeChallenge = false;
+			int bonusGold = 2*Tool::ConvertStringToInt(document["gold"].GetString());
+			if (Player::currentPlayer->id == Tool::ConvertStringToInt(document["id"].GetString())) {
+				ingamePlayerInfo.gold += bonusGold;
+				ingamePlayerInfo.knowledge += 2;
+				UpdateIngamePlayerInfo();
+			}
+			content += " and bonus " + to_string( bonusGold) + " Gold and 2 Knowledge due to Challenge!";
+		}
+
 		chatBoxContent.push_back({ content,0 });
 		GameScene::UpdateChatbox();
 	}
 }
 
-void GameScene::onReceiveEvent_ActiveBet(SIOClient * client, const std::string & data)
+void GameScene::onReceiveEvent_ActiveChallenge(SIOClient * client, const std::string & data)
 {
 	rapidjson::Document document;
 	document.Parse<0>(data.c_str());
 	if (document["Room"].GetString() == Player::currentPlayer->room_name)
 	{
-		string content;
-		if (Player::currentPlayer->id == Tool::ConvertStringToInt(document["id"].GetString())) {
-			content = Player::currentPlayer->username;
+		if ((string)document["status"].GetString() == "Accept Challenge") {
+			Player::currentPlayer->activeChallenge = true;
+			Player::opponentPlayer->activeChallenge = true;
+			chatBoxContent.push_back({ "Challenge Accepted !!! The first next Correct Answer will receive x3 reward!", 3 });
+			GameScene::UpdateChatbox();
+		}
+		else if ((string)document["status"].GetString() == "Deny Challenge") {
+			if (Player::opponentPlayer->id == Tool::ConvertStringToInt(document["id"].GetString())) {
+				ingamePlayerInfo.gold += 200;
+				UpdateIngamePlayerInfo();
+			}
+			chatBoxContent.push_back({ "Challenge Denied !!!", 3 });
+			GameScene::UpdateChatbox();
+		}
+		else if ((string)document["status"].GetString() == "Invite Challenge") {
+			if (Player::opponentPlayer->id == Tool::ConvertStringToInt(document["id"].GetString())) {
+				auto confirmTable = Tool::CreateNotificationTable(Player::opponentPlayer->username + " invite you to Challenge! Use 100 Gold to accept or they will receive back 200 Gold.", "Deny", "Accept", Size(visibleSize.width*0.5, visibleSize.height*0.4));
+				confirmTable->setPosition(visibleSize / 2);
+				staticUI->addChild(confirmTable, 100);
+				confirmTable->getChildByName("btn_Left")->setColor(Color3B(175, 225, 200));
+				((Button*)confirmTable->getChildByName("btn_Left"))->addTouchEventListener([&](Ref * pSender, cocos2d::ui::Button::Widget::TouchEventType type) {
+					if (type == Widget::TouchEventType::ENDED) {
+						if (ingamePlayerInfo.gold < 100) {
+							RunActionNotify("Not enough Gold! You deny a Challenge.");
+							Tool::Socket_Client->_client->emit("Active_Challenge", "{\"Room\":\"" + Player::currentPlayer->room_name + "\" ,\"id\":\"" + to_string(Player::currentPlayer->id) + "\",\"status\":\"" + "Deny Challenge" + "\"}");
+						}
+						else {
+							Tool::Socket_Client->_client->emit("Active_Challenge", "{\"Room\":\"" + Player::currentPlayer->room_name + "\" ,\"id\":\"" + to_string(Player::currentPlayer->id) + "\",\"status\":\"" + "Accept Challenge" + "\"}");
+							ingamePlayerInfo.gold -= 100;
+							UpdateIngamePlayerInfo();
+						}
+						((Node*)pSender)->getParent()->runAction(RemoveSelf::create());
+					}
+				});
+				confirmTable->getChildByName("btn_Right")->setColor(Color3B::RED);
+				((Button*)confirmTable->getChildByName("btn_Right"))->addTouchEventListener([&](Ref * pSender, cocos2d::ui::Button::Widget::TouchEventType type) {
+					if (type == Widget::TouchEventType::ENDED) {
+						Tool::Socket_Client->_client->emit("Active_Challenge", "{\"Room\":\"" + Player::currentPlayer->room_name + "\" ,\"id\":\"" + to_string(Player::currentPlayer->id) + "\",\"status\":\"" + "Deny Challenge" + "\"}");
+						((Node*)pSender)->getParent()->runAction(RemoveSelf::create());
+					}
+				});
+			}
+		}
+	}
+}
+
+void GameScene::onReceiveEvent_UpgradeArmy(SIOClient * client, const std::string & data)
+{
+	rapidjson::Document document;
+	document.Parse<0>(data.c_str());
+	if (document["Room"].GetString() == Player::currentPlayer->room_name)
+	{
+		string name = (string)document["name"].GetString();
+		if (document["id"].GetString() == to_string(Player::currentPlayer->id)) {
+			if (name == "health") army_CurrentPlayer.health += 5;
+			if (name == "attack") army_CurrentPlayer.attack += 5;
+			if (name == "defense") army_CurrentPlayer.defense += 5;
+			if (name == "attackSpeed")army_CurrentPlayer.attackSpeed += 5;
+			ingamePlayerInfo.btn_Army->setTitleText("Health: " + to_string(army_CurrentPlayer.health) + "%"
+				+ "\nAttack: " + to_string(army_CurrentPlayer.attack) + "%"
+				+ "\nDefense: " + to_string(army_CurrentPlayer.defense) + "%"
+				+ "\nAttack Speed: " + to_string(army_CurrentPlayer.attackSpeed) + "%");
 		}
 		else {
-			content = Player::opponentPlayer->username;
-			if (document["betStatus"].GetString() == "Positive") Player::opponentPlayer->betPositive = true;
-			else Player::opponentPlayer->betNegative = true;
+			if (name == "health") army_OpponentPlayer.health += 5;
+			if (name == "attack") army_OpponentPlayer.attack += 5;
+			if (name == "defense") army_OpponentPlayer.defense += 5;
+			if (name == "attackSpeed")army_OpponentPlayer.attackSpeed += 5;
 		}
-		content += " activated a ";
-		content += document["betStatus"].GetString();
-		content += " Bet !!";
-		chatBoxContent.push_back({ content,3 });
-		GameScene::UpdateChatbox();
 	}
 }
 
@@ -1307,17 +1396,12 @@ void GameScene::CreateQuestionTable()
 		lbl_Level->setPosition(Vec2(0, visibleSize.height *.35));
 		questionTable->addChild(lbl_Level, 1);
 	}
-	//button đặt cược
+	//button thách đấu
 	{
-		btn_PositiveBet = Tool::CreateButtonWithoutSprite("btn_PositiveBet", "Positive Bet", Tool::defaultTextSize*1.25, Color3B::GREEN);
-		btn_PositiveBet->setPosition(Vec2(visibleSize.width*-0.25, visibleSize.height*0.3));
-		btn_PositiveBet->addTouchEventListener(CC_CALLBACK_2(GameScene::btn_Click, this));
-		questionTable->addChild(btn_PositiveBet, 1);
-
-		btn_NegativeBet = Tool::CreateButtonWithoutSprite("btn_NegativeBet", "Negative Bet", Tool::defaultTextSize*1.25, Color3B::RED);
-		btn_NegativeBet->setPosition(Vec2(visibleSize.width*0.25, visibleSize.height*0.3));
-		btn_NegativeBet->addTouchEventListener(CC_CALLBACK_2(GameScene::btn_Click, this));
-		questionTable->addChild(btn_NegativeBet, 1);
+		btn_ActiveChallenge = Tool::CreateButtonWithoutSprite("btn_ActiveChallenge", "Invite Challenge", Tool::defaultTextSize*1.25, Color3B::GREEN);
+		btn_ActiveChallenge->setPosition(Vec2(visibleSize.width*-0.25, visibleSize.height*0.3));
+		btn_ActiveChallenge->addTouchEventListener(CC_CALLBACK_2(GameScene::btn_Click, this));
+		questionTable->addChild(btn_ActiveChallenge, 1);
 	}
 }
 
@@ -1364,30 +1448,39 @@ void GameScene::onReceiveEvent_Question(SIOClient* client, const std::string& da
 					return "unknown";
 				}());
 			}
-
 			//answer true
 			if (document.HasMember("answer")) {
 				CCLOG("answer: %s ", document["answer"].GetString());
 				answer = document["answer"].GetString();
 			}
 			//answer
+			vector<string> vec_AnswerList;
 			if (document.HasMember("answer1")) {
 				CCLOG("answer 1: %s ", document["answer1"].GetString());
-				btn_Answer1->setTitleText(document["answer1"].GetString());
+				vec_AnswerList.push_back(document["answer1"].GetString());
 			}
 			if (document.HasMember("answer2")) {
 				CCLOG("answer 2: %s ", document["answer2"].GetString());
-				btn_Answer2->setTitleText(document["answer2"].GetString());
-			}//hjhj
+				vec_AnswerList.push_back(document["answer2"].GetString());
+			}
 			if (document.HasMember("answer3")) {
 				CCLOG("answer 3: %s ", document["answer3"].GetString());
-				btn_Answer3->setTitleText(document["answer3"].GetString());
+				vec_AnswerList.push_back(document["answer3"].GetString());
 			}
 			if (document.HasMember("answer4")) {
 				CCLOG("answer 4: %s ", document["answer4"].GetString());
-				btn_Answer4->setTitleText(document["answer4"].GetString());
-				
+				vec_AnswerList.push_back(document["answer4"].GetString());
 			}
+			vector<string> randomAnswer;
+			while (vec_AnswerList.size() > 0) {
+				int randNum = Tool::CreateRandomNumber(0, vec_AnswerList.size()-1);
+				randomAnswer.push_back(vec_AnswerList[randNum]);
+				vec_AnswerList.erase(vec_AnswerList.begin() + randNum);
+			}
+			btn_Answer1->setTitleText(randomAnswer[0]);
+			btn_Answer2->setTitleText(randomAnswer[1]);
+			btn_Answer3->setTitleText(randomAnswer[2]);
+			btn_Answer4->setTitleText(randomAnswer[3]);
 		}
 	}
 };
@@ -1400,6 +1493,87 @@ void GameScene::RunActionNotify(string content)
 	staticUI->addChild(lbl_Notify, 10);
 	lbl_Notify->runAction(Sequence::create(FadeOut::create(0), FadeIn::create(0.5), DelayTime::create(1), FadeOut::create(0.5), RemoveSelf::create(), nullptr));
 
+}
+
+void GameScene::ExcuteArmyEffect(BaseUnitClass *& object)
+{
+	if (object->isOwned) {
+		object->maxHealth *= (1 + (army_CurrentPlayer.health / 100.0));
+		object->currentHealth = object->maxHealth;
+		object->baseAttack *= (1 + (army_CurrentPlayer.attack / 100.0));
+		object->baseDefense *= (1 + (army_CurrentPlayer.defense / 100.0));
+		object->baseAttackSpeed *= (1 + (army_CurrentPlayer.attackSpeed / 100.0));
+	}
+	else {
+		object->maxHealth *= (1 + (army_OpponentPlayer.health / 100.0));
+		object->currentHealth = object->maxHealth;
+		object->baseAttack *= (1 + (army_OpponentPlayer.attack / 100.0));
+		object->baseDefense *= (1 + (army_OpponentPlayer.defense / 100.0));
+		object->baseAttackSpeed *= (1 + (army_OpponentPlayer.attackSpeed / 100.0));
+	}
+}
+
+void GameScene::CreateTableUpgradeArmy(Ref *pSender, cocos2d::ui::Button::Widget::TouchEventType type)
+{
+	if (type == Widget::TouchEventType::ENDED) {
+		Node* result = Node::create();
+		Sprite* sp_Background = Sprite::create("UI/NotifyBackground.png");
+		Tool::setNodeSize(sp_Background, visibleSize.width*0.5, visibleSize.height*0.4);
+		result->addChild(sp_Background, -1);
+
+		Label* lbl_Content = Tool::CreateLabel("Upgrade Army cost 2 Knowledge, choose a power you want to upgrade.", Tool::defaultTextSize, Color4B::WHITE, TextHAlignment::CENTER);
+		lbl_Content->setName("lbl_Content");
+		lbl_Content->setPositionY(50);
+		lbl_Content->setMaxLineWidth(visibleSize.width*0.5 - 10);
+		result->addChild(lbl_Content);
+		
+		auto btn_Health = Tool::CreateButtonWithSpirte("health", "UI/CardScene/Icon/health.png");
+		btn_Health->setPosition(Vec2(-150, -15));
+		btn_Health->addTouchEventListener(CC_CALLBACK_2(GameScene::btn_UpgradeArmy_Click, this));
+		Tool::setNodeSize(btn_Health, 60, 60);
+		result->addChild(btn_Health);
+
+		auto btn_Attack = Tool::CreateButtonWithSpirte("attack", "UI/CardScene/Icon/attack.png");
+		btn_Attack->setPosition(Vec2(-50, -15));
+		btn_Attack->addTouchEventListener(CC_CALLBACK_2(GameScene::btn_UpgradeArmy_Click, this));
+		result->addChild(btn_Attack);
+
+		auto btn_Defense = Tool::CreateButtonWithSpirte("defense", "UI/CardScene/Icon/defense.png");
+		btn_Defense->setPosition(Vec2(50, -15));
+		btn_Defense->addTouchEventListener(CC_CALLBACK_2(GameScene::btn_UpgradeArmy_Click, this));
+		result->addChild(btn_Defense);
+
+		auto btn_AttackSpeed = Tool::CreateButtonWithSpirte("attackSpeed", "UI/CardScene/Icon/attackSpeed.png");
+		btn_AttackSpeed->setPosition(Vec2(150, -15));
+		btn_AttackSpeed->addTouchEventListener(CC_CALLBACK_2(GameScene::btn_UpgradeArmy_Click, this));
+		result->addChild(btn_AttackSpeed);
+
+		auto btn_Cancel = Tool::CreateButtonWithoutSprite("btn_Cancel", "Cancel",Tool::defaultTextSize*1.25,Color3B::RED);
+		btn_Cancel->setPosition(Vec2(0, -65));
+		btn_Cancel->addTouchEventListener(CC_CALLBACK_2(GameScene::btn_UpgradeArmy_Click, this));
+		result->addChild(btn_Cancel);
+		result->setPosition(visibleSize / 2);
+		staticUI->addChild(result, 20);
+	}
+}
+
+void GameScene::btn_UpgradeArmy_Click(Ref * pSender, cocos2d::ui::Button::Widget::TouchEventType type)
+{
+	if (type == Widget::TouchEventType::ENDED) {
+		string name = ((Node*)pSender)->getName();
+		if (name != "btn_Cancel") {
+			if (ingamePlayerInfo.knowledge < 2) {
+				RunActionNotify("Not enough Knowledege");
+			}
+			else {
+				Tool::Socket_Client->_client->emit("Upgrade_Army", "{\"Room\":\"" + Player::currentPlayer->room_name + "\", \"name\":\"" + name + "\", \"id\":\"" + to_string(Player::currentPlayer->id) + "\"}");
+				ingamePlayerInfo.knowledge -= 2;
+				UpdateIngamePlayerInfo();
+				RunActionNotify("Upgrade Successful!");
+			}
+		}
+		((Node*)pSender)->getParent()->runAction(RemoveSelf::create());
+	}
 }
 
 void GameScene::UpdateIngamePlayerInfo()
@@ -1425,12 +1599,10 @@ void GameScene::CorrectAnswer()
 	Audio::audio->playEffect(Audio::GetCorrectAudio().c_str(), false);
 
 	//( 1 + TimeRemaining % / 1.5) * (0.5 + 0.5 * QuestionLevel) * 150 Gold và 1 Knowledge cho câu đúng
-	//Positive Bet (cost 100g): Nếu người cược trả lời đúng ở câu trả lời tiếp theo sẽ nhận gấp 1.8 lần Gold.
 	auto TimeRemaining = destinationTime - Tool::currentIngameTime;
 	auto QuestionTime = currentQuestionLevel * 10 + 10;
 	auto TimeRemainingPercent = TimeRemaining / QuestionTime;
 	auto goldReceive = (1 + (TimeRemainingPercent / 1.5)) * (0.5 + 0.5 * currentQuestionLevel) * 150 * ingamePlayerInfo.correctAnswerGoldRate;
-	if (Player::currentPlayer->betPositive) goldReceive *= 1.8;
 	ingamePlayerInfo.gold += goldReceive;
 	ingamePlayerInfo.knowledge += 1;
 	GameScene::UpdateIngamePlayerInfo();
@@ -1443,10 +1615,8 @@ void GameScene::WrongAnswer()
 	ResultScene::numOfWrongAnswer++;
 
 	// (0.5 + 0.5 * QuestionLevel) * 100 * Rand[0.4 , 0.7] Gold cho câu sai.
-	//Negative Bet (cost 100g): Nếu đối phương trả lời sai ở câu trả lời tiếp theo sẽ không được nhận Gold và bị trừ 50 Gold.
 	auto randomNumber = Tool::CreateRandomNumber(4, 7) / 10.0;
 	auto goldReceive = (0.5 + 0.5 * currentQuestionLevel) * 100 * randomNumber * ingamePlayerInfo.wrongAnswerGoldRate;
-	if (Player::opponentPlayer->betNegative) goldReceive = -50;
 	ingamePlayerInfo.gold += goldReceive;
 	if (ingamePlayerInfo.gold < 0) ingamePlayerInfo.gold = 0;
 	GameScene::UpdateIngamePlayerInfo();

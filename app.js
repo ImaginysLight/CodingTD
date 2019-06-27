@@ -320,7 +320,7 @@ io.sockets.on('connection', function(socket){
 	//send message
 	socket.on('Send_Message', function(data){
 		var mes = JSON.parse(data)
-		io.sockets.emit('Send_Message', {Room: mes.Room, content: mes.content});
+		io.sockets.emit('Send_Message', {Room: mes.Room, content: mes.content, id: mes.id});
 	});
 	
 	//kết quả trả lời câu hỏi
@@ -330,10 +330,17 @@ io.sockets.on('connection', function(socket){
 	});
 	
 	//đặt cược
-	socket.on('Active_Bet', function(data){
+	socket.on('Active_Challenge', function(data){
 		var mes = JSON.parse(data)
-		io.sockets.emit('Active_Bet', {Room: mes.Room, id: mes.id, betStatus: mes.betStatus});
+		io.sockets.emit('Active_Challenge', {Room: mes.Room, id: mes.id, status: mes.status});
 	});
+	
+	//Nâng cấp quân đội
+	socket.on('Upgrade_Army', function(data){
+		var mes = JSON.parse(data)
+		io.sockets.emit('Upgrade_Army', {Room: mes.Room, id: mes.id, name: mes.name});
+	});
+	
 	//Cập nhật thông tin player vào csdl
 	socket.on('Upload_Player_Info', function(data){
 		var mes = JSON.parse(data)

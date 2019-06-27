@@ -17,7 +17,7 @@ string Audio::GetBackgroundAudio()
 		"Audio/Piano Sonata No.16, K. 545 mov 1.mp3",
 		"Audio/Piano Sonata No.16, K. 545 mov 2.mp3"
 	};
-	//result = music[Tool::CreateRandomNumber(0, music.size() - 1)];
+	result = music[Tool::CreateRandomNumber(0, music.size() - 1)];
 
 	return result;
 }
@@ -31,7 +31,7 @@ string Audio::GetBrightAudio()
 		"Audio/Johann Strauss I - Radetzky-Marsch, Op. 228.mp3",
 		"Audio/Symphony no 5 mov 4.mp3"
 	};
-	//result = music[Tool::CreateRandomNumber(0, music.size() - 1)];
+	result = music[Tool::CreateRandomNumber(0, music.size() - 1)];
 	return result;
 }
 
@@ -45,7 +45,7 @@ string Audio::GetSadAudio()
 		"Audio/BWV 1068 - Suite No. 3 in D major.mp3",
 		"Audio/Sonata no 14 mov 1.mp3"
 	};
-	//result = music[Tool::CreateRandomNumber(0, music.size() - 1)];
+	result = music[Tool::CreateRandomNumber(0, music.size() - 1)];
 	return result;
 }
 
@@ -59,7 +59,7 @@ string Audio::GetButtonClickAudio()
 		"Audio/Button Click 4.wav",
 		"Audio/Button Click 5.wav"
 	};
-	//result = music[Tool::CreateRandomNumber(0, music.size() - 1)];
+	result = music[Tool::CreateRandomNumber(0, music.size() - 1)];
 	return result;
 }
 
@@ -71,7 +71,7 @@ string Audio::GetCorrectAudio()
 		"Audio/Correct 2.mp3",
 		"Audio/Correct 3.wav"
 	};
-	//result = music[Tool::CreateRandomNumber(0, music.size() - 1)];
+	result = music[Tool::CreateRandomNumber(0, music.size() - 1)];
 	return result;
 }
 
@@ -90,7 +90,7 @@ string Audio::GetBattleAudio()
 		"Audio/Chopin sonata no 2 mov 2",
 		"Audio/Fantaisie Impromptu op 66.mp3"
 	};
-	//result = music[Tool::CreateRandomNumber(0, music.size() - 1)];
+	result = music[Tool::CreateRandomNumber(0, music.size() - 1)];
 	return result;
 }
 
@@ -104,7 +104,7 @@ string Audio::GetSpawnAudio()
 		"Audio/Spawn 4.wav",
 		"Audio/Spawn 5.wav"
 	};
-	//result = music[Tool::CreateRandomNumber(0, music.size() - 1)];
+	result = music[Tool::CreateRandomNumber(0, music.size() - 1)];
 	return result;
 }
 

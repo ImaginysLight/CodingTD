@@ -4,6 +4,7 @@
 #include<string>
 #include"cocos2d.h"
 #include"SimpleAudioEngine.h"
+#include"Tool.h"
 
 USING_NS_CC;
 using namespace std;

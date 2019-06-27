@@ -160,7 +160,7 @@ Node * ListRoomScene::CreateRow(string stt, string name, string id)
 		result->addChild(btn_room);
 	}
 
-	auto line = Sprite::create("UI/BG/line.png");
+	auto line = Sprite::create("UI/Background/line.png");
 	line->setPositionX(visibleSize.width  *0.3f);
 	result->addChild(line);
 

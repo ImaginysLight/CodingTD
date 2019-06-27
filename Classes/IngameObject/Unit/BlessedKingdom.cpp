@@ -17,7 +17,7 @@ BlessedKingdom::BlessedKingdom(int line, bool isOwned, int unitId, int playerId)
 	upgradeKnowledgeCost = 3;
 	upgradeLevelRequired = 0;
 
-	this->UpdateIngameInfo("Sprites/Blessed Kingdom/default_315x300.png", unitId, playerId, isOwned, "Blessed Kingdom", line);
+	this->UpdateIngameInfo("Sprites/Blessed Kingdom/default_small.png", unitId, playerId, isOwned, "Blessed Kingdom", line);
 	if (this->isOwned) this->root->setPosition(Vec2(0, 50));
 	else this->root->setPosition(Vec2(3100,50));
 }

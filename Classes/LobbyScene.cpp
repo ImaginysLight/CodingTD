@@ -16,8 +16,6 @@ bool LobbyScene::init()
 
 	Audio::audio->stopAllEffects();
 
-	SetupGUI();
-
 	if (LobbyScene::notify != "") {
 		auto node_Notify = Tool::CreateNotificationTable(notify,"OK");
 		node_Notify->setPosition(visibleSize / 2);
@@ -88,8 +86,10 @@ void LobbyScene::onReceiveEvent_GetPlayerInfo(SIOClient * client, const std::str
 	Player::currentPlayer->total_kill = document["total_kill"].GetInt();
 	Player::currentPlayer->friendshipPoint = document["friendship_point"].GetInt();
 	Player::GetFriendshipLevel(Player::currentPlayer, document["friendship_level"].GetString());
-	//Player::currentPlayer->room_name = document["room_name"].GetString();
+	Player::currentPlayer->room_name = to_string(Player::currentPlayer->id);
 	Player::currentPlayer->submit_available = document["submit_available"].GetInt();
+
+	LobbyScene::SetupGUI();
 }
 
 void LobbyScene::UpdateAudio(float time)
@@ -99,67 +99,64 @@ void LobbyScene::UpdateAudio(float time)
 
 void LobbyScene::SetupGUI()
 {
-	auto sp_SceneName = Sprite::create("UI/LobbyScene/Lobby.png");
-	sp_SceneName->setPosition(Vec2(visibleSize.width * 0.5, visibleSize.height*0.9));
-	this->addChild(sp_SceneName);
 
-	auto sp_Background = Sprite::create("UI/LoginScene/background1.png");
+	auto sp_Background = Sprite::create("UI/Background/Default Background.png");
 	sp_Background->setPosition(visibleSize / 2);
 	this->addChild(sp_Background, -1);
 
-	auto knowledge = Trophy::CalculateKnowledgeTrophy(Player::currentPlayer->total_correctAnswer);
-	Button* btn_Trophy = Button::create("Trophy/Knowledge Trophy " + to_string(knowledge.level) + ".png");
-	btn_Trophy->setName("btn_Trophy");
-	btn_Trophy->addTouchEventListener(CC_CALLBACK_2(LobbyScene::btn_Click, this));
-	btn_Trophy->setPosition(Vec2(visibleSize.width*0.5, visibleSize.height*0.6));
-	btn_Trophy->setScale(1.5);
-	this->addChild(btn_Trophy, 1);
+	auto conquest = Trophy::CalculateConquestTrophy(Player::currentPlayer->total_win);
+	Sprite* sp_Trophy = Sprite::create("Trophy/Conquest Trophy " + to_string(conquest.level) + ".png");
+	sp_Trophy->setPosition(Vec2(visibleSize.width*0.5, visibleSize.height*0.5));
+	sp_Trophy->setScale(1.5);
+	this->addChild(sp_Trophy, 1);
+
+	auto nodePlayer = Player::CreatePlayerOutgameInfoGUI();
+	nodePlayer->setPosition(Vec2(visibleSize.width / 2, visibleSize.height*0.8));
+	this->addChild(nodePlayer);
 
 	lbl_Notify = Label::createWithTTF("", "fonts/arial.ttf", Tool::defaultTextSize);
 	lbl_Notify->setTextColor(Color4B::RED);
 	lbl_Notify->runAction(FadeOut::create(0));
-	lbl_Notify->setPosition(Vec2(visibleSize.width*0.5, visibleSize.height*0.1));
+	lbl_Notify->setPosition(Vec2(visibleSize.width*0.5, visibleSize.height*0.15));
 	this->addChild(lbl_Notify,1);
 
-	btn_Play = Button::create("UI/LobbyScene/btn_Play_nomal.png", "UI/LobbyScene/btn_Play_select.png");
-	btn_Play->setName("btn_Play");
-	btn_Play->setPosition(Vec2(visibleSize.width*0.5, visibleSize.height*0.25));
-	btn_Play->addTouchEventListener(CC_CALLBACK_2(LobbyScene::btn_Click, this));
-	this->addChild(btn_Play);
-
-	btn_Rank = Button::create("UI/LobbyScene/btn_Rank_nomal.png", "UI/LobbyScene/btn_Rank_select.png");
-	btn_Rank->setName("btn_Rank");
-	btn_Rank->setPosition(Vec2(visibleSize.width*0.2, visibleSize.height*0.8));
+	btn_Rank = Tool::CreateButtonWithoutSprite("btn_Rank", "Ranking");
+	btn_Rank->setPosition(Vec2(visibleSize.width*0.9, visibleSize.height*0.4));
 	btn_Rank->addTouchEventListener(CC_CALLBACK_2(LobbyScene::btn_Click, this));
 	this->addChild(btn_Rank);
 
-	btn_Tutorial = Button::create("UI/LobbyScene/btn_Tutorial_nomal.png", "UI/LobbyScene/btn_Tutorial_select.png");
-	btn_Tutorial->setName("btn_Tutorial");
-	btn_Tutorial->setPosition(Vec2(visibleSize.width*0.2, visibleSize.height*0.6));
+	btn_Tutorial = Tool::CreateButtonWithSpirte("btn_Tutorial", "UI/LobbyScene/btn_Tutorial.png");
+	btn_Tutorial->setPosition(Vec2(visibleSize.width*0.1, visibleSize.height*0.4));
 	btn_Tutorial->addTouchEventListener(CC_CALLBACK_2(LobbyScene::btn_Click, this));
 	this->addChild(btn_Tutorial);
 
-	btn_Extend = Button::create("UI/LobbyScene/btn_Extend_nomal.png", "UI/LobbyScene/btn_Extend_select.png");
-	btn_Extend->setName("btn_Extend");
-	btn_Extend->setPosition(Vec2(visibleSize.width*0.2, visibleSize.height*0.4));
-	btn_Extend->addTouchEventListener(CC_CALLBACK_2(LobbyScene::btn_Click, this));
-	this->addChild(btn_Extend);
+	auto btn_Achievement = Tool::CreateButtonWithSpirte("btn_Achievement", "UI/LobbyScene/btn_Achievement.png");
+	btn_Achievement->setPosition(Vec2(visibleSize.width*0.1, visibleSize.height*0.15));
+	btn_Achievement->addTouchEventListener(CC_CALLBACK_2(LobbyScene::btn_Click, this));
+	this->addChild(btn_Achievement);
 
-	btn_Logout = Button::create("UI/LobbyScene/btn_Logout_nomal.png", "UI/LobbyScene/btn_Logout_select.png");
-	btn_Logout->setName("btn_Logout");
-	btn_Logout->setPosition(Vec2(visibleSize.width*0.2, visibleSize.height*0.2));
+	auto btn_Card = Tool::CreateButtonWithSpirte("btn_Card", "UI/LobbyScene/btn_Card.png");
+	btn_Card->setPosition(Vec2(visibleSize.width*0.3, visibleSize.height*0.15));
+	btn_Card->addTouchEventListener(CC_CALLBACK_2(LobbyScene::btn_Click, this));
+	this->addChild(btn_Card);
+
+	btn_Logout = Tool::CreateButtonWithoutSprite("btn_Logout", "Logout");
+	btn_Logout->setPosition(Vec2(visibleSize.width*0.9, visibleSize.height*0.15));
 	btn_Logout->addTouchEventListener(CC_CALLBACK_2(LobbyScene::btn_Click, this));
 	this->addChild(btn_Logout);
 
-	btn_Info = Button::create("UI/LobbyScene/btn_Logout_nomal.png", "UI/LobbyScene/btn_Logout_select.png");
-	btn_Info->setName("btn_Info");
-	btn_Info->setPosition(Vec2(visibleSize.width*0.5, visibleSize.height*0.7));
-	btn_Info->addTouchEventListener(CC_CALLBACK_2(LobbyScene::btn_Click, this));
-	this->addChild(btn_Info);
+	btn_Room = Tool::CreateButtonWithSpirte("btn_Room", "UI/LobbyScene/btn_Room.png");
+	btn_Room->setPosition(Vec2(visibleSize.width*0.7, visibleSize.height*0.15));
+	btn_Room->addTouchEventListener(CC_CALLBACK_2(LobbyScene::btn_Click, this));
+	this->addChild(btn_Room);
 
-	auto lbl_Username = Tool::CreateLabel(Player::currentPlayer->username, Tool::defaultTextSize*1.5);
-	lbl_Username->setPosition(visibleSize / 2);
-	this->addChild(lbl_Username);
+	btn_Play = Tool::CreateButtonWithSpirte("btn_Play", "UI/LobbyScene/btn_Play.png");
+	btn_Play->setPosition(Vec2(visibleSize.width*0.5, visibleSize.height*0.15));
+	btn_Play->addTouchEventListener(CC_CALLBACK_2(LobbyScene::btn_Click, this));
+	this->addChild(btn_Play);
+
+	
+
 
 }
 
@@ -178,16 +175,20 @@ void LobbyScene::btn_Click(Ref *pSender, cocos2d::ui::Button::Widget::TouchEvent
 		{
 			Director::getInstance()->replaceScene(RankingScene::createScene());
 		}
-		if (name == "btn_Extend")
+		if (name == "btn_Room")
 		{
 			Director::getInstance()->replaceScene(ListRoomScene::createScene());
 		}
 		if (name == "btn_Logout")
 		{
 			Director::getInstance()->replaceScene(LoginScene::createScene());
+			Player::currentPlayer = new PlayerInfo();
 		}
-		if (name == "btn_Trophy") {
+		if (name == "btn_Achievement") {
 			Director::getInstance()->replaceScene(PlayerInformationScene::createScene());
+		}
+		if (name == "btn_Card") {
+			Director::getInstance()->replaceScene(CardScene::createScene());
 		}
 	}
 }
@@ -198,7 +199,3 @@ void LobbyScene::RunActionNotify(string content)
 	lbl_Notify->runAction(Sequence::create(FadeIn::create(0.75), DelayTime::create(0.75), FadeOut::create(1), nullptr));
 }
 
-//void LobbyScene::onConnect(SIOClient* client){}
-//void LobbyScene::onMessage(SIOClient* client, const std::string& data){}
-//void LobbyScene::onClose(SIOClient* client){}
-//void LobbyScene::onError(SIOClient* client, const std::string& data){}

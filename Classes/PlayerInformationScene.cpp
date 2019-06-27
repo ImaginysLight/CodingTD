@@ -10,7 +10,7 @@ bool PlayerInformationScene::init()
 {
 	visibleSize = Director::getInstance()->getVisibleSize();
 
-	auto sp_Background = Sprite::create("UI/GameScene/static background.png");
+	auto sp_Background = Sprite::create("UI/Background/Default Background.png");
 	sp_Background->setPosition(visibleSize / 2);
 	this->addChild(sp_Background, -1);
 
@@ -29,9 +29,14 @@ bool PlayerInformationScene::init()
 	Tool::setNodeSize(border3, visibleSize.width*0.32, visibleSize.height*0.6);
 	this->addChild(border3);
 
-	auto playerInfoNode = Player::CreatePlayerOutgameInfoGUI();
-	playerInfoNode->setPosition(Vec2(visibleSize.width*0.2, visibleSize.height*0.9));
-	this->addChild(playerInfoNode);
+	auto lbl_Username = Tool::CreateLabel(Player::currentPlayer->username, Tool::defaultTextSize*1.5);
+	lbl_Username->setPosition(Vec2(visibleSize.width / 2, visibleSize.height*.9));
+	this->addChild(lbl_Username);
+
+	auto sp_Username = Sprite::create("UI/LobbyScene/Username Border.png");
+	sp_Username->setPosition(Vec2(visibleSize.width / 2, visibleSize.height*.9));
+	Tool::setNodeSize(sp_Username, 200, 75);
+	this->addChild(sp_Username);
 
 	auto btn_LobbyScene = Tool::CreateButtonWithoutSprite("btn_LobbyScene", "<< Back To Lobby", Tool::defaultTextSize);
 	btn_LobbyScene->runAction(RepeatForever::create(Sequence::create(
@@ -54,19 +59,19 @@ bool PlayerInformationScene::init()
 	auto knowledge = Trophy::CalculateKnowledgeTrophy(Player::currentPlayer->total_correctAnswer);
 	auto lbl_Knowledge = Tool::CreateLabel("Knowledge Trophy\n\n\n\n\n\n\n" + knowledge.name, Tool::defaultTextSize*1.2, Color4B(175, 225, 200, 255), cocos2d::TextHAlignment::CENTER);
 	lbl_Knowledge->setAnchorPoint(Vec2(0.5, 1));
-	lbl_Knowledge->setPosition(Vec2(visibleSize.width*0.2, visibleSize.height*0.65));
+	lbl_Knowledge->setPosition(Vec2(visibleSize.width*0.2, visibleSize.height*0.625));
 	this->addChild(lbl_Knowledge);
 
 	auto battle = Trophy::CalculateBattleTrophy(Player::currentPlayer->total_kill);
 	auto lbl_Battle = Tool::CreateLabel("Battle Trophy\n\n\n\n\n\n\n" + battle.name, Tool::defaultTextSize*1.2, Color4B(175, 225, 250, 255), cocos2d::TextHAlignment::CENTER);
 	lbl_Battle->setAnchorPoint(Vec2(0.5, 1));
-	lbl_Battle->setPosition(Vec2(visibleSize.width*0.8, visibleSize.height*0.65));
+	lbl_Battle->setPosition(Vec2(visibleSize.width*0.8, visibleSize.height*0.625));
 	this->addChild(lbl_Battle);
 
 	auto conquest = Trophy::CalculateConquestTrophy(Player::currentPlayer->total_win);
 	auto lbl_Conquest = Tool::CreateLabel("Conquest Trophy\n\n\n\n\n\n\n" + conquest.name, Tool::defaultTextSize*1.22, Color4B::WHITE, cocos2d::TextHAlignment::CENTER);
 	lbl_Conquest->setAnchorPoint(Vec2(0.5, 1));
-	lbl_Conquest->setPosition(Vec2(visibleSize.width*0.5, visibleSize.height*0.65));
+	lbl_Conquest->setPosition(Vec2(visibleSize.width*0.5, visibleSize.height*0.625));
 	this->addChild(lbl_Conquest);
 
 	if (knowledge.level != 0) {

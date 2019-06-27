@@ -44,7 +44,7 @@ ConquestTrophy::ConquestTrophy()
 KnowledegeTrophy Trophy::CalculateKnowledgeTrophy(int numOfCorrectQuestion)
 {
 	vector<KnowledegeTrophy> vec;
-	vec.push_back(KnowledegeTrophy(1, "Brainless", 0, 10, 5));
+	vec.push_back(KnowledegeTrophy(1, "Brainless", 50, 10, 5));
 	vec.push_back(KnowledegeTrophy(2, "Noob", 100, 15, 5));
 	vec.push_back(KnowledegeTrophy(3, "Amateur", 200, 25, 5));
 	vec.push_back(KnowledegeTrophy(4, "Excellence", 400, 30, 10));
@@ -85,8 +85,7 @@ BattleTrophy Trophy::CalculateBattleTrophy(int numOfKill)
 ConquestTrophy Trophy::CalculateConquestTrophy(int numOfWin)
 {
 	vector<ConquestTrophy> vec;
-	vec.push_back(ConquestTrophy(0, "None", 0, 0, 0));
-	vec.push_back(ConquestTrophy(1, "New Captain", 10, 0.5, 0.5));
+	vec.push_back(ConquestTrophy(1, "New Captain", 0, 0.5, 0.5));
 	vec.push_back(ConquestTrophy(2, "Experienced Leadership", 50, 1, 0.5));
 	vec.push_back(ConquestTrophy(3, "Excellent Commander", 100, 1.5, 1));
 	vec.push_back(ConquestTrophy(4, "Erudite Strategist", 170, 2.5, 1));

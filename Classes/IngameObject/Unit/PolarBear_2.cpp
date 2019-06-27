@@ -54,6 +54,7 @@ void PolarBear_2::Attack(vector<BaseUnitClass*>& targets)
 		if (numOfAttack == 3) {
 			damage += 100;
 			numOfAttack = 0;
+			target->sprite->runAction(Sequence::create(DelayTime::create(0.4), MoveBy::create(0.4, Vec2(0, 150)), MoveBy::create(0.4, Vec2(0, -150)), nullptr));
 			target->hardEffect.push_back(HardEffect("Stun", triggerTime, triggerTime + 2));
 		}
 		target->damageReceive.push_back(DamageReceive(this->unitId, damage, triggerTime, animateName, ""));
