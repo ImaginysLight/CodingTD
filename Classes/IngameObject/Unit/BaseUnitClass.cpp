@@ -189,7 +189,11 @@ void BaseUnitClass::Attack(vector<BaseUnitClass*>& targets) {
 	for (auto target : targets) {
 		float damage = this->attack;
 		//string animateName = this->animateName + "_explosion";
-		string animateName = "_explosion"; // Không có sprite nên ai bắn cũng nổ như nhau
+		string animateName = "_explosion"; // Ranger bắn nổ bình thường
+		if (this->range < 25) animateName = ""; // Melee ko có hiệu ứng
+		if (this->name.find("Helicopter") != std::string::npos) animateName = "_bullet2";
+		if (this->name.find("Hotheaded Gunner") != std::string::npos) animateName = "_bullet1";
+		if (this->name.find("UFO Driver") != std::string::npos) animateName = "_bullet1";
 		float distance = abs(this->root->getPositionX() - target->root->getPositionX());
 		float triggerTime = Tool::currentIngameTime + delayShootTime + distance * 0.002;
 		target->damageReceive.push_back(DamageReceive(this->unitId, damage, triggerTime, animateName, ""));

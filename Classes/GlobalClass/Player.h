@@ -59,4 +59,5 @@ public:
 	static pair<int, int> CalculateLevel(int exp);
 	static void UploadPlayerInfo(PlayerInfo *player);
 	static Node* CreatePlayerOutgameInfoGUI();
+	static void Logout();
 };

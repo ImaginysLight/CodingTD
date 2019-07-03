@@ -100,6 +100,11 @@ cocos2d::Node * Player::CreatePlayerOutgameInfoGUI()
 	return result;
 }
 
+void Player::Logout()
+{
+	Tool::Socket_Client->_client->emit("Logout", "{\"id\":\"" + to_string(Player::currentPlayer->id) + "\"}");
+}
+
 void Player::ClearOpponentInfo()
 {
 	Player::opponentPlayer = new PlayerInfo();

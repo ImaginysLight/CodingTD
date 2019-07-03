@@ -23,10 +23,9 @@ bool LobbyScene::init()
 		LobbyScene::notify = "";
 	}
 
-	//_client = SocketIO::connect("http://127.0.0.1:3000", *this);
+	LobbyScene::SetupGUI();
+
 	Tool::Socket_Client->_client->on("_Find_The_Opponent_",CC_CALLBACK_2(LobbyScene::findTheOpponent, this));
-	Tool::Socket_Client->_client->on("Get_Player_Info", CC_CALLBACK_2(LobbyScene::onReceiveEvent_GetPlayerInfo, this));
-	Tool::Socket_Client->_client->emit("Get_Player_Info", "{\"id\":\"" + to_string(Player::currentPlayer->id) + "\"}");
 	this->schedule(CC_CALLBACK_1(LobbyScene::UpdateAudio, this), "Audio");
 	return true;
 }
@@ -72,30 +71,14 @@ void LobbyScene::findTheOpponent(SIOClient* client, const std::string& data)
 	}
 }
 
-void LobbyScene::onReceiveEvent_GetPlayerInfo(SIOClient * client, const std::string & data)
-{
-	rapidjson::Document document;
-	document.Parse<0>(data.c_str());
-	Player::currentPlayer->username = document["username"].GetString();
-	Player::currentPlayer->password = document["password"].GetString();
-	Player::currentPlayer->experience = document["experience"].GetInt();
-	Player::currentPlayer->total_correctAnswer = document["correct_answer"].GetInt();
-	Player::currentPlayer->total_wrongAnswer = document["wrong_answer"].GetInt();
-	Player::currentPlayer->total_win = document["total_win"].GetInt();
-	Player::currentPlayer->total_lose = document["total_lose"].GetInt();
-	Player::currentPlayer->total_kill = document["total_kill"].GetInt();
-	Player::currentPlayer->friendshipPoint = document["friendship_point"].GetInt();
-	Player::GetFriendshipLevel(Player::currentPlayer, document["friendship_level"].GetString());
-	Player::currentPlayer->room_name = to_string(Player::currentPlayer->id);
-	Player::currentPlayer->submit_available = document["submit_available"].GetInt();
 
-	LobbyScene::SetupGUI();
-}
 
 void LobbyScene::UpdateAudio(float time)
 {
 	Audio::UpdateAudio();
 }
+
+
 
 void LobbyScene::SetupGUI()
 {
@@ -181,8 +164,10 @@ void LobbyScene::btn_Click(Ref *pSender, cocos2d::ui::Button::Widget::TouchEvent
 		}
 		if (name == "btn_Logout")
 		{
+			Tool::Socket_Client->_client->emit("Logout", "{\"id\":\"" + to_string(Player::currentPlayer->id) + "\"}");
+			Player::currentPlayer = new PlayerInfo(); 
 			Director::getInstance()->replaceScene(LoginScene::createScene());
-			Player::currentPlayer = new PlayerInfo();
+			
 		}
 		if (name == "btn_Achievement") {
 			Director::getInstance()->replaceScene(PlayerInformationScene::createScene());

@@ -2,7 +2,7 @@
 #include "json\document.h"
 #include "json\rapidjson.h"
 #include <network/SocketIO.h>
-
+#include"Player.h"
 USING_NS_CC;
 
 //SIOClient* SocketClient::_client = SocketIO::connect("http://127.0.0.1:3000", this);

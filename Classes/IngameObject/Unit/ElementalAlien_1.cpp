@@ -57,7 +57,7 @@ void ElementalAlien_1::Attack(vector<BaseUnitClass*>& targets)
 	for (auto target : targets) {
 		float damage = this->attack;
 		//string animateName = this->animateName + "_explosion";
-		string animateName = "_explosion"; // Không có sprite nên ai bắn cũng nổ như nhau
+		string animateName = "";
 		float distance = abs(this->root->getPositionX() - target->root->getPositionX());
 		float triggerTime = Tool::currentIngameTime + delayShootTime + distance * 0.002;
 		if (this->element == "Ice") {

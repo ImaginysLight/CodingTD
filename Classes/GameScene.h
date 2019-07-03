@@ -144,7 +144,7 @@ public:
 	void onReceiveEvent_ActiveChallenge(SIOClient* client, const std::string& data);
 	void onReceiveEvent_UpgradeArmy(SIOClient* client, const std::string& data);
 	void onReceiveEvent_EndGame(SIOClient* client, const std::string& data);
-
+	
 	//Setup trong init
 	void SetupCamera();
 	void SetupGUI();
@@ -162,7 +162,8 @@ public:
 	bool onTouchBegan(Touch* touch, Event* event);
 	void onTouchMoved(Touch* touch, Event* event);
 	void onTouchEnded(Touch* touch, Event* event);
-	void onMouseMove(Event *event);
+	void onMouseMove(Event *event); 
+	void onMouseUp(Event *event);
 	static cocos2d::Scene* createScene();
 	virtual bool init();
 	void menuCloseCallback(cocos2d::Ref* pSender);

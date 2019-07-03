@@ -606,7 +606,6 @@ bool GameScene::onTouchBegan(Touch* touch, Event* event) {
 			return true;
 		}
 	}
-	GameScene::choosingUnit = new BaseUnitClass();
 	return true;
 }
 void GameScene::onTouchMoved(Touch* touch, Event* event) {
@@ -654,6 +653,14 @@ void GameScene::onMouseMove(Event * event)
 	else GameScene::tooltip->removeAllChildrenWithCleanup(true);
 }
 
+void GameScene::onMouseUp(Event * event)
+{
+	EventMouse* e = (EventMouse*)event;
+	if (e->getMouseButton() == EventMouse::MouseButton::BUTTON_RIGHT) {
+		GameScene::choosingUnit = new BaseUnitClass();
+	}
+}
+
 void GameScene::SetupCamera() {
 	auto cameraSprite = Sprite::create();
 	this->addChild(cameraSprite);
@@ -665,6 +672,7 @@ void GameScene::SetupCamera() {
 
 	auto _mouseListener = EventListenerMouse::create();
 	_mouseListener->onMouseMove = CC_CALLBACK_1(GameScene::onMouseMove, this);
+	_mouseListener->onMouseUp = CC_CALLBACK_1(GameScene::onMouseUp, this);
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(_mouseListener, this);
 
 }
@@ -835,7 +843,7 @@ void GameScene::BuyUnit(string name, int line) {
 		Tool::Socket_Client->_client->emit("Create_Unit", "{\"Room\":\"" + Player::currentPlayer->room_name + "\", \"name\":\"" + name + "\", \"line\":\"" + to_string(line) + "\", \"id\":\"" + to_string(Player::currentPlayer->id) + "\"}");
 		ingamePlayerInfo.gold -= unitDetail->goldCost;
 		GameScene::UpdateIngamePlayerInfo();
-		GameScene::RunActionNotify(name + " has spawned successfully");
+		GameScene::RunActionNotify(name + " has successfully spawned.");
 	}
 }
 
@@ -902,6 +910,7 @@ void GameScene::UpgradeUnit(string name) {
 		}
 		else if (unitDetails.description == "Kingdom") {
 			Tool::Socket_Client->_client->emit("_Upgrade_Kingdom_", "{\"Room\":\"" + Player::currentPlayer->room_name + "\", \"Id\":\"" + to_string(Player::currentPlayer->id) + "\"}");
+			RunActionNotify("Upgrade Kingdom successful!");
 		}
 		//Upgrade Unit
 		else {
@@ -1049,7 +1058,7 @@ void GameScene::UpdateChatbox() {
 	for (auto content : chatBoxContent) {
 		if (chatboxMode == "General") copyOfChatboxContent.push_back(content);
 		else if (chatboxMode == "Notify" && content.second != 1 && content.second != 2) copyOfChatboxContent.push_back(content);
-		else if (chatboxMode == "Chat"  && content.second == 1 && content.second == 2) copyOfChatboxContent.push_back(content);
+		else if (chatboxMode == "Chat"  && (content.second == 1 || content.second == 2)) copyOfChatboxContent.push_back(content);
 	}
 	vector<int> labelHeight;
 	int currentHeight = 10;
@@ -1098,7 +1107,7 @@ void GameScene::btn_ChatBox_Click(Ref *pSender, cocos2d::ui::Button::Widget::Tou
 		}
 		else if (((Button*)pSender)->getName() == "btn_Hide") {
 			EditBox_Chat->runAction(FadeOut::create(0.5));
-			sc_ChatBox->runAction(FadeOut::create(0.5));
+			sc_ChatBox->setVisible(false);
 			btn_General->runAction(MoveBy::create(0.5, Vec2(0, -visibleSize.height *0.35)));
 			btn_Notify->runAction(MoveBy::create(0.5, Vec2(0, -visibleSize.height *0.35)));
 			btn_Chat->runAction(MoveBy::create(0.5, Vec2(0, -visibleSize.height *0.35)));
@@ -1108,7 +1117,7 @@ void GameScene::btn_ChatBox_Click(Ref *pSender, cocos2d::ui::Button::Widget::Tou
 		}
 		else if (((Button*)pSender)->getName() == "btn_Show") {
 			EditBox_Chat->runAction(FadeIn::create(0.5));
-			sc_ChatBox->runAction(FadeIn::create(0.5));
+			sc_ChatBox->setVisible(true);
 			btn_General->runAction(MoveBy::create(0.5, Vec2(0, visibleSize.height *0.35)));
 			btn_Notify->runAction(MoveBy::create(0.5, Vec2(0, visibleSize.height *0.35)));
 			btn_Chat->runAction(MoveBy::create(0.5, Vec2(0, visibleSize.height *0.35)));
@@ -1281,6 +1290,7 @@ void GameScene::onReceiveEvent_UpgradeArmy(SIOClient * client, const std::string
 		}
 	}
 }
+
 
 void GameScene::onReceiveEvent_EndGame(SIOClient * client, const std::string & data)
 {

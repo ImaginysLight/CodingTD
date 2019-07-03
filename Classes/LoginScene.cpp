@@ -16,8 +16,29 @@ bool LoginScene::init()
 	SetupGUI();
 	
 	//_client = SocketIO::connect("http://127.0.0.1:3000", *this);
- 	Tool::Socket_Client->_client->on("_Check_Login_", CC_CALLBACK_2(LoginScene::onReceiveEvent, this));
+
+
 	return true;
+}
+
+void LoginScene::onReceiveEvent_GetPlayerInfo(SIOClient * client, const std::string & data)
+{
+	rapidjson::Document document;
+	document.Parse<0>(data.c_str());
+	Player::currentPlayer->username = document["username"].GetString();
+	Player::currentPlayer->password = document["password"].GetString();
+	Player::currentPlayer->experience = document["experience"].GetInt();
+	Player::currentPlayer->total_correctAnswer = document["correct_answer"].GetInt();
+	Player::currentPlayer->total_wrongAnswer = document["wrong_answer"].GetInt();
+	Player::currentPlayer->total_win = document["total_win"].GetInt();
+	Player::currentPlayer->total_lose = document["total_lose"].GetInt();
+	Player::currentPlayer->total_kill = document["total_kill"].GetInt();
+	Player::currentPlayer->friendshipPoint = document["friendship_point"].GetInt();
+	Player::GetFriendshipLevel(Player::currentPlayer, document["friendship_level"].GetString());
+	Player::currentPlayer->room_name = to_string(Player::currentPlayer->id);
+	Player::currentPlayer->submit_available = document["submit_available"].GetInt();
+
+	Director::getInstance()->replaceScene(LobbyScene::createScene());
 }
 
 void LoginScene::menuCloseCallback(Ref* pSender)
@@ -34,22 +55,20 @@ void LoginScene::onReceiveEvent(SIOClient* client, const std::string& data)
 	//check name has member in json
 	if (document.HasMember("Check")) {
 		//CCLOG("Check: %d ", document["Check"].GetInt());
-		if (document["Check"].GetInt() != 0)
-		{
-			RunActionNotify(editBox_Username->getText());
-			Player::currentPlayer->username = editBox_Username->getText();
-			Player::currentPlayer->password = editBox_Password->getText();
-			Player::currentPlayer->id = document["Check"].GetInt();
-			//CCLOG("ID: %d ",document["id"].GetInt());
-			//_client->disconnect();
-			
-			Director::getInstance()->replaceScene(LobbyScene::createScene());
-		}
-		else
-		{
+		if (document["Check"].GetInt() == 0) {
 			auto node_Notify = Tool::CreateNotificationTable("Incorrect Username or Password\nPlease try again", "OK");
 			node_Notify->setPosition(visibleSize / 2);
 			this->addChild(node_Notify, 10);
+		}
+		else if (document["Check"].GetInt() == -1) {
+			auto node_Notify = Tool::CreateNotificationTable("You can't Login because someone is using this Account.", "OK");
+			node_Notify->setPosition(visibleSize / 2);
+			this->addChild(node_Notify, 10);
+		}
+		else
+		{
+			Player::currentPlayer->id = document["Check"].GetInt();
+			Tool::Socket_Client->_client->emit("Get_Player_Info", "{\"id\":\"" + to_string(Player::currentPlayer->id) + "\"}");
 		}
 	}
 }
@@ -65,7 +84,7 @@ void LoginScene::btn_Click(Ref *pSender, cocos2d::ui::Button::Widget::TouchEvent
 		if (term->getName() == "btn_Login") {
 			if (editBox_Username->getText() == "" || editBox_Password->getText() == "")
 			{
-				CCLOG("Fail");
+				RunActionNotify("Please enter your Username and Password first!");
 			}
 			else
 			{
@@ -78,11 +97,12 @@ void LoginScene::btn_Click(Ref *pSender, cocos2d::ui::Button::Widget::TouchEvent
 		}
 		else if (term->getName() == "btn_Register") {
 			//LoginScene::onClose(_client);
-			Director::getInstance()->end();
+			Director::getInstance()->replaceScene(RegisterScene::createScene());
 		}
 		else if (term->getName() == "btn_Connect") {
 			Tool::Socket_Client->_client = SocketIO::connect(LoginScene::editBox_Domain->getText(), *Tool::Socket_Client);
 			Tool::Socket_Client->_client->on("_Check_Login_", CC_CALLBACK_2(LoginScene::onReceiveEvent, this));
+			Tool::Socket_Client->_client->on("Get_Player_Info", CC_CALLBACK_2(LoginScene::onReceiveEvent_GetPlayerInfo, this));
 		}
 	}
 	default: break;

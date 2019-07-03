@@ -37,12 +37,39 @@ io.sockets.on('connection', function(socket){
 			function (error, result, fields) {
 				if (error) throw error;
 				if(result.length == 1){
-				socket.emit('_Check_Login_', {Check: result[0].id});	
+					if(result[0].status == 1) socket.emit('_Check_Login_', {Check: -1});	
+					else {
+						con.query("UPDATE `player` SET player.status = 1 WHERE player.id = " + result[0].id); 
+						socket.emit('_Check_Login_', {Check: result[0].id});	
+					}
 				}
 				else{
 					socket.emit('_Check_Login_', {Check: 0});
 				}
 		});
+	});
+	
+	//Đăng ký
+	socket.on('Register', function(data){
+		var mes = JSON.parse(data)
+		con.query("SELECT *FROM `player` WHERE player.username like '" + mes.username +"'",
+			function (error, result, fields) {
+				if (error) throw error;
+				if(result.length != 0){
+					socket.emit('Register', {Check: -1});	
+				}
+				else{
+					socket.emit('Register', {Check: 0});
+					con.query("INSERT INTO `player`(username,password) VALUE('"+mes.username+"', '"+mes.password+"')"); 
+				}
+		});
+	});
+	
+	//Đăng xuất
+	socket.on('Logout', function(data){
+		var mes = JSON.parse(data)
+		console.log(mes.id + " logged out");
+		con.query("UPDATE `player` SET player.status = 0, player.ready = 0 WHERE player.id = '" + mes.id + "'"); 
 	});
 
 	//lay thong tin nguoi choi
@@ -135,10 +162,10 @@ io.sockets.on('connection', function(socket){
 
 
 	//lấy danh sách rank
-	socket.on('_Get_List_Rank_', function(data){
+		socket.on('_Get_List_Rank_', function(data){
 		var mes = JSON.parse(data)
 		//console.log(mes.username +"_"+mes.password);
-		con.query("SELECT * FROM `player` GROUP BY player.total_score DESC", 
+		con.query("SELECT * FROM `player` GROUP BY player.total_win DESC", 
 			function (error, result, fields) {
 				if (error) throw error;
 
@@ -151,11 +178,11 @@ io.sockets.on('connection', function(socket){
 		    		var key = "username"+i;
 		    		var value = result[i].username;
 		    		_Get_List_Rank_[key] = value;
-		    		var key = "total_score"+i;
-		    		var value = result[i].total_score;
+		    		var key = "total_win"+i;
+		    		var value = result[i].total_win;
 		    		_Get_List_Rank_[key] = value;
-		    		var key = "total_question"+i;
-		    		var value = result[i].total_question;
+		    		var key = "correct_answer"+i;
+		    		var value = result[i].correct_answer;
 		    		_Get_List_Rank_[key] = value;
 		    	}
 		    	
@@ -367,6 +394,17 @@ io.sockets.on('connection', function(socket){
 	socket.on('End_Game', function(data){
 		var mes = JSON.parse(data)
 		io.sockets.emit('End_Game', {Room: mes.Room, id: mes.id});
+	});
+	
+	//Thời gian trên server
+	socket.on('Server_Time', function(data){
+		var today = new Date();
+		var h = today.getHours();
+        var m = today.getMinutes();
+        var s = today.getSeconds();
+		var time = h + ":" + m + ":" + s;
+		var mes = JSON.parse(data)
+		io.sockets.emit('Server_Time', {Server_Time: time});
 	});
 	
 	//lấy câu hỏi theo level

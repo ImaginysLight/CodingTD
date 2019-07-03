@@ -4,6 +4,7 @@
 #include "GlobalClass/Audio.h"
 #include "LobbyScene.h"
 #include "ui/CocosGUI.h"
+#include"RegisterScene.h"
 using namespace cocos2d::ui;
 using namespace std;
 using namespace cocos2d::network;
@@ -27,5 +28,7 @@ public:
 	void RunActionNotify(string content);
 
 	void onReceiveEvent(SIOClient* client, const std::string& data);
+	void onReceiveEvent_GetPlayerInfo(SIOClient * client, const std::string & data);
+
 };
 

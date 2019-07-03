@@ -129,8 +129,17 @@ void Tool::Button_ChangeState(Button *& btn, bool isShow, float fadeTime)
 
 int Tool::CreateRandomNumber(int begin, int end)
 {
+	/*
+	//Hóa ra trước giờ mình bị lừa @@
 	srand(time(NULL));
 	return rand() % (end - begin + 1) + begin;
+	*/
+	random_device rd;	// only used once to initialize (seed) engine
+	mt19937 rng(rd());	// random-number engine used (Mersenne-Twister in this case)
+
+	uniform_int_distribution<int> uni(begin, end);
+	auto random_integer = uni(rng);
+	return random_integer;
 }
 
 
@@ -165,5 +174,22 @@ Node * Tool::CreateNotificationTable(string lblContent, string btnRightContent, 
 		result->addChild(btn_Left);
 	}
 
+	return result;
+}
+
+EditBox * Tool::CreateEditBox(string placeholder, Size size)
+{
+	EditBox* result;
+	result = ui::EditBox::create(size, "", "");
+	result->setTextHorizontalAlignment(TextHAlignment::CENTER);
+	result->setInputMode(EditBox::InputMode::ANY);
+	result->setFontSize(Tool::defaultTextSize);
+	result->setPlaceHolder(placeholder.c_str());
+	result->setMaxLength(100);
+
+	auto sp_EditBox = Sprite::create("UI/GameScene/bgEditBox.png");
+	sp_EditBox->setAnchorPoint(Vec2(0, 0));
+	Tool::setNodeSize(sp_EditBox, result->getBoundingBox().size.width, result->getBoundingBox().size.height);
+	result->addChild(sp_EditBox, -1);
 	return result;
 }

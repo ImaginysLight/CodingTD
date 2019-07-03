@@ -23,6 +23,8 @@ void IngameObject::loadIngameObjectStaticVariables() {
 
 void IngameObject::loadAnimate() {
 	IngameObject::animate.insert(CreateAnimateWithKey("", "explosion", 1, 20));
+	IngameObject::animate.insert(CreateAnimateWithKey("", "bullet1", 1, 7));
+	IngameObject::animate.insert(CreateAnimateWithKey("", "bullet2", 1, 8));
 
 	IngameObject::animate.insert(CreateAnimateWithKey("Crazy Wolf", "attack", 1, 11));
 	IngameObject::animate.insert(CreateAnimateWithKey("Crazy Wolf", "die", 1, 11));

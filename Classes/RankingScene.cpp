@@ -49,20 +49,20 @@ void RankingScene::onReceiveEvent(SIOClient* client, const std::string& data)
 			id.insert(id.length(), stt);
 			string username = document["_Get_List_Rank_"][id.c_str()].GetString();
 			//CCLOG("Rank_id: %d ", document["_Get_List_Rank_"][id.c_str()].GetString());
-			id = "total_score";
+			id = "total_win";
 			id.insert(id.length(), stt);
-			int total_score = document["_Get_List_Rank_"][id.c_str()].GetInt();
+			int total_win = document["_Get_List_Rank_"][id.c_str()].GetInt();
 			//CCLOG("Rank_id: %d ", document["_Get_List_Rank_"][id.c_str()].GetInt());
-			id = "total_question";
+			id = "correct_answer";
 			id.insert(id.length(), stt);
-			int total_question = document["_Get_List_Rank_"][id.c_str()].GetInt();
+			int correct_answer = document["_Get_List_Rank_"][id.c_str()].GetInt();
 			//CCLOG("Rank_id: %d ", document["_Get_List_Rank_"][id.c_str()].GetInt());
 
 
 
 			auto height = 50 * 50 + 500;
 			ScrollView_RankingTable->setInnerContainerSize(Size(1000, height));
-			auto row = CreateRow(to_string(i), to_string(Id), username, to_string(total_score), to_string(total_question));
+			auto row = CreateRow(to_string(i), to_string(Id), username, to_string(total_win), to_string(correct_answer));
 			row->setPosition(Vec2(50, height - 50 * i));
 			ScrollView_RankingTable->addChild(row);
 		}
@@ -74,7 +74,7 @@ void RankingScene::menuCloseCallback(Ref* pSender)
 	Director::getInstance()->end();
 }
 
-Node * RankingScene::CreateRow(string stt, string id, string name, string score, string question)
+Node * RankingScene::CreateRow(string stt, string id, string name, string win, string correct_answer)
 {
 	Node* result = Node::create();
 
@@ -90,16 +90,16 @@ Node * RankingScene::CreateRow(string stt, string id, string name, string score,
 	lbl_Name->setPositionX(300);
 	result->addChild(lbl_Name);
 
-	Label* lbl_total_score = Tool::CreateLabel((score));
+	Label* lbl_total_score = Tool::CreateLabel((win));
 	lbl_total_score->setPositionX(450);
 	result->addChild(lbl_total_score);
 
-	Label* lbl_total_question = Tool::CreateLabel((question));
+	Label* lbl_total_question = Tool::CreateLabel((correct_answer));
 	lbl_total_question->setPositionX(600);
 	result->addChild(lbl_total_question);
 
 	auto line = Sprite::create("UI/Background/line.png");
-	line->setPositionX(visibleSize.width  *0.3f);
+	line->setPosition(Vec2(visibleSize.width  *0.3f,-25));
 	result->addChild(line);
 	
 	return result;
@@ -121,7 +121,7 @@ Node * RankingScene::CreateRow_Default()
 	lbl_Name->setPositionX(290);
 	result->addChild(lbl_Name);
 
-	Label* lbl_total_score = Tool::CreateLabel("Score");
+	Label* lbl_total_score = Tool::CreateLabel("Total Win");
 	lbl_total_score->setPositionX(440);
 	result->addChild(lbl_total_score);
 
@@ -134,7 +134,7 @@ Node * RankingScene::CreateRow_Default()
 
 void RankingScene::SetupGUI()
 {
-	auto sp_Background = Sprite::create("UI/Background/background1.png");
+	auto sp_Background = Sprite::create("UI/Background/Default Background 1.png");
 	sp_Background->setPosition(visibleSize / 2);
 	this->addChild(sp_Background, -1);
 

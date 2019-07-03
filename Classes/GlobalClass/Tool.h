@@ -11,6 +11,7 @@
 #include "SocketClient.h"
 #include "json\document.h"
 #include "json\rapidjson.h"
+#include<random>
 
 #include <network/SocketIO.h>
 using namespace cocos2d::network;
@@ -40,7 +41,7 @@ public:
 	static Button* CreateButtonWithSpirte(string name, string spritePath);
 	static Node* CreateBar(string content = "", Color4B textColor = Color4B::WHITE, Size size = Size(200,25), Color3B frontColor = Color3B::WHITE, Color4F backColor = Color4F(0.69, 0.69, 0.69, 0.33));
 	static Node* CreateNotificationTable(string lblContent, string btnRightContent, string btnLeftContent = "", Size tableSize = Size(384,135));
-	
+	static EditBox* CreateEditBox(string placeholder, Size size = Size(300,35));
 
 	//Xử lý size
 	static void setNodeSize(Node* node, int width, int height);
