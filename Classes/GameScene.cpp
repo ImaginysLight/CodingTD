@@ -503,11 +503,11 @@ void GameScene::btn_Click(Ref * pSender, cocos2d::ui::Button::Widget::TouchEvent
 						UpdateIngamePlayerInfo();
 						int disableTime = (int)Tool::currentIngameTime + 120;
 						btn_ActiveChallenge->runAction(Sequence::create(
-							CallFunc::create([&]() {	btn_ActiveChallenge->setName("Disable Until: " + to_string(disableTime / 60) + ":" + to_string(disableTime % 60));
+							CallFunc::create([&]() {	btn_ActiveChallenge->setTitleText("Disable Until: " + to_string(disableTime / 60) + ":" + to_string(disableTime % 60));
 								btn_ActiveChallenge->setEnabled(false);
 							}),
 							DelayTime::create(120),
-							CallFunc::create([&]() {	btn_ActiveChallenge->setName("Invite Challenge");
+							CallFunc::create([&]() {	btn_ActiveChallenge->setTitleText("Invite Challenge");
 							btn_ActiveChallenge->setEnabled(true);
 							}),
 							nullptr
