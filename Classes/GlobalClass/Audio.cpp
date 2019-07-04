@@ -9,13 +9,8 @@ string Audio::GetBackgroundAudio()
 		"Audio/Czardas - Vittorio Monti Piano Transcription .mp3",
 		"Audio/Canon in D Major.mp3",
 		"Audio/Chaconne F Minor.mp3",
-		"Audio/Sonata no 1 mov 1.mp3",
-		"Audio/Sonata no 8 mov 2.mp3",
-		"Audio/Sonata no 18 mov 2.mp3",
 		"Audio/BWV 846 - Prelude 1 in C Major.mp3",
 		"Audio/Luigi Boccherini - String Quintet in E Major, Op.11 No.5.mp3",
-		"Audio/Piano Sonata No.16, K. 545 mov 1.mp3",
-		"Audio/Piano Sonata No.16, K. 545 mov 2.mp3"
 	};
 	result = music[Tool::CreateRandomNumber(0, music.size() - 1)];
 
@@ -27,8 +22,6 @@ string Audio::GetBrightAudio()
 	string result = "";
 	vector<string> music = {
 		"Audio/Eine kleine Nachtmusik - K525.mp3",
-		"Audio/Op.25 No.9.mp3",
-		"Audio/Johann Strauss I - Radetzky-Marsch, Op. 228.mp3",
 		"Audio/Symphony no 5 mov 4.mp3"
 	};
 	result = music[Tool::CreateRandomNumber(0, music.size() - 1)];
@@ -40,10 +33,8 @@ string Audio::GetSadAudio()
 	string result = "";
 	vector<string> music = {
 		"Audio/Preludium and Allegro.mp3",
-		"Audio/Clair de Lune.mp3",
 		"Audio/Prelude Op 28 No 4 in E minor.mp3",
-		"Audio/BWV 1068 - Suite No. 3 in D major.mp3",
-		"Audio/Sonata no 14 mov 1.mp3"
+		"Audio/BWV 1068 - Suite No. 3 in D major.mp3"
 	};
 	result = music[Tool::CreateRandomNumber(0, music.size() - 1)];
 	return result;
@@ -82,13 +73,9 @@ string Audio::GetBattleAudio()
 		"Audio/Sonata no 8 mov 3.mp3",
 		"Audio/Op.10 No.4.mp3",
 		"Audio/Op.25 No.12.mp3",
-		"Audio/Sonata no 17 mov 3.mp3",
 		"Audio/Op.25 No.11.mp3",
-		"Audio/Liebestraum - Love Dream.mp3",
-		"Audio/Paganini Etude no 6.mp3",
 		"Audio/Chopin sonata no 2 mov 1",
-		"Audio/Chopin sonata no 2 mov 2",
-		"Audio/Fantaisie Impromptu op 66.mp3"
+		"Audio/Chopin sonata no 2 mov 2"
 	};
 	result = music[Tool::CreateRandomNumber(0, music.size() - 1)];
 	return result;
