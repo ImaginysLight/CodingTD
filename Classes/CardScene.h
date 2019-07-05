@@ -52,6 +52,7 @@ public:
 	Node* friendshipNode, *detailNode_Before, *detailNode_After, *spriteNode, *skillNode, *dynamicUI, *playerInfoNode;
 	ui::ScrollView* scroll_Navigator, *scroll_UI;
 	unordered_map<string, Button*> vec_Card;
+	Label* lbl_Friendship;
 	void btn_UpFriendship_Click(Ref *pSender, cocos2d::ui::Button::Widget::TouchEventType type);
 	void btn_DownFriendship_Click(Ref *pSender, cocos2d::ui::Button::Widget::TouchEventType type);
 	void btn_Click(Ref *pSender, cocos2d::ui::Button::Widget::TouchEventType type);

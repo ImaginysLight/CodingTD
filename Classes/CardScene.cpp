@@ -27,7 +27,7 @@ bool CardScene::init()
 	sp_Friendship->setPosition(Vec2(visibleSize.width*0.05, visibleSize.height*0.9));
 	this->addChild(sp_Friendship);
 
-	auto lbl_Friendship = Tool::CreateLabel(to_string(Player::currentPlayer->friendshipPoint), Tool::defaultTextSize*1.25, Color4B::GREEN);
+	lbl_Friendship = Tool::CreateLabel(to_string(Player::currentPlayer->friendshipPoint), Tool::defaultTextSize*1.25, Color4B::GREEN);
 	lbl_Friendship->setName("lbl_Friendship");
 	lbl_Friendship->setPosition(Vec2(100,39));
 	sp_Friendship->addChild(lbl_Friendship);
@@ -139,7 +139,7 @@ void CardScene::btn_UpFriendship_Click(Ref * pSender, cocos2d::ui::Button::Widge
 			Player::UploadPlayerInfo(Player::currentPlayer);
 		}
 		((Node*)pSender)->getParent()->runAction(RemoveSelf::create());
-		((Label*)this->getChildByName("lbl_Friendship"))->setString(to_string(Player::currentPlayer->friendshipPoint));
+		lbl_Friendship->setString(to_string(Player::currentPlayer->friendshipPoint));
 	}
 }
 
@@ -154,7 +154,7 @@ void CardScene::btn_DownFriendship_Click(Ref * pSender, cocos2d::ui::Button::Wid
 		Player::UploadPlayerInfo(Player::currentPlayer);
 
 		((Node*)pSender)->getParent()->runAction(RemoveSelf::create());
-		((Label*)this->getChildByName("lbl_Friendship"))->setString(to_string(Player::currentPlayer->friendshipPoint));
+		lbl_Friendship->setString(to_string(Player::currentPlayer->friendshipPoint));
 
 	}
 }
