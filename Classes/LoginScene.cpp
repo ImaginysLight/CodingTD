@@ -13,6 +13,8 @@ bool LoginScene::init()
 {
 	visibleSize = Director::getInstance()->getVisibleSize();
 	Audio::audio->playEffect("Audio/The seasons - june (barcarolle).mp3", true);
+	Audio::audio->setBackgroundMusicVolume(0.01f);
+	Audio::audio->setEffectsVolume(0.01f);
 	SetupGUI();
 	
 	//_client = SocketIO::connect("http://127.0.0.1:3000", *this);
@@ -104,6 +106,9 @@ void LoginScene::btn_Click(Ref *pSender, cocos2d::ui::Button::Widget::TouchEvent
 			Tool::Socket_Client->_client->on("_Check_Login_", CC_CALLBACK_2(LoginScene::onReceiveEvent, this));
 			Tool::Socket_Client->_client->on("Get_Player_Info", CC_CALLBACK_2(LoginScene::onReceiveEvent_GetPlayerInfo, this));
 		}
+		else if (term->getName() == "btn_Close") {
+			Director::getInstance()->end();
+		}
 	}
 	default: break;
 	}
@@ -111,6 +116,7 @@ void LoginScene::btn_Click(Ref *pSender, cocos2d::ui::Button::Widget::TouchEvent
 
 void LoginScene::SetupGUI()
 {
+
 	{
 		auto btn = Tool::CreateButtonWithoutSprite("btn_Connect", "Connect");
 		btn->setPosition(Vec2(visibleSize.width*0.5, visibleSize.height*0.1));
@@ -128,11 +134,18 @@ void LoginScene::SetupGUI()
 		this->addChild(editBox_Domain);
 
 	}
-	auto sp_SceneName = Sprite::create("UI/LoginScene/Login.png");
-	sp_SceneName->setPosition(Vec2(visibleSize.width * 0.5, visibleSize.height*0.9));
+	auto btn_Close = Button::create("UI/Login/btn_close.png");
+	btn_Close->setPosition(Vec2(visibleSize.width*.9, visibleSize.height*0.9));
+	btn_Close->setName("btn_Close");
+	btn_Close->addTouchEventListener(CC_CALLBACK_2(LoginScene::btn_Click,this));
+	this->addChild(btn_Close);
+
+
+	auto sp_SceneName = Sprite::create("UI/Login/head_login.png");
+	sp_SceneName->setPosition(Vec2(visibleSize.width * 0.5, visibleSize.height*0.8));
 	this->addChild(sp_SceneName);
 
-	auto sp_Background = Sprite::create("UI/Background/Default Background 1.png");
+	auto sp_Background = Sprite::create("UI/Login/BG.png");
 	sp_Background->setPosition(visibleSize / 2);
 	this->addChild(sp_Background, -1);
 
@@ -159,23 +172,23 @@ void LoginScene::SetupGUI()
 	editBox_Password->setText("Player001");
 	this->addChild(editBox_Password);
 
-	auto sp_EditBox_Username = Sprite::create("UI/GameScene/bgEditBox.png");
+	auto sp_EditBox_Username = Sprite::create("UI/Login/editbox.png");
 	sp_EditBox_Username->setPosition(editBox_Username->getPosition());
 	Tool::setNodeSize(sp_EditBox_Username, editBox_Username->getBoundingBox().size.width, editBox_Username->getBoundingBox().size.height);
 	this->addChild(sp_EditBox_Username, -1);
 
-	auto sp_EditBox_Password = Sprite::create("UI/GameScene/bgEditBox.png");
+	auto sp_EditBox_Password = Sprite::create("UI/Login/editbox.png");
 	sp_EditBox_Password->setPosition(editBox_Password->getPosition());
 	Tool::setNodeSize(sp_EditBox_Password, editBox_Password->getBoundingBox().size.width, editBox_Password->getBoundingBox().size.height);
 	this->addChild(sp_EditBox_Password, -1);
 
-	btn_Login = Button::create("UI/LoginScene/btn_Login_nomal.png","UI/LoginScene/btn_Login_select.png");
+	btn_Login = Button::create("UI/Login/btn_login.png");
 	btn_Login->setPosition(Vec2(visibleSize.width*0.4, visibleSize.height*0.3));
 	btn_Login->setName("btn_Login");
 	btn_Login->addTouchEventListener(CC_CALLBACK_2(LoginScene::btn_Click, this));
 	this->addChild(btn_Login);
 
-	btn_Register = Button::create("UI/LoginScene/btn_Register_nomal.png", "UI/LoginScene/btn_Register_select.png");
+	btn_Register = Button::create("UI/Login/btn_register.png");
 	btn_Register->setPosition(Vec2(visibleSize.width*0.6, visibleSize.height*0.3));
 	btn_Register->setName("btn_Register");
 	btn_Register->addTouchEventListener(CC_CALLBACK_2(LoginScene::btn_Click, this));

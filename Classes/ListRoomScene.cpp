@@ -106,11 +106,11 @@ void ListRoomScene::btn_Click(Ref *pSender, cocos2d::ui::Button::Widget::TouchEv
 
 void ListRoomScene::SetupGUI()
 {
-	auto sp_SceneName = Sprite::create("UI/LoginScene/Login.png");
+	auto sp_SceneName = Sprite::create("UI/Room/head_room.png");
 	sp_SceneName->setPosition(Vec2(visibleSize.width * 0.5, visibleSize.height*0.9));
 	this->addChild(sp_SceneName);
 
-	auto sp_Background = Sprite::create("UI/LoginScene/background1.png");
+	auto sp_Background = Sprite::create("UI/Login/BG.png");
 	sp_Background->setPosition(visibleSize / 2);
 	this->addChild(sp_Background, -1);
 

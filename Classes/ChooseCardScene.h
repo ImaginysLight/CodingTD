@@ -38,5 +38,6 @@ public:
 	void onReceive_PickCard(SIOClient* client, const std::string& data);
 	void onReceive_SelectElement(SIOClient* client, const std::string& data);
 	void onReceiveEvent_GetInfoPlayer(SIOClient* client, const std::string& data);
+	void onReceiveEvent_GetInfoOpponent(SIOClient* client, const std::string& data);
 };
 

@@ -16,8 +16,9 @@ public:
 	ui::ScrollView *ScrollView_RankingTable;
 	
 
-	Node* CreateRow(string stt, string id, string name, string score, string question);
+	Node* CreateRow(string stt, string name, string score, string question);
 	Node* CreateRow_Default();
+	Node* CreateRowCurrentPlayer(string stt, string name, string win, string correct_answer);
 	void SetupGUI();
 	void btn_Click(Ref *pSender, cocos2d::ui::Button::Widget::TouchEventType type);
 	void RunActionNotify(string content);

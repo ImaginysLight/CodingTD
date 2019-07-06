@@ -23,8 +23,7 @@ bool ChooseCardScene::init()
 	Tool::Socket_Client->_client->on("_Pick_Card_", CC_CALLBACK_2(ChooseCardScene::onReceive_PickCard, this));
 	Tool::Socket_Client->_client->on("_Select_Element_", CC_CALLBACK_2(ChooseCardScene::onReceive_SelectElement, this));
 
-	Tool::Socket_Client->_client->on("Get_Player_Info", CC_CALLBACK_2(ChooseCardScene::onReceiveEvent_GetInfoPlayer, this));
-	Tool::Socket_Client->_client->emit("Get_Player_Info", "{\"id\":\"" + to_string(Player::currentPlayer->id) + "\"}");
+	Tool::Socket_Client->_client->on("Get_Player_Info", CC_CALLBACK_2(ChooseCardScene::onReceiveEvent_GetInfoOpponent, this));
 	Tool::Socket_Client->_client->emit("Get_Player_Info", "{\"id\":\"" + to_string(Player::opponentPlayer->id) + "\"}");
 	
 	SetupGUI();
@@ -87,27 +86,12 @@ void ChooseCardScene::onReceive_SelectElement(SIOClient* client, const std::stri
 	}
 }
 
-void ChooseCardScene::onReceiveEvent_GetInfoPlayer(SIOClient * client, const std::string & data)
+
+void ChooseCardScene::onReceiveEvent_GetInfoOpponent(SIOClient * client, const std::string & data)
 {
 	rapidjson::Document document;
 	document.Parse<0>(data.c_str());
-	if (Player::currentPlayer->id == Tool::ConvertStringToInt(document["id"].GetString())) {
-		Player::currentPlayer->username = document["username"].GetString();
-		Player::currentPlayer->password = document["password"].GetString();
-		Player::currentPlayer->experience = document["experience"].GetInt();
-		Player::currentPlayer->total_correctAnswer = document["correct_answer"].GetInt();
-		Player::currentPlayer->total_wrongAnswer = document["wrong_answer"].GetInt();
-		Player::currentPlayer->total_win = document["total_win"].GetInt();
-		Player::currentPlayer->total_lose = document["total_lose"].GetInt();
-		Player::currentPlayer->total_kill = document["total_kill"].GetInt();
-		Player::currentPlayer->friendshipPoint = document["friendship_point"].GetInt();
-		Player::GetFriendshipLevel(Player::currentPlayer,document["friendship_level"].GetString());
-		//Player::currentPlayer->room_name = document["room_name"].GetString();
-		Player::currentPlayer->submit_available = document["submit_available"].GetInt();
-
-		ChooseCardScene::lbl_CurrentPlayerName->setString(Player::currentPlayer->username);
-	}
-	else if (Player::opponentPlayer->id == Tool::ConvertStringToInt(document["id"].GetString())) {
+	if (Player::opponentPlayer->id == Tool::ConvertStringToInt(document["id"].GetString())) {
 		Player::opponentPlayer->username = document["username"].GetString();
 		Player::opponentPlayer->password = document["password"].GetString();
 		Player::opponentPlayer->experience = document["experience"].GetInt();
@@ -118,12 +102,10 @@ void ChooseCardScene::onReceiveEvent_GetInfoPlayer(SIOClient * client, const std
 		Player::opponentPlayer->total_kill = document["total_kill"].GetInt();
 		Player::opponentPlayer->friendshipPoint = document["friendship_point"].GetInt();
 		Player::GetFriendshipLevel(Player::opponentPlayer, document["friendship_level"].GetString());
-		//Player::opponentPlayer->room_name = document["room_name"].GetString();
-		Player::opponentPlayer->submit_available = document["submit_available"].GetInt();
 
+		ChooseCardScene::lbl_CurrentPlayerName->setString(Player::currentPlayer->username);
 		ChooseCardScene::lbl_OpponentPlayerName->setString(Player::opponentPlayer->username);
 	}
-
 }
 
 void ChooseCardScene::btn_BanCard_Click(Ref *pSender, cocos2d::ui::Button::Widget::TouchEventType type) {

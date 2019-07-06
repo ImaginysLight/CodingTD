@@ -16,8 +16,8 @@ void SocketClient::onMessage(SIOClient* client, const std::string& data) {
 	//CCLOG("receive %s " , data);
 }
 void SocketClient::onClose(SIOClient* client) {
-	// SocketIO::disconnect success
-	///CCLOG("disconnect success");
+
+	CCLOG("disconnect success");
 }
 void SocketClient::onError(SIOClient* client, const std::string& data) {
 	// SocketIO::failed

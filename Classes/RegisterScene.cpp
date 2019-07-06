@@ -72,13 +72,15 @@ void RegisterScene::RunActionNotify(string content)
 
 void RegisterScene::SetupGUI()
 {
-	auto sp_Background = Sprite::create("UI/Background/Default Background 1.png"); 
+	auto sp_Background = Sprite::create("UI/Login/BG.png"); 
 	sp_Background->setPosition(visibleSize / 2);
 	this->addChild(sp_Background, -1);
 
-	auto lbl_Register = Tool::CreateLabel("REGISTER", Tool::defaultTextSize*1.5, Color4B::RED);
-	lbl_Register->setPosition(Vec2(visibleSize.width*0.5, visibleSize.height*.9));
-	this->addChild(lbl_Register);
+	
+
+	auto sp_Register = Sprite::create("UI/Login/head_register.png");
+	sp_Register->setPosition(Vec2(visibleSize.width*0.5, visibleSize.height*.8));
+	this->addChild(sp_Register);
 
 	lbl_Notify = Label::createWithTTF("", "fonts/arial.ttf", Tool::defaultTextSize);
 	lbl_Notify->setTextColor(Color4B::RED);
@@ -87,12 +89,13 @@ void RegisterScene::SetupGUI()
 	this->addChild(lbl_Notify, 1);
 
 	auto lbl_Username = Tool::CreateLabel("Username", Tool::defaultTextSize, Color4B(175, 225, 200, 255));
-	lbl_Username->setPosition(Vec2(visibleSize.width*0.15, visibleSize.height*0.7));
+	lbl_Username->setPosition(Vec2(visibleSize.width*0.15, visibleSize.height*0.6));
 	lbl_Username->setAnchorPoint(Vec2(0, 0.5));
 	this->addChild(lbl_Username);
 
 	editBox_Username = Tool::CreateEditBox("Username");
-	editBox_Username->setPosition(Vec2(visibleSize.width*0.15, visibleSize.height*0.6));
+	editBox_Username->setPosition(Vec2(visibleSize.width*0.15, visibleSize.height*0.525));
+	editBox_Username->setMaxLength(20);
 	editBox_Username->setAnchorPoint(Vec2(0, 0.5));
 	this->addChild(editBox_Username);
 
@@ -101,44 +104,45 @@ void RegisterScene::SetupGUI()
 	}
 
 	auto lbl_SecurityCode = Tool::CreateLabel("Security Code: " + code, Tool::defaultTextSize, Color4B(175, 225, 250, 255));
-	lbl_SecurityCode->setPosition(Vec2(visibleSize.width*0.15, visibleSize.height*0.5));
+	lbl_SecurityCode->setPosition(Vec2(visibleSize.width*0.15, visibleSize.height*0.4));
 	lbl_SecurityCode->setAnchorPoint(Vec2(0, 0.5));
 	this->addChild(lbl_SecurityCode);
 
 	editBox_SecurityCode = Tool::CreateEditBox("Security Code");
-	editBox_SecurityCode->setPosition(Vec2(visibleSize.width*0.15, visibleSize.height*0.4));
+	editBox_SecurityCode->setPosition(Vec2(visibleSize.width*0.15, visibleSize.height*0.325));
 	editBox_SecurityCode->setAnchorPoint(Vec2(0, 0.5));
 	this->addChild(editBox_SecurityCode);
 
 	auto lbl_Password = Tool::CreateLabel("Password", Tool::defaultTextSize, Color4B(175, 225, 200, 255));
-	lbl_Password->setPosition(Vec2(visibleSize.width*0.6, visibleSize.height*0.7));
+	lbl_Password->setPosition(Vec2(visibleSize.width*0.6, visibleSize.height*0.6));
 	lbl_Password->setAnchorPoint(Vec2(0, 0.5));
 	this->addChild(lbl_Password);
 
 	editBox_Password = Tool::CreateEditBox("Password");
-	editBox_Password->setPosition(Vec2(visibleSize.width*0.6, visibleSize.height*0.6));
+	editBox_Password->setPosition(Vec2(visibleSize.width*0.6, visibleSize.height*0.525));
 	editBox_Password->setAnchorPoint(Vec2(0, 0.5));
+	editBox_Password->setMaxLength(20);
 	editBox_Password->setInputFlag(EditBox::InputFlag::PASSWORD);
 	this->addChild(editBox_Password);
 
 	auto lbl_RetypePassword = Tool::CreateLabel("Retype Password", Tool::defaultTextSize, Color4B(175, 225, 250, 255));
-	lbl_RetypePassword->setPosition(Vec2(visibleSize.width*0.6, visibleSize.height*0.5));
+	lbl_RetypePassword->setPosition(Vec2(visibleSize.width*0.6, visibleSize.height*0.4));
 	lbl_RetypePassword->setAnchorPoint(Vec2(0, 0.5));
 	this->addChild(lbl_RetypePassword);
 
 	editBox_RetypePassword = Tool::CreateEditBox("Retype Password");
-	editBox_RetypePassword->setPosition(Vec2(visibleSize.width*0.6, visibleSize.height*0.4));
+	editBox_RetypePassword->setPosition(Vec2(visibleSize.width*0.6, visibleSize.height*0.325));
 	editBox_RetypePassword->setAnchorPoint(Vec2(0, 0.5));
 	editBox_RetypePassword->setInputFlag(EditBox::InputFlag::PASSWORD);
 	this->addChild(editBox_RetypePassword);
 
-	auto btn_Register = Button::create("UI/LobbyScene/btn_Register_nomal.png", "UI/LobbyScene/btn_Register_select.png");
+	auto btn_Register = Button::create("UI/Login/btn_register.png");
 	btn_Register->setName("btn_Register");
 	btn_Register->setPosition(Vec2(visibleSize.width*0.4, visibleSize.height*0.15));
 	btn_Register->addTouchEventListener(CC_CALLBACK_2(RegisterScene::btn_Click, this));
 	this->addChild(btn_Register);
 
-	auto btn_Exit = Button::create("UI/LobbyScene/btn_Exit_nomal.png", "UI/LobbyScene/btn_Exit_select.png");
+	auto btn_Exit = Button::create("UI/Lobby/btn_exit.png");
 	btn_Exit->setName("btn_Exit");
 	btn_Exit->setPosition(Vec2(visibleSize.width*0.6, visibleSize.height*0.15));
 	btn_Exit->addTouchEventListener(CC_CALLBACK_2(RegisterScene::btn_Click, this));

@@ -26,6 +26,10 @@ void ResultScene::menuCloseCallback(Ref* pSender)
 
 void ResultScene::SetupGUI()
 {
+	auto sp_Background = Sprite::create("UI/Background/Default Background 1.png");
+	sp_Background->setPosition(visibleSize / 2);
+	this->addChild(sp_Background, -1);
+
 	if (Player::CalculateLevel(Player::oldPlayerInfo.experience).first < Player::CalculateLevel(Player::currentPlayer->experience).first) {
 		auto nodeLevelUp = Tool::CreateNotificationTable("LEVEL UP!!!\nYou receive 1 Friendship Point", "");
 		this->addChild(nodeLevelUp);

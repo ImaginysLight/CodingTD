@@ -83,11 +83,59 @@ void LobbyScene::UpdateAudio(float time)
 void LobbyScene::SetupGUI()
 {
 
-	auto sp_Background = Sprite::create("UI/Background/Default Background.png");
+	auto sp_Background = Sprite::create("UI/Login/BG.png");
 	sp_Background->setPosition(visibleSize / 2);
 	this->addChild(sp_Background, -1);
 
-	auto conquest = Trophy::CalculateConquestTrophy(Player::currentPlayer->total_win);
+	auto sp_SceneName = Sprite::create("UI/Lobby/head_coding.png");
+	sp_SceneName->setPosition(Vec2(visibleSize.width*0.5, visibleSize.height*0.8));
+	this->addChild(sp_SceneName);
+
+	auto btn_Audio = Tool::CreateButtonWithSpirte("btn_Audio", "UI/Lobby/btn_sound.png");
+	btn_Audio->addTouchEventListener(CC_CALLBACK_2(LobbyScene::btn_Click, this));
+	btn_Audio->setPosition(Vec2(visibleSize.width*0.1, visibleSize.height*0.6));
+	this->addChild(btn_Audio);
+
+	btn_Rank = Tool::CreateButtonWithSpirte("btn_Rank", "UI/Lobby/btn_rank.png");
+	btn_Rank->setPosition(Vec2(visibleSize.width*0.1, visibleSize.height*0.4));
+	btn_Rank->addTouchEventListener(CC_CALLBACK_2(LobbyScene::btn_Click, this));
+	this->addChild(btn_Rank);
+
+	auto btn_Credit = Tool::CreateButtonWithSpirte("btn_Credit", "UI/Lobby/btn_credit.png");
+	btn_Credit->setPosition(Vec2(visibleSize.width*0.1, visibleSize.height*0.2));
+	btn_Credit->addTouchEventListener(CC_CALLBACK_2(LobbyScene::btn_Click, this));
+	this->addChild(btn_Credit);
+
+	btn_Play = Tool::CreateButtonWithSpirte("btn_Play", "UI/Lobby/btn_start.png");
+	btn_Play->setPosition(Vec2(visibleSize.width*0.5, visibleSize.height*0.45));
+	btn_Play->addTouchEventListener(CC_CALLBACK_2(LobbyScene::btn_Click, this));
+	this->addChild(btn_Play);
+
+	btn_Room = Tool::CreateButtonWithSpirte("btn_Room", "UI/Lobby/btn_room.png");
+	btn_Room->setPosition(Vec2(visibleSize.width*0.5, visibleSize.height*0.3));
+	btn_Room->addTouchEventListener(CC_CALLBACK_2(LobbyScene::btn_Click, this));
+	this->addChild(btn_Room);
+
+	btn_Logout = Tool::CreateButtonWithSpirte("btn_Logout", "UI/Lobby/btn_exit.png");
+	btn_Logout->setPosition(Vec2(visibleSize.width*0.5, visibleSize.height*0.15));
+	btn_Logout->addTouchEventListener(CC_CALLBACK_2(LobbyScene::btn_Click, this));
+	this->addChild(btn_Logout);
+
+	auto btn_Achievement = Tool::CreateButtonWithSpirte("btn_Achievement", "UI/Lobby/btn_infor_player.png");
+	btn_Achievement->setPosition(Vec2(visibleSize.width*0.9, visibleSize.height*0.6));
+	btn_Achievement->addTouchEventListener(CC_CALLBACK_2(LobbyScene::btn_Click, this));
+	this->addChild(btn_Achievement);
+
+	auto btn_Card = Tool::CreateButtonWithSpirte("btn_Card", "UI/Lobby/btn_upgrade.png");
+	btn_Card->setPosition(Vec2(visibleSize.width*0.9, visibleSize.height*0.4));
+	btn_Card->addTouchEventListener(CC_CALLBACK_2(LobbyScene::btn_Click, this));
+	this->addChild(btn_Card);
+
+	btn_Tutorial = Tool::CreateButtonWithSpirte("btn_Tutorial", "UI/Lobby/btn_tutorial.png");
+	btn_Tutorial->setPosition(Vec2(visibleSize.width*0.9, visibleSize.height*0.2));
+	btn_Tutorial->addTouchEventListener(CC_CALLBACK_2(LobbyScene::btn_Click, this));
+	this->addChild(btn_Tutorial);
+	/*auto conquest = Trophy::CalculateConquestTrophy(Player::currentPlayer->total_win);
 	Sprite* sp_Trophy = Sprite::create("Trophy/Conquest Trophy " + to_string(conquest.level) + ".png");
 	sp_Trophy->setPosition(Vec2(visibleSize.width*0.5, visibleSize.height*0.5));
 	sp_Trophy->setScale(1.5);
@@ -95,50 +143,13 @@ void LobbyScene::SetupGUI()
 
 	auto nodePlayer = Player::CreatePlayerOutgameInfoGUI();
 	nodePlayer->setPosition(Vec2(visibleSize.width / 2, visibleSize.height*0.8));
-	this->addChild(nodePlayer);
+	this->addChild(nodePlayer);*/
 
 	lbl_Notify = Label::createWithTTF("", "fonts/arial.ttf", Tool::defaultTextSize);
 	lbl_Notify->setTextColor(Color4B::RED);
 	lbl_Notify->runAction(FadeOut::create(0));
 	lbl_Notify->setPosition(Vec2(visibleSize.width*0.5, visibleSize.height*0.15));
 	this->addChild(lbl_Notify,1);
-
-	btn_Rank = Tool::CreateButtonWithoutSprite("btn_Rank", "Ranking");
-	btn_Rank->setPosition(Vec2(visibleSize.width*0.9, visibleSize.height*0.4));
-	btn_Rank->addTouchEventListener(CC_CALLBACK_2(LobbyScene::btn_Click, this));
-	this->addChild(btn_Rank);
-
-	btn_Tutorial = Tool::CreateButtonWithSpirte("btn_Tutorial", "UI/LobbyScene/btn_Tutorial.png");
-	btn_Tutorial->setPosition(Vec2(visibleSize.width*0.1, visibleSize.height*0.4));
-	btn_Tutorial->addTouchEventListener(CC_CALLBACK_2(LobbyScene::btn_Click, this));
-	this->addChild(btn_Tutorial);
-
-	auto btn_Achievement = Tool::CreateButtonWithSpirte("btn_Achievement", "UI/LobbyScene/btn_Achievement.png");
-	btn_Achievement->setPosition(Vec2(visibleSize.width*0.1, visibleSize.height*0.15));
-	btn_Achievement->addTouchEventListener(CC_CALLBACK_2(LobbyScene::btn_Click, this));
-	this->addChild(btn_Achievement);
-
-	auto btn_Card = Tool::CreateButtonWithSpirte("btn_Card", "UI/LobbyScene/btn_Card.png");
-	btn_Card->setPosition(Vec2(visibleSize.width*0.3, visibleSize.height*0.15));
-	btn_Card->addTouchEventListener(CC_CALLBACK_2(LobbyScene::btn_Click, this));
-	this->addChild(btn_Card);
-
-	btn_Logout = Tool::CreateButtonWithoutSprite("btn_Logout", "Logout");
-	btn_Logout->setPosition(Vec2(visibleSize.width*0.9, visibleSize.height*0.15));
-	btn_Logout->addTouchEventListener(CC_CALLBACK_2(LobbyScene::btn_Click, this));
-	this->addChild(btn_Logout);
-
-	btn_Room = Tool::CreateButtonWithSpirte("btn_Room", "UI/LobbyScene/btn_Room.png");
-	btn_Room->setPosition(Vec2(visibleSize.width*0.7, visibleSize.height*0.15));
-	btn_Room->addTouchEventListener(CC_CALLBACK_2(LobbyScene::btn_Click, this));
-	this->addChild(btn_Room);
-
-	btn_Play = Tool::CreateButtonWithSpirte("btn_Play", "UI/LobbyScene/btn_Play.png");
-	btn_Play->setPosition(Vec2(visibleSize.width*0.5, visibleSize.height*0.15));
-	btn_Play->addTouchEventListener(CC_CALLBACK_2(LobbyScene::btn_Click, this));
-	this->addChild(btn_Play);
-
-	
 
 
 }
@@ -174,6 +185,9 @@ void LobbyScene::btn_Click(Ref *pSender, cocos2d::ui::Button::Widget::TouchEvent
 		}
 		if (name == "btn_Card") {
 			Director::getInstance()->replaceScene(CardScene::createScene());
+		}
+		if (name == "btn_Audio") {
+
 		}
 	}
 }

@@ -36,7 +36,7 @@ bool TutorialScene::init()
 		this->addChild(lbl_Tutorial);
 	}
 
-	auto sp_Background = Sprite::create("UI/LoginScene/background1.png");
+	auto sp_Background = Sprite::create("UI/Background/Default Background 1.png");
 	sp_Background->setPosition(visibleSize / 2);
 	this->addChild(sp_Background, -1);
 

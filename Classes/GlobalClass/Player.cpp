@@ -55,48 +55,34 @@ cocos2d::Node * Player::CreatePlayerOutgameInfoGUI()
 {
 	Node* result = Node::create();
 
+	auto lbl_Username = Label::create(Player::currentPlayer->username, "fonts/custom_font.ttf", Tool::defaultTextSize*1.5);
+	lbl_Username->setPositionX(-300);
+	lbl_Username->setAnchorPoint(Vec2(0, 0.5));
+	result->addChild(lbl_Username);
+
 	auto levelInfo = Player::CalculateLevel(Player::currentPlayer->experience);
-
-	auto sp_Level = Sprite::create("UI/LobbyScene/btn_Level.png");
-	sp_Level->setScale(1.25);
-	result->addChild(sp_Level);
-
-	auto lbl_Level = Tool::CreateLabel(to_string(levelInfo.first),Tool::defaultTextSize*0.8,Color4B::RED);
-	lbl_Level->enableBold();
-	result->addChild(lbl_Level);
 	
-	auto expBar = Tool::CreateBar(to_string(Player::currentPlayer->experience) + " / " + to_string(levelInfo.second), Color4B::WHITE, Size(200, 4), Color3B(175, 225, 250));
+	string level = to_string(Player::CalculateLevel(Player::currentPlayer->experience).first);
+	auto levelBar = Tool::CreateBar("Level", Color4B::WHITE, Size(200, 4), Color3B(175, 225, 250));
+	((ProgressTimer*)levelBar->getChildByName("Front Bar"))->setPercentage((Player::currentPlayer->experience / (float)levelInfo.second *100.0));
+	((Label*)levelBar->getChildByName("Content"))->setPositionY(14);
+	levelBar->setPositionX(75);
+	result->addChild(levelBar);
+
+	auto lbl_Level = Label::create(level + " / 25", "fonts/custom_font.ttf", Tool::defaultTextSize);
+	lbl_Level->setPosition(Vec2(75, -18));
+	result->addChild(lbl_Level);
+
+	auto expBar = Tool::CreateBar("Experience", Color4B::WHITE, Size(200, 4), Color3B(175, 225, 250));
 	((ProgressTimer*)expBar->getChildByName("Front Bar"))->setPercentage((Player::currentPlayer->experience / (float)levelInfo.second *100.0));
-	((Label*)expBar->getChildByName("Content"))->setPositionY(12);
-	expBar->setPosition(Vec2(0, -50));
+	((Label*)expBar->getChildByName("Content"))->setPositionY(14);
+	expBar->setPositionX(300);
 	result->addChild(expBar);
 	
-	auto lbl_PlayerName = Tool::CreateLabel(Player::currentPlayer->username, Tool::defaultTextSize*1.5);
-	lbl_PlayerName->setPosition(Vec2(0, 75));
-	result->addChild(lbl_PlayerName);
-
-	/*auto lbl_PlayerName = Tool::CreateLabel(Player::currentPlayer->username, Tool::defaultTextSize*1.5);
-	result->addChild(lbl_PlayerName);
-
-	auto levelInfo = Player::CalculateLevel(Player::currentPlayer->experience);
-
-	auto lbl_Level = Tool::CreateLabel("Level: " + to_string(levelInfo.first));
-	lbl_Level->setPosition(Vec2(lbl_PlayerName->getBoundingBox().size.width, 0));
-	result->addChild(lbl_Level);
-
-	auto lbl_Exp = Tool::CreateLabel("Experience");
-	lbl_Exp->setPosition(Vec2(lbl_Level->getPositionX() +  175, 12));
+	auto lbl_Exp = Label::create(to_string(Player::currentPlayer->experience) + " / " + to_string(levelInfo.second), "fonts/custom_font.ttf", Tool::defaultTextSize);
+	lbl_Exp->setPosition(Vec2(300, -18));
 	result->addChild(lbl_Exp);
 
-	auto expBar = Tool::CreateBar(to_string(Player::currentPlayer->experience) + " / " + to_string(levelInfo.second), Color4B::RED, Size(200, 25), Color3B(250, 250, 200));
-	((ProgressTimer*)expBar->getChildByName("Front Bar"))->setPercentage((Player::currentPlayer->experience / (float)levelInfo.second *100.0));
-	expBar->setPosition(Vec2(lbl_Level->getPositionX() + 175, -12));
-	result->addChild(expBar);
-
-	auto lbl_Friendship = Tool::CreateLabel("Friendship: " + to_string(Player::currentPlayer->friendshipPoint));
-	lbl_Friendship->setPosition(Vec2(lbl_Level->getPositionX() + 350, 0));
-	lbl_Friendship->setName("lbl_Friendship");
-	result->addChild(lbl_Friendship);*/
 	return result;
 }
 

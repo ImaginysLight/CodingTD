@@ -107,7 +107,8 @@ Node * Tool::CreateBar(string content, Color4B textColor, Size size, Color3B fro
 	background->setPosition(-Vec2(frontBar->getBoundingBox().size.width / 2, frontBar->getBoundingBox().size.height / 2));
 	result->addChild(background, -1);
 
-	auto lbl_Content = Tool::CreateLabel(content, Tool::defaultTextSize, Color4B::WHITE, TextHAlignment::CENTER);
+	auto lbl_Content = Label::create(content, "fonts/custom_font.ttf", Tool::defaultTextSize,Size::ZERO,cocos2d::TextHAlignment::CENTER);
+	lbl_Content->setTextColor(Color4B::WHITE);
 	lbl_Content->setName("Content");
 	lbl_Content->setTextColor(textColor);
 	result->addChild(lbl_Content, 1);
@@ -187,7 +188,7 @@ EditBox * Tool::CreateEditBox(string placeholder, Size size)
 	result->setPlaceHolder(placeholder.c_str());
 	result->setMaxLength(100);
 
-	auto sp_EditBox = Sprite::create("UI/GameScene/bgEditBox.png");
+	auto sp_EditBox = Sprite::create("UI/Login/editbox.png");
 	sp_EditBox->setAnchorPoint(Vec2(0, 0));
 	Tool::setNodeSize(sp_EditBox, result->getBoundingBox().size.width, result->getBoundingBox().size.height);
 	result->addChild(sp_EditBox, -1);
