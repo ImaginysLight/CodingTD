@@ -87,6 +87,7 @@ bool PlayerInformationScene::init()
 	if (conquest.level != 0) {
 		auto sp_Conquest = Sprite::create("Trophy/Conquest Trophy " + to_string(conquest.level) + ".png");
 		sp_Conquest->setPosition(Vec2(visibleSize.width*0.5, visibleSize.height*0.45));
+		Tool::setNodeSize(sp_Conquest, 120, 120);
 		this->addChild(sp_Conquest, 1);
 
 		auto lbl_Conquest = Tool::CreateLabel(
