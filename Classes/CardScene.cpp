@@ -13,102 +13,68 @@ bool CardScene::init()
 
 	scroll_UI = ui::ScrollView::create();
 	scroll_UI->setContentSize(Size(visibleSize));
-	scroll_UI->setInnerContainerSize(Size(visibleSize.width, 1200));
-	scroll_UI->setPosition(Vec2(visibleSize.width*0.7, visibleSize.height*0.5));
+	scroll_UI->setInnerContainerSize(Size(visibleSize.width, visibleSize.height * 2));
+	scroll_UI->setPosition(Vec2(visibleSize.width*0.5, visibleSize.height*0.5));
 	scroll_UI->setAnchorPoint(Vec2(0.5, 0.5));
 	scroll_UI->setBounceEnabled(true);
-	this->addChild(scroll_UI);
+	this->addChild(scroll_UI, 0);
 
-	dynamicUI = Node::create();
-	scroll_UI->addChild(dynamicUI);
-	dynamicUI->setPositionY(scroll_UI->getInnerContainerSize().height - visibleSize.height);
+	sceneUpgrade = Node::create();
+	scroll_UI->addChild(sceneUpgrade, 1);
+	sceneUpgrade->setPositionY(scroll_UI->getInnerContainerSize().height - visibleSize.height);
 
-	auto sp_Friendship = Sprite::create("UI/CardScene/friendship.png");
-	sp_Friendship->setPosition(Vec2(visibleSize.width*0.05, visibleSize.height*0.9));
-	this->addChild(sp_Friendship);
+	SetupGUI_sceneUpgrade();
 
-	lbl_Friendship = Tool::CreateLabel(to_string(Player::currentPlayer->friendshipPoint), Tool::defaultTextSize*1.25, Color4B::GREEN);
-	lbl_Friendship->setName("lbl_Friendship");
-	lbl_Friendship->setPosition(Vec2(100,39));
-	sp_Friendship->addChild(lbl_Friendship);
-	
-	auto btn_LobbyScene = Tool::CreateButtonWithoutSprite("btn_LobbyScene", "<< Back To Lobby", Tool::defaultTextSize, Color3B::MAGENTA);
-	btn_LobbyScene->runAction(RepeatForever::create(Sequence::create(
-		MoveBy::create(1, Vec2(25, 0)),
-		MoveBy::create(1, Vec2(-25, 0)),
-		nullptr)));
-	btn_LobbyScene->setPosition(Vec2(visibleSize.width*0.08, visibleSize.height*0.05));
-	btn_LobbyScene->addTouchEventListener(CC_CALLBACK_2(CardScene::btn_Click, this));
-	this->addChild(btn_LobbyScene,2);
 
-	friendshipNode = Node::create();
-	friendshipNode->setPosition(Vec2(visibleSize.width*0.3, visibleSize.height*-0.85));
-	dynamicUI->addChild(friendshipNode);
+	//dynamicUI = Node::create();
+	//scroll_UI->addChild(dynamicUI);
+	//dynamicUI->setPositionY(scroll_UI->getInnerContainerSize().height - visibleSize.height);
 
-	detailNode_Before = Node::create();
-	detailNode_Before->setPosition(Vec2(visibleSize.width *0.1, visibleSize.height*0.05));
-	dynamicUI->addChild(detailNode_Before);
+	//auto sp_Friendship = Sprite::create("UI/CardScene/friendship.png");
+	//sp_Friendship->setPosition(Vec2(visibleSize.width*0.05, visibleSize.height*0.9));
+	//this->addChild(sp_Friendship);
 
-	auto lbl_After = Tool::CreateLabel("After Friendship Effect", Tool::defaultTextSize*1.2, Color4B::GREEN);
-	lbl_After->setName("lbl_After");
-	lbl_After->setPosition(Vec2(visibleSize.width*0.4, visibleSize.height*-0.275));
-	dynamicUI->addChild(lbl_After);
+	//lbl_Friendship = Tool::CreateLabel(to_string(Player::currentPlayer->friendshipPoint), Tool::defaultTextSize*1.25, Color4B::GREEN);
+	//lbl_Friendship->setName("lbl_Friendship");
+	//lbl_Friendship->setPosition(Vec2(100, 39));
+	//sp_Friendship->addChild(lbl_Friendship);
 
-	detailNode_After = Node::create();
-	detailNode_After->setPosition(Vec2(visibleSize.width *0.1, visibleSize.height*-0.5));
-	dynamicUI->addChild(detailNode_After);
+	//auto btn_LobbyScene = Tool::CreateButtonWithoutSprite("btn_LobbyScene", "<< Back To Lobby", Tool::defaultTextSize, Color3B::MAGENTA);
+	//btn_LobbyScene->runAction(RepeatForever::create(Sequence::create(
+	//	MoveBy::create(1, Vec2(25, 0)),
+	//	MoveBy::create(1, Vec2(-25, 0)),
+	//	nullptr)));
+	//btn_LobbyScene->setPosition(Vec2(visibleSize.width*0.08, visibleSize.height*0.05));
+	//btn_LobbyScene->addTouchEventListener(CC_CALLBACK_2(CardScene::btn_Click, this));
+	//this->addChild(btn_LobbyScene, 2);
 
-	spriteNode = Node::create();
-	spriteNode->setPosition(Vec2(visibleSize.width*0.17, visibleSize.height*0.95));
-	dynamicUI->addChild(spriteNode);
+	//friendshipNode = Node::create();
+	//friendshipNode->setPosition(Vec2(visibleSize.width*0.3, visibleSize.height*-0.85));
+	//dynamicUI->addChild(friendshipNode);
 
-	skillNode = Node::create();
-	skillNode->setPosition(Vec2(visibleSize.width*0.3, visibleSize.height*0.85));
-	dynamicUI->addChild(skillNode);
+	//fullDetails = Node::create();
+	//fullDetails->setPosition(Vec2(visibleSize.width *0.1, visibleSize.height*0.05));
+	//dynamicUI->addChild(fullDetails);
 
-	scroll_Navigator = ui::ScrollView::create();
-	scroll_Navigator->setContentSize(Size(200, 400));
-	scroll_Navigator->setInnerContainerSize(Size(200, 900));
-	scroll_Navigator->setPosition(Vec2(0, visibleSize.height*0.815));
-	scroll_Navigator->setAnchorPoint(Vec2(0, 1));
-	scroll_Navigator->setBounceEnabled(true);
-	this->addChild(scroll_Navigator);
+	//auto lbl_After = Tool::CreateLabel("After Friendship Effect", Tool::defaultTextSize*1.2, Color4B::GREEN);
+	//lbl_After->setName("lbl_After");
+	//lbl_After->setPosition(Vec2(visibleSize.width*0.4, visibleSize.height*-0.275));
+	//dynamicUI->addChild(lbl_After);
 
-	vector<string> cardName;
-	cardName.push_back("Hotheaded Gunner");
-	cardName.push_back("Crazy Wolf");
-	cardName.push_back("Helicopter");
-	cardName.push_back("Dead Walker");
-	cardName.push_back("UFO Driver");
-	cardName.push_back("Winged Orc");
-	cardName.push_back("Liquid Assassin");
-	cardName.push_back("Elemental Alien");
+	//detailNode_After = Node::create();
+	//detailNode_After->setPosition(Vec2(visibleSize.width *0.1, visibleSize.height*-0.5));
+	//dynamicUI->addChild(detailNode_After);
 
-	cardName.push_back("Frost Wyvern");
-	cardName.push_back("Polar Bear");
-	cardName.push_back("Volcarona");
-	cardName.push_back("Enraged Ursa");
-	cardName.push_back("Poisonous Butterfly");
-	cardName.push_back("Vampire Dragon");
+	//spriteNode = Node::create();
+	//spriteNode->setPosition(Vec2(visibleSize.width*0.17, visibleSize.height*0.95));
+	//dynamicUI->addChild(spriteNode);
 
-	cardName.push_back("Frozen Kingdom");
-	cardName.push_back("Flamed Kingdom");
-	cardName.push_back("Blessed Kingdom");
-	for (int i = 0; i < cardName.size(); i++) {
-		Button* btn = Tool::CreateButtonWithoutSprite(cardName[i], cardName[i], Tool::defaultTextSize, Color3B::GRAY);
-		btn->setAnchorPoint(Vec2(0, 0.5));
-		btn->addTouchEventListener(CC_CALLBACK_2(CardScene::btn_Navigator_Click, this));
-		btn->setPosition(Vec2(10, 850 - 50 * i));
-		scroll_Navigator->addChild(btn);
-		vec_Card.insert({ cardName[i],btn });
-		auto sp = Sprite::create("UI/CardScene/UnitDetailsTable.png");
-		sp->setPosition(Vec2(10, 850 - 50 * i));
-		Tool::setNodeSize(sp, 200, 50);
-		sp->setAnchorPoint(Vec2(0.1, 0.5));
-		scroll_Navigator->addChild(sp,-1);
-	}
-	vec_Card["Hotheaded Gunner"]->setTitleColor(Color3B(175, 225, 200));
-	CardScene::RefreshScene("Hotheaded Gunner");
+	//skillNode = Node::create();
+	//skillNode->setPosition(Vec2(visibleSize.width*0.3, visibleSize.height*0.85));
+	//dynamicUI->addChild(skillNode);
+
+	///*vec_Card["Hotheaded Gunner"]->setTitleColor(Color3B(175, 225, 200));
+	//CardScene::RefreshScene("Hotheaded Gunner");*/
 
 	this->schedule(schedule_selector(LobbyScene::UpdateAudio), 1);
 	return true;
@@ -134,9 +100,9 @@ void CardScene::btn_UpFriendship_Click(Ref * pSender, cocos2d::ui::Button::Widge
 		else {
 			Player::currentPlayer->friendshipPoint--;
 			Player::currentPlayer->friendshipLevel[name] ++;
-			RefreshScene(name);
 			RunActionNotify("Upgrade successful!");
 			Player::UploadPlayerInfo(Player::currentPlayer);
+			RefreshScene_Upgrade(name);
 		}
 		((Node*)pSender)->getParent()->runAction(RemoveSelf::create());
 		lbl_Friendship->setString(to_string(Player::currentPlayer->friendshipPoint));
@@ -149,13 +115,42 @@ void CardScene::btn_DownFriendship_Click(Ref * pSender, cocos2d::ui::Button::Wid
 		string name = ((Node*)pSender)->getName();
 		Player::currentPlayer->friendshipPoint++;
 		Player::currentPlayer->friendshipLevel[name] --;
-		RefreshScene(name);
+		RefreshScene_Upgrade(name);
 		RunActionNotify("Downgrade successful!");
 		Player::UploadPlayerInfo(Player::currentPlayer);
 
 		((Node*)pSender)->getParent()->runAction(RemoveSelf::create());
 		lbl_Friendship->setString(to_string(Player::currentPlayer->friendshipPoint));
 
+	}
+}
+
+void CardScene::btn_Friendship_Click(Ref * pSender, cocos2d::ui::Button::Widget::TouchEventType type)
+{
+	if (type == Widget::TouchEventType::ENDED) {
+		auto btn = (Button*)pSender;
+		if (btn->getTag() == 1) {
+			if (Player::currentPlayer->friendshipLevel[btn->getName()] == 5)
+				RunActionNotify(btn->getName() + "'s Friendship already at maximum level!");
+			else {
+				auto notify = Tool::CreateNotificationTable("Upgrade 1 Friendship level for " + btn->getName(), "Cancel", "Process");
+				notify->setPosition(visibleSize / 2);
+				((Button*)notify->getChildByName("btn_Left"))->addTouchEventListener(CC_CALLBACK_2(CardScene::btn_UpFriendship_Click, this));
+				((Button*)notify->getChildByName("btn_Left"))->setName(btn->getName());
+				sceneUpgrade->addChild(notify);
+			}
+		}
+		else if (btn->getTag() == -1) {
+			if (Player::currentPlayer->friendshipLevel[btn->getName()] == 0)
+				RunActionNotify(btn->getName() + "'s Friendship already at minimum level!");
+			else {
+				auto notify = Tool::CreateNotificationTable("Downgrade 1 Friendship level for " + btn->getName(), "Cancel", "Process");
+				notify->setPosition(visibleSize / 2);
+				((Button*)notify->getChildByName("btn_Left"))->addTouchEventListener(CC_CALLBACK_2(CardScene::btn_DownFriendship_Click, this));
+				((Button*)notify->getChildByName("btn_Left"))->setName(btn->getName());
+				sceneUpgrade->addChild(notify);
+			}
+		}
 	}
 }
 
@@ -169,6 +164,12 @@ void CardScene::btn_Click(Ref * pSender, cocos2d::ui::Button::Widget::TouchEvent
 		}*/
 		if (((Node*)pSender)->getName() == "btn_LobbyScene") {
 			Director::getInstance()->replaceScene(LobbyScene::createScene());
+		}
+		else if (((Node*)pSender)->getName() == "btn_Back") {
+			Director::getInstance()->replaceScene(LobbyScene::createScene());
+		}
+		else if (((Node*)pSender)->getName() == "btn_Info") {
+			//
 		}
 		auto btn = (Button*)pSender;
 		if (btn->getTitleText() == "Up") {
@@ -200,13 +201,14 @@ void CardScene::btn_Navigator_Click(Ref * pSender, cocos2d::ui::Button::Widget::
 {
 	if (type == Widget::TouchEventType::ENDED) {
 		string name = ((Node*)pSender)->getName();
-		for (auto card : vec_Card) {
+		/*for (auto card : vec_Card) {
 			card.second->setTitleColor(Color3B::GRAY);
 		}
 		vec_Card[name]->setTitleColor(Color3B(175, 225, 200));
 		if(name.find("Kingdom") == std::string::npos)
 			RefreshScene(name);
-		else RefreshSceneKingdom(name);
+		else RefreshSceneKingdom(name);*/
+		RefreshScene_Upgrade(name);
 	}
 }
 
@@ -283,40 +285,40 @@ void CardScene::RefreshScene(string unitName)
 	friendship.btn_Down->addTouchEventListener(CC_CALLBACK_2(CardScene::btn_Click, this));
 	friendshipNode->addChild(friendship.root);
 
-	CardScene::detailNode_Before->removeAllChildrenWithCleanup(true);
+	CardScene::fullDetails->removeAllChildrenWithCleanup(true);
 	int currentFriendship = Player::currentPlayer->friendshipLevel[unitName];
 	Player::currentPlayer->friendshipLevel[unitName] = 0;
 	vector<UnitDetailsTable> detailNodeBefore, detailNodeAfter;
 	int numOfLevel = IngameObject::GetNumOfLevel(unitName);
 
 	for (int i = 1; i <= numOfLevel; i++) {
-		detailNodeBefore.push_back(UnitDetailsTable(*ObjectConstructor::InitializeObject(unitName+ " " + to_string(i), 0, 1, 0, -1), Vec2(0, 0)));
+		detailNodeBefore.push_back(UnitDetailsTable(*ObjectConstructor::InitializeObject(unitName + " " + to_string(i), 0, 1, 0, -1), Vec2(0, 0)));
 		detailNodeBefore[i - 1].root->setName("level" + to_string(i));
-		detailNode_Before->addChild(detailNodeBefore[i - 1].root);
+		fullDetails->addChild(detailNodeBefore[i - 1].root);
 	}
-	if (numOfLevel == 2) detailNode_Before->getChildByName("level1")->setPositionX(visibleSize.width*0.2);
-	if (numOfLevel == 3) detailNode_Before->getChildByName("level1")->setPositionX(visibleSize.width*0.1);
+	if (numOfLevel == 2) fullDetails->getChildByName("level1")->setPositionX(visibleSize.width*0.2);
+	if (numOfLevel == 3) fullDetails->getChildByName("level1")->setPositionX(visibleSize.width*0.1);
 	for (int i = 1; i < detailNodeBefore.size(); i++) {
-		detailNode_Before->getChildByName("level" + to_string(i + 1))->setPosition(detailNode_Before->getChildByName("level" + to_string(i))->getPosition() + Vec2(visibleSize.width*0.2,0));
-		
+		fullDetails->getChildByName("level" + to_string(i + 1))->setPosition(fullDetails->getChildByName("level" + to_string(i))->getPosition() + Vec2(visibleSize.width*0.2, 0));
+
 		auto object = ObjectConstructor::InitializeObject(unitName + " " + to_string(i), 0, 1, 0, -1);
 		auto lbl_UpgradeGold = Tool::CreateLabel("Gold: " + to_string(object->upgradeGoldCost), Tool::defaultTextSize, Color4B::YELLOW, TextHAlignment::CENTER);
-		lbl_UpgradeGold->setPosition(detailNode_Before->getChildByName("level" + to_string(i))->getPosition() + Vec2(visibleSize.width*0.1, visibleSize.height*0.35));
-		detailNode_Before->addChild(lbl_UpgradeGold);
+		lbl_UpgradeGold->setPosition(fullDetails->getChildByName("level" + to_string(i))->getPosition() + Vec2(visibleSize.width*0.1, visibleSize.height*0.35));
+		fullDetails->addChild(lbl_UpgradeGold);
 
 		auto lbl_UpgradeKnowledge = Tool::CreateLabel("Knowledge: " + to_string(object->upgradeKnowledgeCost), Tool::defaultTextSize, Color4B(175, 225, 200, 255), TextHAlignment::CENTER);
-		lbl_UpgradeKnowledge->setPosition(detailNode_Before->getChildByName("level" + to_string(i))->getPosition() + Vec2(visibleSize.width*0.1, visibleSize.height*0.3));
-		detailNode_Before->addChild(lbl_UpgradeKnowledge);
-		
+		lbl_UpgradeKnowledge->setPosition(fullDetails->getChildByName("level" + to_string(i))->getPosition() + Vec2(visibleSize.width*0.1, visibleSize.height*0.3));
+		fullDetails->addChild(lbl_UpgradeKnowledge);
+
 		auto lbl_LevelRequired = Tool::CreateLabel("Kingdom Required: " + to_string(object->upgradeLevelRequired), Tool::defaultTextSize, Color4B::RED, TextHAlignment::CENTER);
-		lbl_LevelRequired->setPosition(detailNode_Before->getChildByName("level" + to_string(i))->getPosition() + Vec2(visibleSize.width*0.1, visibleSize.height*0.25));
-		detailNode_Before->addChild(lbl_LevelRequired);
+		lbl_LevelRequired->setPosition(fullDetails->getChildByName("level" + to_string(i))->getPosition() + Vec2(visibleSize.width*0.1, visibleSize.height*0.25));
+		fullDetails->addChild(lbl_LevelRequired);
 
 		auto sp_Arrow = Sprite::create("UI/CardScene/Long Arrow.png");
 		sp_Arrow->setScale(0.25);
 		sp_Arrow->setRotation(-90);
-		sp_Arrow->setPosition(detailNode_Before->getChildByName("level" + to_string(i))->getPosition() + Vec2(visibleSize.width*0.1, visibleSize.height*0.2));
-		detailNode_Before->addChild(sp_Arrow);
+		sp_Arrow->setPosition(fullDetails->getChildByName("level" + to_string(i))->getPosition() + Vec2(visibleSize.width*0.1, visibleSize.height*0.2));
+		fullDetails->addChild(sp_Arrow);
 	}
 
 	CardScene::detailNode_After->removeAllChildrenWithCleanup(true);
@@ -326,9 +328,9 @@ void CardScene::RefreshScene(string unitName)
 		detailNodeAfter[i - 1].root->setName("level" + to_string(i));
 		detailNode_After->addChild(detailNodeAfter[i - 1].root);
 	}
-	detailNode_After->getChildByName("level1")->setPosition(detailNode_Before->getChildByName("level1")->getPosition());
+	detailNode_After->getChildByName("level1")->setPosition(fullDetails->getChildByName("level1")->getPosition());
 	for (int i = 1; i < detailNodeBefore.size(); i++) {
-		detailNode_After->getChildByName("level" + to_string(i + 1))->setPosition(detailNode_Before->getChildByName("level" + to_string(i))->getPosition() + Vec2(visibleSize.width*0.2, 0));
+		detailNode_After->getChildByName("level" + to_string(i + 1))->setPosition(fullDetails->getChildByName("level" + to_string(i))->getPosition() + Vec2(visibleSize.width*0.2, 0));
 	}
 
 	CardScene::spriteNode->removeAllChildrenWithCleanup(true);
@@ -336,20 +338,20 @@ void CardScene::RefreshScene(string unitName)
 	sp->setPosition(Vec2(0, visibleSize.height*-0.25));
 	spriteNode->addChild(sp);
 	auto lbl_Gold = Tool::CreateLabel(to_string(ObjectConstructor::InitializeObject(unitName + " 1", 0, 1, 0, -1)->goldCost), Tool::defaultTextSize*0.8, Color4B::YELLOW);
-	lbl_Gold->setPosition(Vec2(-5,-89));
+	lbl_Gold->setPosition(Vec2(-5, -89));
 	lbl_Gold->enableBold();
 	spriteNode->addChild(lbl_Gold);
 	auto lbl_Name = Tool::CreateLabel(unitName, Tool::defaultTextSize*1.5, Color4B(200, 75, 150, 255));
 	lbl_Name->setPosition(Vec2(visibleSize.width*0.23, -15));
 	spriteNode->addChild(lbl_Name);
 
-	if (unitName.find("Frost Wyvern") != std::string::npos || unitName.find("Polar Bear") != std::string::npos) lbl_Name->setTextColor(Color4B(175,225,250,255));
+	if (unitName.find("Frost Wyvern") != std::string::npos || unitName.find("Polar Bear") != std::string::npos) lbl_Name->setTextColor(Color4B(175, 225, 250, 255));
 	if (unitName.find("Volcarona") != std::string::npos || unitName.find("Enraged Ursa") != std::string::npos) lbl_Name->setTextColor(Color4B::RED);
-	if (unitName.find("Poisonous Butterfly") != std::string::npos || unitName.find("Vampire Dragon") != std::string::npos) lbl_Name->setTextColor(Color4B(175,225,200,255));
+	if (unitName.find("Poisonous Butterfly") != std::string::npos || unitName.find("Vampire Dragon") != std::string::npos) lbl_Name->setTextColor(Color4B(175, 225, 200, 255));
 
 
 	CardScene::skillNode->removeAllChildrenWithCleanup(true);
-	Label* lbl_Skill = Tool::CreateLabel("",Tool::defaultTextSize*0.9,Color4B(255,230,255,255),TextHAlignment::CENTER);
+	Label* lbl_Skill = Tool::CreateLabel("", Tool::defaultTextSize*0.9, Color4B(255, 230, 255, 255), TextHAlignment::CENTER);
 	lbl_Skill->setAnchorPoint(Vec2(0, 1));
 	lbl_Skill->setMaxLineWidth(400);
 	skillNode->addChild(lbl_Skill);
@@ -364,43 +366,43 @@ void CardScene::RefreshSceneKingdom(string unitName)
 	dynamicUI->getChildByName("lbl_After")->setVisible(false);
 	CardScene::friendshipNode->removeAllChildrenWithCleanup(true);
 
-	CardScene::detailNode_Before->removeAllChildrenWithCleanup(true);
+	CardScene::fullDetails->removeAllChildrenWithCleanup(true);
 	auto KingdomLevel1 = ObjectConstructor::InitializeObject(unitName, 0, 0, 0, -1);
 	auto UnitDetail = UnitDetailsTable(*KingdomLevel1, Vec2(0, 0));
 	UnitDetail.root->setPositionX(visibleSize.width*0.1);
-	detailNode_Before->addChild(UnitDetail.root);
+	fullDetails->addChild(UnitDetail.root);
 	auto lbl_UpgradeGold1 = Tool::CreateLabel("Gold: " + to_string(KingdomLevel1->upgradeGoldCost), Tool::defaultTextSize, Color4B::YELLOW, TextHAlignment::CENTER);
 	lbl_UpgradeGold1->setPosition(Vec2(visibleSize.width*0.2, visibleSize.height*0.35));
-	detailNode_Before->addChild(lbl_UpgradeGold1);
+	fullDetails->addChild(lbl_UpgradeGold1);
 	auto lbl_UpgradeKnowledge1 = Tool::CreateLabel("Knowledge: " + to_string(KingdomLevel1->upgradeKnowledgeCost), Tool::defaultTextSize, Color4B(175, 225, 200, 255), TextHAlignment::CENTER);
 	lbl_UpgradeKnowledge1->setPosition(Vec2(visibleSize.width*0.2, visibleSize.height*0.3));
-	detailNode_Before->addChild(lbl_UpgradeKnowledge1);
+	fullDetails->addChild(lbl_UpgradeKnowledge1);
 	auto sp_Arrow1 = Sprite::create("UI/CardScene/Long Arrow.png");
 	sp_Arrow1->setScale(0.25);
 	sp_Arrow1->setRotation(-90);
 	sp_Arrow1->setPosition(Vec2(visibleSize.width*0.2, visibleSize.height*0.2));
-	detailNode_Before->addChild(sp_Arrow1);
+	fullDetails->addChild(sp_Arrow1);
 
 	KingdomLevel1->Upgrade();
 	UnitDetail = UnitDetailsTable(*KingdomLevel1, Vec2(0, 0));
 	UnitDetail.root->setPositionX(visibleSize.width*0.3);
-	detailNode_Before->addChild(UnitDetail.root);
+	fullDetails->addChild(UnitDetail.root);
 	auto lbl_UpgradeGold2 = Tool::CreateLabel("Gold: " + to_string(KingdomLevel1->upgradeGoldCost), Tool::defaultTextSize, Color4B::YELLOW, TextHAlignment::CENTER);
 	lbl_UpgradeGold2->setPosition(Vec2(visibleSize.width*0.4, visibleSize.height*0.35));
-	detailNode_Before->addChild(lbl_UpgradeGold2);
+	fullDetails->addChild(lbl_UpgradeGold2);
 	auto lbl_UpgradeKnowledge2 = Tool::CreateLabel("Knowledge: " + to_string(KingdomLevel1->upgradeKnowledgeCost), Tool::defaultTextSize, Color4B(175, 225, 200, 255), TextHAlignment::CENTER);
 	lbl_UpgradeKnowledge2->setPosition(Vec2(visibleSize.width*0.4, visibleSize.height*0.3));
-	detailNode_Before->addChild(lbl_UpgradeKnowledge2);
+	fullDetails->addChild(lbl_UpgradeKnowledge2);
 	auto sp_Arrow2 = Sprite::create("UI/CardScene/Long Arrow.png");
 	sp_Arrow2->setScale(0.25);
 	sp_Arrow2->setRotation(-90);
 	sp_Arrow2->setPosition(Vec2(visibleSize.width*0.4, visibleSize.height*0.2));
-	detailNode_Before->addChild(sp_Arrow2);
+	fullDetails->addChild(sp_Arrow2);
 
 	KingdomLevel1->Upgrade();
 	UnitDetail = UnitDetailsTable(*KingdomLevel1, Vec2(0, 0));
 	UnitDetail.root->setPositionX(visibleSize.width*0.5);
-	detailNode_Before->addChild(UnitDetail.root);
+	fullDetails->addChild(UnitDetail.root);
 
 	CardScene::detailNode_After->removeAllChildrenWithCleanup(true);
 
@@ -414,7 +416,7 @@ void CardScene::RefreshSceneKingdom(string unitName)
 	spriteNode->addChild(lbl_Name);
 
 	if (unitName.find("Flamed") != std::string::npos) lbl_Name->setTextColor(Color4B::RED);
-	if (unitName.find("Blessed") != std::string::npos) lbl_Name->setTextColor(Color4B(175,225,200,255));
+	if (unitName.find("Blessed") != std::string::npos) lbl_Name->setTextColor(Color4B(175, 225, 200, 255));
 
 	CardScene::skillNode->removeAllChildrenWithCleanup(true);
 	Label* lbl_Skill = Tool::CreateLabel("", Tool::defaultTextSize*0.9, Color4B(255, 230, 255, 255), TextHAlignment::CENTER);
@@ -427,13 +429,240 @@ void CardScene::RefreshSceneKingdom(string unitName)
 	}
 }
 
+void CardScene::RefreshScene_Upgrade(string unitName)
+{
+	lbl_Friendship->setString(to_string(Player::currentPlayer->friendshipPoint));
+	auto friendship = FriendShipUpgrade(unitName, Player::currentPlayer->friendshipLevel[unitName]);
+	sceneUpgrade_friendshipNode->removeAllChildrenWithCleanup(true);
+	sceneUpgrade_friendshipNode->addChild(friendship.root);
+
+	auto currentLevel = Player::currentPlayer->friendshipLevel[unitName];
+	Player::currentPlayer->friendshipLevel[unitName] = 0;
+	sceneUpgrade_Before->removeAllChildrenWithCleanup(true);
+	auto before = UnitDetailsTable(*ObjectConstructor::InitializeObject(unitName + " 1", 0, 1, 0, -1), Vec2(0, 0));
+	sceneUpgrade_Before->addChild(before.root);
+
+	btn_Up->setName(unitName);
+	btn_Down->setName(unitName);
+
+	Player::currentPlayer->friendshipLevel[unitName] = currentLevel;
+	sceneUpgrade_After->removeAllChildrenWithCleanup(true);
+	auto after = UnitDetailsTable(*ObjectConstructor::InitializeObject(unitName + " 1", 0, 1, 0, -1), Vec2(0, 0));
+	sceneUpgrade_After->addChild(after.root);
+
+	
+	CardScene::skillNode->removeAllChildrenWithCleanup(true);
+	Label* lbl_Skill = Tool::CreateLabel("", Tool::defaultTextSize*0.9, Color4B(255, 230, 255, 255), TextHAlignment::CENTER);
+	lbl_Skill->setAnchorPoint(Vec2(0.5, 1));
+	lbl_Skill->setMaxLineWidth(visibleSize.width*0.8);
+	skillNode->addChild(lbl_Skill);
+	auto skillDetail = CardScene::GetSkillDetail(unitName);
+	for (auto detail : skillDetail) {
+		lbl_Skill->setString(lbl_Skill->getString() + detail + "\n\n");
+	}
+	auto sp_Background = Sprite::create("UI/Lobby/long_frame.png");
+	sp_Background->setAnchorPoint(Vec2(0.5, 1));
+	sp_Background->setPositionY(20);
+	Tool::setNodeSize(sp_Background, sp_Background->getBoundingBox().size.width, lbl_Skill->getBoundingBox().size.height);
+	skillNode->addChild(sp_Background, -1);
+
+	CardScene::fullDetails->removeAllChildrenWithCleanup(true);
+	vector<UnitDetailsTable> detailNodeBefore;
+	int numOfLevel = IngameObject::GetNumOfLevel(unitName);
+
+	for (int i = 1; i <= numOfLevel; i++) {
+		detailNodeBefore.push_back(UnitDetailsTable(*ObjectConstructor::InitializeObject(unitName + " " + to_string(i), 0, 1, 0, -1), Vec2(0, 0)));
+		detailNodeBefore[i - 1].root->setName("level" + to_string(i));
+		fullDetails->addChild(detailNodeBefore[i - 1].root);
+	}
+	fullDetails->getChildByName("level1")->setPositionX(visibleSize.width*(-0.125*(numOfLevel - 1)));
+	for (int i = 1; i < detailNodeBefore.size(); i++) {
+		fullDetails->getChildByName("level" + to_string(i + 1))->setPosition(fullDetails->getChildByName("level" + to_string(i))->getPosition() + Vec2(visibleSize.width*0.25, 0));
+
+		auto object = ObjectConstructor::InitializeObject(unitName + " " + to_string(i), 0, 1, 0, -1);
+
+
+		auto lbl_UpgradeGold = Tool::CreateLabel(to_string(object->upgradeGoldCost), Tool::defaultTextSize, Color4B::YELLOW, TextHAlignment::CENTER);
+		lbl_UpgradeGold->setPosition(fullDetails->getChildByName("level" + to_string(i))->getPosition() + Vec2(visibleSize.width*0.075, visibleSize.height*0.25));
+		fullDetails->addChild(lbl_UpgradeGold);
+
+		auto sp_Gold = Sprite::create("UI/GameScene/gold.png");
+		sp_Gold->setPosition(lbl_UpgradeGold->getPosition() + Vec2(-30, 0));
+		Tool::setNodeSize(sp_Gold, 25, 25);
+		fullDetails->addChild(sp_Gold);
+
+		auto lbl_UpgradeKnowledge = Tool::CreateLabel(to_string(object->upgradeKnowledgeCost), Tool::defaultTextSize, Color4B(175, 225, 200, 255), TextHAlignment::CENTER);
+		lbl_UpgradeKnowledge->setPosition(fullDetails->getChildByName("level" + to_string(i))->getPosition() + Vec2(visibleSize.width*0.15, visibleSize.height*0.25));
+		fullDetails->addChild(lbl_UpgradeKnowledge);
+
+		auto sp_Knowledge = Sprite::create("UI/GameScene/knowledge.png");
+		sp_Knowledge->setPosition(lbl_UpgradeKnowledge->getPosition() + Vec2(-25, 0));
+		Tool::setNodeSize(sp_Knowledge, 25, 25);
+		fullDetails->addChild(sp_Knowledge);
+
+		auto lbl_LevelRequired = Tool::CreateLabel(to_string(object->upgradeLevelRequired), Tool::defaultTextSize, Color4B::RED, TextHAlignment::CENTER);
+		lbl_LevelRequired->setPosition(fullDetails->getChildByName("level" + to_string(i))->getPosition() + Vec2(visibleSize.width*0.2, visibleSize.height*0.25));
+		fullDetails->addChild(lbl_LevelRequired);
+
+		auto sp_Level = Sprite::create("UI/GameScene/kingdomLevel.png");
+		sp_Level->setPosition(lbl_LevelRequired->getPosition() + Vec2(-25, 0));
+		Tool::setNodeSize(sp_Level, 25, 25);
+		fullDetails->addChild(sp_Level);
+
+
+		auto sp_Arrow = Sprite::create("UI/CardScene/Long Arrow.png");
+		sp_Arrow->setScale(0.35);
+		sp_Arrow->setRotation(-90);
+		sp_Arrow->setPosition(fullDetails->getChildByName("level" + to_string(i))->getPosition() + Vec2(visibleSize.width*0.12, visibleSize.height*0.2));
+		fullDetails->addChild(sp_Arrow);
+	}
+
+}
+
+void CardScene::SetupGUI_sceneUpgrade()
+{
+	auto sp_Background = Sprite::create("UI/Login/BG.png");
+	sp_Background->setPosition(visibleSize / 2);
+	sceneUpgrade->addChild(sp_Background, -1);
+
+	auto sp_Background2 = Sprite::create("UI/Login/BG.png");
+	sp_Background2->setPosition(Vec2(visibleSize.width*.5, visibleSize.height*-0.5));
+	sp_Background2->setRotation(180);
+	sceneUpgrade->addChild(sp_Background2, -1);
+
+	auto sp_SceneName = Sprite::create("UI/Upgrade/head_upgrade.png");
+	sp_SceneName->setPosition(Vec2(visibleSize.width*0.5, visibleSize.height*.85));
+	sceneUpgrade->addChild(sp_SceneName);
+
+	/*auto btn_ToInfo = Tool::CreateButtonWithSpirte("btn_ToInfo", "UI/Upgrade/btn_up.png");
+	btn_ToInfo->addTouchEventListener(CC_CALLBACK_2(CardScene::btn_Click, this));
+	btn_ToInfo->setPosition(Vec2(visibleSize.width*.9, visibleSize.height*.85));
+	btn_ToInfo->setRotation(90);
+	sceneUpgrade->addChild(btn_ToInfo);*/
+
+	auto btn_Back = Tool::CreateButtonWithSpirte("btn_Back", "UI/Room/btn_back.png");
+	btn_Back->addTouchEventListener(CC_CALLBACK_2(CardScene::btn_Click, this));
+	btn_Back->setPosition(Vec2(visibleSize.width*.1, visibleSize.height*.85));
+	sceneUpgrade->addChild(btn_Back);
+
+	auto sp_Friendship = Sprite::create("UI/CardScene/friendship.png");
+	sp_Friendship->setPosition(Vec2(visibleSize.width*0.6, visibleSize.height*0.65));
+	Tool::setNodeSize(sp_Friendship, 70, 70);
+	sceneUpgrade->addChild(sp_Friendship);
+
+	lbl_Friendship = Tool::CreateLabel(to_string(Player::currentPlayer->friendshipPoint), Tool::defaultTextSize*1.5, Color4B::GREEN);
+	lbl_Friendship->setName("lbl_Friendship");
+	lbl_Friendship->setPosition(Vec2(110, 35));
+	sp_Friendship->addChild(lbl_Friendship);
+
+	btn_Up = Tool::CreateButtonWithSpirte("btn_Up", "UI/Upgrade/btn_up.png");
+	btn_Up->addTouchEventListener(CC_CALLBACK_2(CardScene::btn_Friendship_Click, this));
+	btn_Up->setTag(1);
+	btn_Up->setPosition(Vec2(visibleSize.width*0.225, visibleSize.height*.6));
+	sceneUpgrade->addChild(btn_Up);
+
+	btn_Down = Tool::CreateButtonWithSpirte("btn_Down", "UI/Upgrade/btn_up.png");
+	btn_Down->setTag(-1);
+	btn_Down->addTouchEventListener(CC_CALLBACK_2(CardScene::btn_Friendship_Click, this));
+	btn_Down->setPosition(Vec2(visibleSize.width*0.225, visibleSize.height*.4));
+	btn_Down->setRotation(180);
+	sceneUpgrade->addChild(btn_Down);
+
+	auto scroll_Background = Sprite::create("Trophy/Trophy Border.png");
+	scroll_Background->setPosition(Vec2(visibleSize.width*0.1, visibleSize.height*.5));
+	Tool::setNodeSize(scroll_Background, 122, 250);
+	sceneUpgrade->addChild(scroll_Background);
+
+	sceneUpgrade_Before = Node::create();
+	sceneUpgrade_Before->setPosition(Vec2(visibleSize.width*0.4, visibleSize.height*0.55));
+	sceneUpgrade->addChild(sceneUpgrade_Before);
+
+	sceneUpgrade_After = Node::create();
+	sceneUpgrade_After->setPosition(Vec2(visibleSize.width*0.875, visibleSize.height*0.55));
+	sceneUpgrade->addChild(sceneUpgrade_After);
+
+	sceneUpgrade_friendshipNode = Node::create();
+	sceneUpgrade_friendshipNode->setPosition(Vec2(visibleSize.width*0.525, visibleSize.height*0.55));
+	sceneUpgrade->addChild(sceneUpgrade_friendshipNode);
+
+	scroll_Navigator = ui::ScrollView::create();
+	scroll_Navigator->setContentSize(Size(200, 225));
+	scroll_Navigator->setInnerContainerSize(Size(200, 2000));
+	scroll_Navigator->setAnchorPoint(Vec2(0.5, 1));
+	scroll_Navigator->setPosition(Vec2(visibleSize.width*0.1, visibleSize.height*0.7));
+	scroll_Navigator->setBounceEnabled(true);
+	sceneUpgrade->addChild(scroll_Navigator);
+
+	auto lbl_Before = Label::create("Before", "fonts/custom_font.ttf", Tool::defaultTextSize*1.25);
+	lbl_Before->setTextColor(Color4B::RED);
+	lbl_Before->setPosition(Vec2(visibleSize.width*.4, visibleSize.height*0.25));
+	sceneUpgrade->addChild(lbl_Before);
+
+	auto lbl_After = Label::create("After", "fonts/custom_font.ttf", Tool::defaultTextSize*1.25);
+	lbl_After->setTextColor(Color4B::GREEN);
+	lbl_After->setPosition(Vec2(visibleSize.width *0.875, visibleSize.height*0.25));
+	sceneUpgrade->addChild(lbl_After);
+
+	vector<string> cardName;
+	cardName.push_back("Hotheaded Gunner");
+	cardName.push_back("Crazy Wolf");
+	cardName.push_back("Helicopter");
+	cardName.push_back("Dead Walker");
+	cardName.push_back("UFO Driver");
+	cardName.push_back("Winged Orc");
+	cardName.push_back("Liquid Assassin");
+	cardName.push_back("Elemental Alien");
+
+	cardName.push_back("Frost Wyvern");
+	cardName.push_back("Polar Bear");
+	cardName.push_back("Volcarona");
+	cardName.push_back("Enraged Ursa");
+	cardName.push_back("Poisonous Butterfly");
+	cardName.push_back("Vampire Dragon");
+
+	cardName.push_back("Frozen Kingdom");
+	cardName.push_back("Flamed Kingdom");
+	cardName.push_back("Blessed Kingdom");
+	for (int i = 0; i < cardName.size(); i++) {
+		Button* btn = Tool::CreateButtonWithSpirte(cardName[i], "Sprites/" + cardName[i] + "/card.png");
+		btn->setAnchorPoint(Vec2(0.5, 0.5));
+		btn->addTouchEventListener(CC_CALLBACK_2(CardScene::btn_Navigator_Click, this));
+		btn->setPosition(Vec2(100, -100 + scroll_Navigator->getInnerContainerSize().height - 140 * i));
+		scroll_Navigator->addChild(btn);
+		vec_Card.insert({ cardName[i],btn });
+		//auto sp = Sprite::create("UI/CardScene/UnitDetailsTable.png");
+		//sp->setPosition(Vec2(10, 850 - 50 * i));
+		//Tool::setNodeSize(sp, 200, 50);
+		//sp->setAnchorPoint(Vec2(0.1, 0.5));
+		//scroll_Navigator->addChild(sp, -1);
+	}
+
+	auto lbl_Skill = Label::create("Skill", "fonts/custom_font.ttf", Tool::defaultTextSize*1.5);
+	lbl_Skill->setPosition(Vec2(visibleSize.width*0.5, visibleSize.height*0.16));
+	sceneUpgrade->addChild(lbl_Skill);
+
+	skillNode = Node::create();
+	skillNode->setPosition(Vec2(visibleSize.width*0.5, visibleSize.height*0.1));
+	sceneUpgrade->addChild(skillNode);
+
+	auto lbl_Upgrade = Label::create("Upgrade", "fonts/custom_font.ttf", Tool::defaultTextSize*1.5);
+	lbl_Upgrade->setPosition(Vec2(visibleSize.width*0.5, visibleSize.height*-0.27));
+	sceneUpgrade->addChild(lbl_Upgrade);
+
+	fullDetails = Node::create();
+	fullDetails->setPosition(Vec2(visibleSize.width*0.5, visibleSize.height*-0.6));
+	sceneUpgrade->addChild(fullDetails);
+
+	RefreshScene_Upgrade("Hotheaded Gunner");
+}
+
 UnitDetailsTable::UnitDetailsTable(BaseUnitClass object, Vec2 position)
 {
 	this->root = Node::create();
 
 	this->lbl_Name = Tool::CreateLabel(object.name, Tool::defaultTextSize*0.8);
 	lbl_Name->enableBold();
-	lbl_Name->setPosition(position + Vec2(0,85));
+	lbl_Name->setPosition(position + Vec2(0, 85));
 	root->addChild(lbl_Name);
 
 	this->sp_Health = Sprite::create("UI/CardScene/Icon/health.png");
@@ -500,10 +729,10 @@ UnitDetailsTable::UnitDetailsTable(BaseUnitClass object, Vec2 position)
 	lbl_Regeneration->setAnchorPoint(Vec2(0, 0.5));
 	root->addChild(lbl_Regeneration);
 
-	this->sp_Background = Sprite::create("UI/CardScene/UnitDetailsTable.png");
+	this->sp_Background = Sprite::create("UI/Upgrade/frame.png");
 	Tool::setNodeSize(sp_Background, 200, 240);
-	sp_Background->setPosition(position + Vec2(0,-24));
-	root->addChild(sp_Background,-1);
+	sp_Background->setPosition(position + Vec2(0, -24));
+	root->addChild(sp_Background, -1);
 }
 
 FriendShipUpgrade::FriendShipUpgrade(string unitName, int currentLevel)
@@ -554,7 +783,7 @@ FriendShipUpgrade::FriendShipUpgrade(string unitName, int currentLevel)
 		info5 = "Level 5 : +9 Attack";
 	}
 	else if (unitName == "Hotheaded Gunner") {
-		info1 = "Level 1: +2 Attack";
+		info1 = "Level 1 : +2 Attack";
 		info2 = "Level 2 : +25 Health";
 		info3 = "Level 3 : +3 Attack";
 		info4 = "Level 4 : +35 Health";
@@ -611,7 +840,7 @@ FriendShipUpgrade::FriendShipUpgrade(string unitName, int currentLevel)
 	}
 	else return;
 
-	lbl_Level1 = Tool::CreateLabel(info1,Tool::defaultTextSize,Color4B::GRAY);
+	lbl_Level1 = Tool::CreateLabel(info1, Tool::defaultTextSize, Color4B::GRAY);
 	lbl_Level1->setAnchorPoint(Vec2(0, 0.5));
 	if (currentLevel > 0) lbl_Level1->setTextColor(Color4B(175, 225, 250, 250));
 	root->addChild(lbl_Level1);
@@ -640,13 +869,13 @@ FriendShipUpgrade::FriendShipUpgrade(string unitName, int currentLevel)
 	lbl_Level5->setPosition(Vec2(0, -80));
 	root->addChild(lbl_Level5);
 
-	btn_Up = Tool::CreateButtonWithoutSprite(unitName, "Up", Tool::defaultTextSize*1.24, Color3B::GREEN);
-	btn_Up->setPosition(Vec2(25, -120));
-	root->addChild(btn_Up);
+	//btn_Up = Tool::CreateButtonWithoutSprite(unitName, "Up", Tool::defaultTextSize*1.24, Color3B::GREEN);
+	//btn_Up->setPosition(Vec2(25, -120));
+	//root->addChild(btn_Up);
 
-	btn_Down = Tool::CreateButtonWithoutSprite(unitName, "Down", Tool::defaultTextSize*1.24, Color3B::RED);
-	btn_Down->setPosition(Vec2(150, -120));
-	root->addChild(btn_Down);
+	//btn_Down = Tool::CreateButtonWithoutSprite(unitName, "Down", Tool::defaultTextSize*1.24, Color3B::RED);
+	//btn_Down->setPosition(Vec2(150, -120));
+	//root->addChild(btn_Down);
 
 
 }
@@ -655,6 +884,6 @@ void CardScene::RunActionNotify(string content)
 {
 	auto lbl_Notify = Tool::CreateLabel(content, Tool::defaultTextSize, Color4B::MAGENTA);
 	lbl_Notify->setPosition(visibleSize / 2);
-	this->addChild(lbl_Notify, 10);
+	sceneUpgrade->addChild(lbl_Notify, 10);
 	lbl_Notify->runAction(Sequence::create(FadeOut::create(0), FadeIn::create(0.5), DelayTime::create(1), FadeOut::create(0.5), RemoveSelf::create(), nullptr));
 }

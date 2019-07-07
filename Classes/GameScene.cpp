@@ -501,9 +501,10 @@ void GameScene::btn_Click(Ref * pSender, cocos2d::ui::Button::Widget::TouchEvent
 						Tool::Socket_Client->_client->emit("Active_Challenge", "{\"Room\":\"" + Player::currentPlayer->room_name + "\" ,\"id\":\"" + to_string(Player::currentPlayer->id) + "\",\"status\":\"" + "Invite Challenge" + "\"}");
 						ingamePlayerInfo.gold -= 100;
 						UpdateIngamePlayerInfo();
-						int disableTime = (int)Tool::currentIngameTime + 120;
+						
 						btn_ActiveChallenge->runAction(Sequence::create(
-							CallFunc::create([&]() {	btn_ActiveChallenge->setTitleText("Disable Until: " + to_string(disableTime / 60) + ":" + to_string(disableTime % 60));
+							CallFunc::create([&]() {	int disableTime = (int)Tool::currentIngameTime + 120;
+								btn_ActiveChallenge->setTitleText("Disable Until: " + to_string((int)disableTime / 60) + ":" + to_string((int)disableTime % 60));
 								btn_ActiveChallenge->setEnabled(false);
 							}),
 							DelayTime::create(120),
@@ -1521,6 +1522,9 @@ void GameScene::ExcuteArmyEffect(BaseUnitClass *& object)
 		object->baseDefense *= (1 + (army_OpponentPlayer.defense / 100.0));
 		object->baseAttackSpeed *= (1 + (army_OpponentPlayer.attackSpeed / 100.0));
 	}
+	object->ClearStatusStat("Attack");
+	object->ClearStatusStat("Defense");
+	object->ClearStatusStat("AttackSpeed");
 }
 
 void GameScene::CreateTableUpgradeArmy(Ref *pSender, cocos2d::ui::Button::Widget::TouchEventType type)

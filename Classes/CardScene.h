@@ -49,16 +49,23 @@ public:
 
 	Size visibleSize;
 	static Node* GetUnitInfo(BaseUnitClass* unit);
-	Node* friendshipNode, *detailNode_Before, *detailNode_After, *spriteNode, *skillNode, *dynamicUI, *playerInfoNode;
+	Node* sceneUpgrade, *sceneCardInfo;
+	Node* sceneUpgrade_Before, *sceneUpgrade_After, *sceneUpgrade_friendshipNode, *skillNode, *fullDetails;
+	Button* btn_Up, *btn_Down;
+
+	Node* friendshipNode, *detailNode_Before, *detailNode_After, *spriteNode, *dynamicUI, *playerInfoNode;
 	ui::ScrollView* scroll_Navigator, *scroll_UI;
 	unordered_map<string, Button*> vec_Card;
 	Label* lbl_Friendship;
 	void btn_UpFriendship_Click(Ref *pSender, cocos2d::ui::Button::Widget::TouchEventType type);
 	void btn_DownFriendship_Click(Ref *pSender, cocos2d::ui::Button::Widget::TouchEventType type);
+	void btn_Friendship_Click(Ref *pSender, cocos2d::ui::Button::Widget::TouchEventType type);
 	void btn_Click(Ref *pSender, cocos2d::ui::Button::Widget::TouchEventType type);
 	void btn_Navigator_Click(Ref *pSender, cocos2d::ui::Button::Widget::TouchEventType type);
 	void RunActionNotify(string content);
 	vector<string> GetSkillDetail(string unitName);
 	void RefreshScene(string unitName);
 	void RefreshSceneKingdom(string unitName);
+	void RefreshScene_Upgrade(string unitName);
+	void SetupGUI_sceneUpgrade();
 };

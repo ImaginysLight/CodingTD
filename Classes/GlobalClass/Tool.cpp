@@ -147,7 +147,7 @@ int Tool::CreateRandomNumber(int begin, int end)
 Node * Tool::CreateNotificationTable(string lblContent, string btnRightContent, string btnLeftContent, Size tableSize)
 {
 	Node* result = Node::create();
-	Sprite* sp_Background = Sprite::create("UI/NotifyBackground.png");
+	Sprite* sp_Background = Sprite::create("Trophy/Trophy Border.png");
 	Tool::setNodeSize(sp_Background, tableSize.width, tableSize.height);
 	result->addChild(sp_Background,-1);
 

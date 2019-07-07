@@ -23,6 +23,9 @@ public:
 	Size visibleSize;
 	Label* lbl_Notify, *lbl_RoomName;
 	Button *btn_Extend, *btn_Play, *btn_Rank, *btn_Tutorial, *btn_Logout, *btn_Roomname;
+	Node* opponentNode;
+
+	void LoadOpponentInfo();
 
 	void SetupGUI();
 	void btn_Click(Ref *pSender, cocos2d::ui::Button::Widget::TouchEventType type);
@@ -32,6 +35,7 @@ public:
 	void onReceiveEvent_UpdateRoom(SIOClient* client, const std::string& data);
 	void onReceiveEvent_Ready(SIOClient* client, const std::string& data);
 	void onReceiveEvent_Chase_Player(SIOClient* client, const std::string& data);
+	void onReceiveEvent_GetInfoOpponent(SIOClient * client, const std::string & data);
 	/*virtual void onConnect(SIOClient* client);
 	virtual void onMessage(SIOClient* client, const std::string& data);
 	virtual void onClose(SIOClient* client);

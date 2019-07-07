@@ -54,7 +54,7 @@ void ChooseCardScene::onReceive_PickCard(SIOClient* client, const std::string& d
 		this->addChild(sp_Card);
 		if (Player::currentPlayer->id == Tool::ConvertStringToInt(document["Id"].GetString())) {
 			Player::currentPlayer->picked_units.push_back(cardName);
-			ChooseCardScene::currentPlayerPosition -= Vec2(0, visibleSize.height*0.155);
+			ChooseCardScene::currentPlayerPosition -= Vec2(0, visibleSize.height*0.15);
 			sp_Card->setPosition(ChooseCardScene::currentPlayerPosition);
 		}
 		else {
@@ -148,32 +148,35 @@ void ChooseCardScene::btn_ChooseKingdom_Click(Ref * pSender, cocos2d::ui::Button
 
 void ChooseCardScene::SetupGUI()
 {
-	auto frame1 = Sprite::create("UI/Background/frame1.png");
+	auto frame1 = Sprite::create("Trophy/Trophy Border.png");
 	frame1->setPosition(Vec2(visibleSize.width * 0.5, visibleSize.height*0.5));
+	Tool::setNodeSize(frame1, 440, 515);
 	this->addChild(frame1);
 
-	auto frame2 = Sprite::create("UI/Background/frame2.png");
+	auto frame2 = Sprite::create("UI/Upgrade/frame.png");
 	frame2->setPosition(Vec2(visibleSize.width * 0.15f, visibleSize.height*0.5));
+	Tool::setNodeSize(frame2, 210, 515);
 	this->addChild(frame2);
 
-	auto frame3 = Sprite::create("UI/Background/frame2.png");
+	auto frame3 = Sprite::create("UI/Upgrade/frame.png");
 	frame3->setPosition(Vec2(visibleSize.width * 0.85f, visibleSize.height*0.5));
+	Tool::setNodeSize(frame3, 210, 515);
 	this->addChild(frame3);
 
-	ChooseCardScene::lbl_CurrentPlayerName = Tool::CreateLabel("");
-	lbl_CurrentPlayerName->setPosition(Vec2(visibleSize.width*0.15, visibleSize.height*0.88));
+	ChooseCardScene::lbl_CurrentPlayerName = Label::create("", "fonts/custom_font.ttf", Tool::defaultTextSize);
+	lbl_CurrentPlayerName->setPosition(Vec2(visibleSize.width*0.15, visibleSize.height*0.925));
 	this->addChild(lbl_CurrentPlayerName, 1);
 
-	ChooseCardScene::lbl_OpponentPlayerName = Tool::CreateLabel("");
-	lbl_OpponentPlayerName->setPosition(Vec2(visibleSize.width*0.85, visibleSize.height*0.88));
+	ChooseCardScene::lbl_OpponentPlayerName = Label::create("", "fonts/custom_font.ttf", Tool::defaultTextSize);
+	lbl_OpponentPlayerName->setPosition(Vec2(visibleSize.width*0.85, visibleSize.height*0.925));
 	this->addChild(lbl_OpponentPlayerName, 1);
 
-	ChooseCardScene::lbl_Cooldown = Tool::CreateLabel("");
-	lbl_Cooldown->setPosition(Vec2(visibleSize.width *0.65, visibleSize.height*0.88));
+	ChooseCardScene::lbl_Cooldown = Label::create("", "fonts/custom_font.ttf", Tool::defaultTextSize);
+	lbl_Cooldown->setPosition(Vec2(visibleSize.width *0.68, visibleSize.height*0.88));
 	this->addChild(lbl_Cooldown);
 
-	ChooseCardScene::lbl_Turn = Tool::CreateLabel("");
-	lbl_Turn->setPosition(Vec2(visibleSize.width *0.45, visibleSize.height*0.88));
+	ChooseCardScene::lbl_Turn = Label::create("", "fonts/custom_font.ttf", Tool::defaultTextSize);
+	lbl_Turn->setPosition(Vec2(visibleSize.width *0.48, visibleSize.height*0.88));
 	this->addChild(lbl_Turn);
 
 	currentPlayerPosition = Vec2(visibleSize.width*0.15, visibleSize.height*0.82);
@@ -192,7 +195,7 @@ void ChooseCardScene::SetupGUI()
 	sp_SceneName->setPosition(Vec2(visibleSize.width * 0.5, visibleSize.height*0.9));
 	this->addChild(sp_SceneName);*/
 
-	auto sp_Background = Sprite::create("UI/Background/background1.png");
+	auto sp_Background = Sprite::create("UI/Login/BG.png");
 	sp_Background->setPosition(visibleSize / 2);
 	this->addChild(sp_Background, -1);
 
@@ -239,7 +242,7 @@ void ChooseCardScene::ChangeTurn() {
 			}
 			vecButton[0]->setPosition(Vec2(visibleSize.width*0.4, visibleSize.height*0.3));
 			vecButton[1]->setPosition(Vec2(visibleSize.width*0.6, visibleSize.height*0.3));
-			vecButton[2]->setPosition(Vec2(visibleSize.width*0.5, visibleSize.height*0.6));
+			vecButton[2]->setPosition(Vec2(visibleSize.width*0.5, visibleSize.height*0.625));
 		}
 	
 		ChooseCardScene::lbl_Turn->setString("Select your Kingdom");

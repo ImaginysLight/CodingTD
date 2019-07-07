@@ -91,6 +91,7 @@ io.sockets.on('connection', function(socket){
 		con.query("UPDATE `player` set player.room_name = '1' where player.id = " + mes.id, 
 			function (error, result, fields) {
 				if (error) throw error;
+
 				console.log('create room success');
 		});
 	});
@@ -102,7 +103,7 @@ io.sockets.on('connection', function(socket){
 		con.query("UPDATE `player` set player.room_name = '0' where player.id = " + mes.id, 
 			function (error, result, fields) {
 				if (error) throw error;
-				//io.sockets.emit('Destroy_Room', {Room: mes.Room, id: mes.id});
+
 				console.log('destroy room success');
 		});
 	});
@@ -162,10 +163,10 @@ io.sockets.on('connection', function(socket){
 
 
 	//lấy danh sách rank
-		socket.on('_Get_List_Rank_', function(data){
+	socket.on('_Get_List_Rank_', function(data){
 		var mes = JSON.parse(data)
 		//console.log(mes.username +"_"+mes.password);
-		con.query("SELECT * FROM `player` GROUP BY player.total_win DESC", 
+		con.query("SELECT * FROM `player` ORDER BY player.total_win DESC", 
 			function (error, result, fields) {
 				if (error) throw error;
 
@@ -184,10 +185,35 @@ io.sockets.on('connection', function(socket){
 		    		var key = "correct_answer"+i;
 		    		var value = result[i].correct_answer;
 		    		_Get_List_Rank_[key] = value;
+		    		var key = "total_kill"+i;
+		    		var value = result[i].total_kill;
+		    		_Get_List_Rank_[key] = value;
 		    	}
-		    	
+		    	for(var i = 0; i < result.length; i++)
+		    	{
+		    		if(result[i].id == mes.id)
+		    		{
+		    			var key = "Current_rank";
+			    		var value = i+1;
+			    		_Get_List_Rank_[key] = value;
+		    			var key = "Current_id";
+			    		var value = result[i].id;
+			    		_Get_List_Rank_[key] = value;
+			    		var key = "Current_user_name";
+			    		var value = result[i].username;
+			    		_Get_List_Rank_[key] = value;
+			    		var key = "Current_total_win";
+			    		var value = result[i].total_win;
+			    		_Get_List_Rank_[key] = value;
+			    		var key = "Current_correct_answer";
+			    		var value = result[i].correct_answer;
+			    		_Get_List_Rank_[key] = value;
+			    		var key = "Current_total_kill";
+		    			var value = result[i].total_kill;
+		    			_Get_List_Rank_[key] = value;
+		    		}
+		    	}
 				socket.emit('_Get_List_Rank_', {_Get_List_Rank_});	
-				//console.log(_Get_List_Rank_);
 		});
 	});
 
@@ -383,7 +409,6 @@ io.sockets.on('connection', function(socket){
 			+ ", friendship_point = " + mes.friendship_point
 			+ ", friendship_level = '" + mes.friendship_level + "'"
 			+ ", submit_available = " + mes.submit_available
-			+ ", status = " + mes.status
 			+ " WHERE id = " + mes.id,
 			function (error, result, fields) {
 				if (error) throw error;

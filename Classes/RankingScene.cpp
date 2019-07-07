@@ -25,7 +25,7 @@ void RankingScene::onReceiveEvent(SIOClient* client, const std::string& data)
 	//CCLOG("RANK: %d ", document["_Get_List_Rank_"]["CountRank"].GetInt());
 
 	auto row = CreateRow_Default();
-	row->setPosition(Vec2(visibleSize.width*0.185f, visibleSize.height*0.70f));
+	row->setPosition(Vec2(visibleSize.width*0.185f, visibleSize.height*0.68f));
 	this->addChild(row);
 
 	int size = document["_Get_List_Rank_"]["CountRank"].GetInt();
@@ -48,14 +48,23 @@ void RankingScene::onReceiveEvent(SIOClient* client, const std::string& data)
 		id.insert(id.length(), stt);
 		int correct_answer = document["_Get_List_Rank_"][id.c_str()].GetInt();
 		//CCLOG("Rank_id: %d ", document["_Get_List_Rank_"][id.c_str()].GetInt());
+		id = "total_kill";
+		id.insert(id.length(), stt);
+		int total_kill = document["_Get_List_Rank_"][id.c_str()].GetInt();
+		//CCLOG("Rank_id: %d ", document["_Get_List_Rank_"][id.c_str()].GetInt());
 
-		auto row = CreateRow(to_string(i+1), username, to_string(total_win), to_string(correct_answer));
-		row->setPosition(Vec2(50, height - 50 * (i+1)));
+		auto row = CreateRow(to_string(i+1), username, to_string(total_win), to_string(correct_answer), to_string(total_kill));
+		row->setPosition(Vec2(50, height - 50 * (i+1)+20));
 		ScrollView_RankingTable->addChild(row);
 
 	}
 
-	auto rowCurrentPlayer = CreateRowCurrentPlayer("100","username","total win", "correct answer");
+	auto rowCurrentPlayer = CreateRowCurrentPlayer(to_string(document["_Get_List_Rank_"]["Current_rank"].GetInt())
+		, document["_Get_List_Rank_"]["Current_user_name"].GetString()
+		, to_string(document["_Get_List_Rank_"]["Current_total_win"].GetInt())
+		, to_string(document["_Get_List_Rank_"]["Current_correct_answer"].GetInt())
+		, to_string(document["_Get_List_Rank_"]["Current_total_kill"].GetInt())
+	);
 	rowCurrentPlayer->setPosition(Vec2(visibleSize.width*0.185f, visibleSize.height*0.2));
 	this->addChild(rowCurrentPlayer);
 }
@@ -65,7 +74,7 @@ void RankingScene::menuCloseCallback(Ref* pSender)
 	Director::getInstance()->end();
 }
 
-Node * RankingScene::CreateRow(string stt, string name, string win, string correct_answer)
+Node * RankingScene::CreateRow(string stt, string name, string win, string correct_answer, string total_kill)
 {
 	Node* result = Node::create();
 
@@ -82,22 +91,29 @@ Node * RankingScene::CreateRow(string stt, string name, string win, string corre
 	result->addChild(lbl_total_score);
 
 	Label* lbl_total_question = Tool::CreateLabel((correct_answer));
-	lbl_total_question->setPositionX(500);
+	lbl_total_question->setPositionX(450);
 	result->addChild(lbl_total_question);
+
+	Label* lbl_total_kill = Tool::CreateLabel((total_kill));
+	lbl_total_kill->setPositionX(550);
+	result->addChild(lbl_total_kill);
 
 	if (stt == "1") {
 		auto line = Sprite::create("UI/rank/table1.png");
-		line->setPosition(Vec2(visibleSize.width  *0.3f, 0));
+		line->setPosition(Vec2(visibleSize.width  *0.32f, 0));
+		line->setScaleX(1.1);
 		result->addChild(line, -1);
 	}
 	else if (stt == "2") {
 		auto line = Sprite::create("UI/rank/table2.png");
-		line->setPosition(Vec2(visibleSize.width  *0.3f, 0));
+		line->setPosition(Vec2(visibleSize.width  *0.32f, 0));
+		line->setScaleX(1.1);
 		result->addChild(line, -1);
 	}
 	else {
 		auto line = Sprite::create("UI/rank/table3.png");
-		line->setPosition(Vec2(visibleSize.width  *0.3f, 0));
+		line->setPosition(Vec2(visibleSize.width  *0.32f, 0));
+		line->setScaleX(1.1);
 		result->addChild(line, -1);
 	}
 	
@@ -105,7 +121,7 @@ Node * RankingScene::CreateRow(string stt, string name, string win, string corre
 	return result;
 }
 
-Node * RankingScene::CreateRowCurrentPlayer(string stt, string name, string win, string correct_answer)
+Node * RankingScene::CreateRowCurrentPlayer(string stt, string name, string win, string correct_answer, string total_kill)
 {
 	Node* result = Node::create();
 
@@ -122,12 +138,16 @@ Node * RankingScene::CreateRowCurrentPlayer(string stt, string name, string win,
 	result->addChild(lbl_total_score);
 
 	Label* lbl_total_question = Tool::CreateLabel((correct_answer));
-	lbl_total_question->setPositionX(500);
+	lbl_total_question->setPositionX(450);
 	result->addChild(lbl_total_question);
 
+	Label* lbl_total_kill = Tool::CreateLabel(total_kill);
+	lbl_total_kill->setPositionX(550);
+	result->addChild(lbl_total_kill);
 
 	auto line = Sprite::create("UI/rank/table4.png");
-	line->setPosition(Vec2(visibleSize.width  *0.3f, 0));
+	line->setPosition(Vec2(visibleSize.width  *0.32f, 0));
+	line->setScaleX(1.1);
 	result->addChild(line, -1);
 
 
@@ -139,21 +159,25 @@ Node * RankingScene::CreateRow_Default()
 {
 	Node* result = Node::create();
 
-	Label* lbl_stt = Tool::CreateLabel("Rank");
+	Label* lbl_stt = Label::create("Rank","fonts/custom_font.ttf",Tool::defaultTextSize);
 	lbl_stt->setPositionX(50);
 	result->addChild(lbl_stt);
 
-	Label* lbl_Name = Tool::CreateLabel("Name");
+	Label* lbl_Name = Label::create("Name", "fonts/custom_font.ttf", Tool::defaultTextSize);
 	lbl_Name->setPositionX(200);
 	result->addChild(lbl_Name);
 
-	Label* lbl_total_score = Tool::CreateLabel("Total Win");
+	Label* lbl_total_score = Label::create("Win", "fonts/custom_font.ttf", Tool::defaultTextSize);
 	lbl_total_score->setPositionX(350);
 	result->addChild(lbl_total_score);
 
-	Label* lbl_total_question = Tool::CreateLabel("Total Question");
-	lbl_total_question->setPositionX(500);
+	Label* lbl_total_question = Label::create("Correct", "fonts/custom_font.ttf", Tool::defaultTextSize);
+	lbl_total_question->setPositionX(450);
 	result->addChild(lbl_total_question);
+
+	Label* lbl_total_kill = Label::create("Kill", "fonts/custom_font.ttf", Tool::defaultTextSize);
+	lbl_total_kill->setPositionX(550);
+	result->addChild(lbl_total_kill);
 
 	return result;
 }
@@ -177,8 +201,8 @@ void RankingScene::SetupGUI()
 	ScrollView_RankingTable->setBounceEnabled(true);
 	this->addChild(ScrollView_RankingTable);
 
-	btn_Exit = Button::create("UI/Lobby/btn_exit.png");
-	btn_Exit->setPosition(Vec2(visibleSize.width*0.85, visibleSize.height * 0.1));
+	btn_Exit = Button::create("UI/Rank/btn_back.png");
+	btn_Exit->setPosition(Vec2(visibleSize.width*0.1, visibleSize.height * 0.8));
 	btn_Exit->addTouchEventListener(CC_CALLBACK_2(RankingScene::btn_Click, this));
 	btn_Exit->setName("btn_Exit");
 	this->addChild(btn_Exit);

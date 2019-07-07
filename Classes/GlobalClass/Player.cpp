@@ -64,7 +64,7 @@ cocos2d::Node * Player::CreatePlayerOutgameInfoGUI()
 	
 	string level = to_string(Player::CalculateLevel(Player::currentPlayer->experience).first);
 	auto levelBar = Tool::CreateBar("Level", Color4B::WHITE, Size(200, 4), Color3B(175, 225, 250));
-	((ProgressTimer*)levelBar->getChildByName("Front Bar"))->setPercentage((Player::currentPlayer->experience / (float)levelInfo.second *100.0));
+	((ProgressTimer*)levelBar->getChildByName("Front Bar"))->setPercentage((float)Player::CalculateLevel(Player::currentPlayer->experience).first / (float)0.25);
 	((Label*)levelBar->getChildByName("Content"))->setPositionY(14);
 	levelBar->setPositionX(75);
 	result->addChild(levelBar);

@@ -1,4 +1,4 @@
-#include"LobbyScene.h"
+﻿#include"LobbyScene.h"
 
 USING_NS_CC;
 using namespace CocosDenshion;
@@ -188,6 +188,11 @@ void LobbyScene::btn_Click(Ref *pSender, cocos2d::ui::Button::Widget::TouchEvent
 		}
 		if (name == "btn_Audio") {
 
+		}
+		if (name == "btn_Credit") {
+			auto nodeLevelUp = Tool::CreateNotificationTable(Tool::ConvertUTF16ToString(L"Welcome to Coding TD Online\n\nThis project was developed by\n Võ Anh Quyết aka VoQuyt\nĐinh Lê Hoàng Chương aka ImaginysLight\n\nHope you enjoy the game!"), "Close","",Size(visibleSize.width*0.5,visibleSize.height*0.8));
+			this->addChild(nodeLevelUp, 100);
+			nodeLevelUp->setPosition(visibleSize / 2);
 		}
 	}
 }

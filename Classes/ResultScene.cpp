@@ -26,74 +26,120 @@ void ResultScene::menuCloseCallback(Ref* pSender)
 
 void ResultScene::SetupGUI()
 {
-	auto sp_Background = Sprite::create("UI/Background/Default Background 1.png");
+	auto sp_Background = Sprite::create("UI/Login/BG.png");
 	sp_Background->setPosition(visibleSize / 2);
 	this->addChild(sp_Background, -1);
 
 	if (Player::CalculateLevel(Player::oldPlayerInfo.experience).first < Player::CalculateLevel(Player::currentPlayer->experience).first) {
-		auto nodeLevelUp = Tool::CreateNotificationTable("LEVEL UP!!!\nYou receive 1 Friendship Point", "");
-		this->addChild(nodeLevelUp);
+		auto nodeLevelUp = Tool::CreateNotificationTable("LEVEL UP!!!\nYou receive 1 Friendship Point", "OK");
+		this->addChild(nodeLevelUp,100);
 		nodeLevelUp->setPosition(visibleSize / 2);
 	}
 
-	auto lbl_Title = Tool::CreateLabel("", Tool::defaultTextSize * 2);
-	lbl_Title->setPosition(Vec2(visibleSize.width*0.5, visibleSize.height*0.9));
-	this->addChild(lbl_Title);
+	auto sp_Frame = Sprite::create("Trophy/Trophy Border.png");
+	sp_Frame->setPosition(Vec2(visibleSize.width / 2, visibleSize.height*0.4));
+	Tool::setNodeSize(sp_Frame, visibleSize.width*0.8, visibleSize.height*0.6);
+	this->addChild(sp_Frame, -1);
+
 	if (ResultScene::isVictorious) {
-		lbl_Title->setString("You are Victorious");
-		lbl_Title->setTextColor(Color4B::GREEN);
+		auto sp_Win = Sprite::create("UI/Lobby/win.png");
+		sp_Win->setPosition(Vec2(visibleSize.width*0.5, visibleSize.height*0.8));
+		this->addChild(sp_Win);
 	}
 	else {
-		lbl_Title->setString("You are Defeated");
-		lbl_Title->setTextColor(Color4B::RED);
+		auto sp_Win = Sprite::create("UI/Lobby/lose.png");
+		sp_Win->setPosition(Vec2(visibleSize.width*0.5, visibleSize.height*0.8));
+		this->addChild(sp_Win);
 	}
 
-	Label* lbl_CurrentExperience = Tool::CreateLabel("Experience: " + to_string(Player::oldPlayerInfo.experience));
-	lbl_CurrentExperience->setPosition(Vec2(visibleSize.width*0.1, visibleSize.height*0.7));
-	lbl_CurrentExperience->setAnchorPoint(Vec2(0, 0.5));
-	this->addChild(lbl_CurrentExperience);
-	Label* lbl_BonusExperience = Tool::CreateLabel("+" + to_string((int)Player::currentPlayer->experience - Player::oldPlayerInfo.experience), Tool::defaultTextSize, Color4B(175, 225, 200, 255));
-	lbl_BonusExperience->setPosition(Vec2(visibleSize.width*0.3, visibleSize.height*0.7));
+	Label* lbl_Experience = Label::create("Experience", "fonts/custom_font.ttf", Tool::defaultTextSize);
+	lbl_Experience->setPosition(Vec2(visibleSize.width*0.2, visibleSize.height*0.65));
+	lbl_Experience->setAnchorPoint(Vec2(0, 0.5));
+	this->addChild(lbl_Experience);
+
+	auto levelInfo = Player::CalculateLevel(Player::currentPlayer->experience);
+	auto expBar = Tool::CreateBar(to_string(Player::currentPlayer->experience) + " / " + to_string(levelInfo.second), Color4B::WHITE, Size(200, 4), Color3B::WHITE);
+	((ProgressTimer*)expBar->getChildByName("Front Bar"))->setPercentage((Player::currentPlayer->experience / (float)levelInfo.second *100.0));
+	((Label*)expBar->getChildByName("Content"))->setPositionY(14);
+	expBar->setPosition(Vec2(visibleSize.width*0.5, visibleSize.height*0.625));
+	this->addChild(expBar);
+
+	Label* lbl_BonusExperience = Label::create("( +" + to_string((int)Player::currentPlayer->experience - Player::oldPlayerInfo.experience) + " )", "fonts/custom_font.ttf", Tool::defaultTextSize);
+	lbl_BonusExperience->setPosition(Vec2(visibleSize.width*0.65, visibleSize.height*0.65));
+	lbl_BonusExperience->setAnchorPoint(Vec2(0, 0.5));
 	this->addChild(lbl_BonusExperience);
 
-	Label* lbl_CurrentKill = Tool::CreateLabel("Total Kill: " + to_string(Player::oldPlayerInfo.total_kill));
-	lbl_CurrentKill->setPosition(Vec2(visibleSize.width*0.1, visibleSize.height*0.6));
-	lbl_CurrentKill->setAnchorPoint(Vec2(0, 0.5));
-	this->addChild(lbl_CurrentKill);
-	Label* lbl_BonusKill = Tool::CreateLabel("+" + to_string(ResultScene::numOfEnemyDefeated), Tool::defaultTextSize, Color4B(175, 225, 200, 255));
-	lbl_BonusKill->setPosition(Vec2(visibleSize.width*0.3, visibleSize.height*0.6));
+
+
+
+	Label* lbl_CorrectAnswer = Label::create("Correct", "fonts/custom_font.ttf", Tool::defaultTextSize);
+	lbl_CorrectAnswer->setPosition(Vec2(visibleSize.width*0.2, visibleSize.height*0.55));
+	lbl_CorrectAnswer->setAnchorPoint(Vec2(0, 0.5));
+	lbl_CorrectAnswer->setTextColor(Color4B(175, 225, 200, 255));
+	this->addChild(lbl_CorrectAnswer);
+
+	auto knowledge = Trophy::CalculateKnowledgeTrophy(Player::currentPlayer->total_correctAnswer);
+	auto correctBar = Tool::CreateBar(to_string(Player::currentPlayer->total_correctAnswer) + " / " + to_string(knowledge.ExpToNext), Color4B(175, 225, 200, 255), Size(200, 4), Color3B(175, 225, 200));
+	((ProgressTimer*)correctBar->getChildByName("Front Bar"))->setPercentage((Player::currentPlayer->total_correctAnswer / (float)knowledge.ExpToNext *100.0));
+	((Label*)correctBar->getChildByName("Content"))->setPositionY(14);
+	correctBar->setPosition(Vec2(visibleSize.width*0.5, visibleSize.height*0.525));
+	this->addChild(correctBar);
+
+	Label* lbl_BonusCorrect = Label::create("( +" + to_string((int)Player::currentPlayer->total_correctAnswer - Player::oldPlayerInfo.total_correctAnswer) + " )", "fonts/custom_font.ttf", Tool::defaultTextSize);
+	lbl_BonusCorrect->setPosition(Vec2(visibleSize.width*0.65, visibleSize.height*0.55));
+	lbl_BonusCorrect->setAnchorPoint(Vec2(0, 0.5));
+	lbl_BonusCorrect->setTextColor(Color4B(175, 225, 200, 255));
+	this->addChild(lbl_BonusCorrect);
+
+
+
+	Label* lbl_Kill = Label::create("Kill", "fonts/custom_font.ttf", Tool::defaultTextSize);
+	lbl_Kill->setPosition(Vec2(visibleSize.width*0.2, visibleSize.height*0.45));
+	lbl_Kill->setAnchorPoint(Vec2(0, 0.5));
+	lbl_Kill->setTextColor(Color4B::RED);
+	this->addChild(lbl_Kill);
+
+	auto battle = Trophy::CalculateBattleTrophy(Player::currentPlayer->total_kill);
+	auto killBar = Tool::CreateBar(to_string(Player::currentPlayer->total_kill) + " / " + to_string(battle.ExpToNext), Color4B::RED, Size(200, 4), Color3B::RED);
+	((ProgressTimer*)killBar->getChildByName("Front Bar"))->setPercentage((Player::currentPlayer->total_kill / (float)battle.ExpToNext *100.0));
+	((Label*)killBar->getChildByName("Content"))->setPositionY(14);
+	killBar->setPosition(Vec2(visibleSize.width*0.5, visibleSize.height*0.425));
+	this->addChild(killBar);
+
+	Label* lbl_BonusKill = Label::create("( +" + to_string((int)Player::currentPlayer->total_kill - Player::oldPlayerInfo.total_kill) + " )", "fonts/custom_font.ttf", Tool::defaultTextSize);
+	lbl_BonusKill->setPosition(Vec2(visibleSize.width*0.65, visibleSize.height*0.45));
+	lbl_BonusKill->setAnchorPoint(Vec2(0, 0.5));
+	lbl_BonusKill->setTextColor(Color4B::RED);
 	this->addChild(lbl_BonusKill);
 
-	Label* lbl_CurrentCorrectAnswer = Tool::CreateLabel("Correct Answer: " + to_string(Player::oldPlayerInfo.total_correctAnswer));
-	lbl_CurrentCorrectAnswer->setPosition(Vec2(visibleSize.width*0.55, visibleSize.height*0.7));
-	lbl_CurrentCorrectAnswer->setAnchorPoint(Vec2(0, 0.5));
-	this->addChild(lbl_CurrentCorrectAnswer);
-	Label* lbl_BonusCorrectAnswer = Tool::CreateLabel("+" + to_string(ResultScene::numOfCorrectAnswer), Tool::defaultTextSize, Color4B(175, 225, 200, 255));
-	lbl_BonusCorrectAnswer->setPosition(Vec2(visibleSize.width*0.75, visibleSize.height*0.7));
-	this->addChild(lbl_BonusCorrectAnswer);
+	Label* lbl_Accurary = Label::create("Accurary", "fonts/custom_font.ttf", Tool::defaultTextSize);
+	lbl_Accurary->setPosition(Vec2(visibleSize.width*0.3, visibleSize.height*0.3));
+	lbl_Accurary->setTextColor(Color4B(175, 225, 250, 255));
+	this->addChild(lbl_Accurary);
+	
+	float accurary = (float)Player::currentPlayer->total_correctAnswer / (Player::currentPlayer->total_correctAnswer + Player::currentPlayer->total_wrongAnswer)*100.0;
+	if (accurary != accurary) accurary = 0;
+	auto accuraryBar = Tool::CreateBar((string)CCString::createWithFormat("%.1f", accurary)->getCString() + " %", Color4B(175, 225, 250, 255), Size(150, 4), Color3B(175, 225, 250));
+	((ProgressTimer*)accuraryBar->getChildByName("Front Bar"))->setPercentage(accurary);
+	((Label*)accuraryBar->getChildByName("Content"))->setPositionY(14);
+	accuraryBar->setPosition(Vec2(visibleSize.width*0.3, visibleSize.height*0.325));
+	this->addChild(accuraryBar);
 
-	Label* lbl_CurrentWrongAnswer = Tool::CreateLabel("Wrong Answer: " + to_string(Player::oldPlayerInfo.total_wrongAnswer));
-	lbl_CurrentWrongAnswer->setPosition(Vec2(visibleSize.width*0.55, visibleSize.height*0.6));
-	lbl_CurrentWrongAnswer->setAnchorPoint(Vec2(0, 0.5));
-	this->addChild(lbl_CurrentWrongAnswer);
-	Label* lbl_BonusWrongAnswer = Tool::CreateLabel("+" + to_string(ResultScene::numOfWrongAnswer), Tool::defaultTextSize, Color4B::RED);
-	lbl_BonusWrongAnswer->setPosition(Vec2(visibleSize.width*0.75, visibleSize.height*0.6));
-	this->addChild(lbl_BonusWrongAnswer);
+	Label* lbl_Winrate = Label::create("Win Rate", "fonts/custom_font.ttf", Tool::defaultTextSize);
+	lbl_Winrate->setPosition(Vec2(visibleSize.width*0.7, visibleSize.height*0.3));
+	lbl_Winrate->setTextColor(Color4B(175, 225, 250, 255));
+	this->addChild(lbl_Winrate);
 
-	float oldAccurary = Player::oldPlayerInfo.total_correctAnswer / (float)(Player::oldPlayerInfo.total_correctAnswer + Player::oldPlayerInfo.total_wrongAnswer) * 100;
-	if (oldAccurary != oldAccurary) oldAccurary = 0;
-	float newAccurary = Player::currentPlayer->total_correctAnswer / (float)(Player::currentPlayer->total_correctAnswer + Player::currentPlayer->total_wrongAnswer) * 100;
-	Label* lbl_OldAccuraryRate = Tool::CreateLabel((string)CCString::createWithFormat("Accurary Rate: %.1f", oldAccurary)->getCString() + "%");
-	lbl_OldAccuraryRate->setPosition(Vec2(visibleSize.width*0.55, visibleSize.height*0.5));
-	lbl_OldAccuraryRate->setAnchorPoint(Vec2(0, 0.5));
-	this->addChild(lbl_OldAccuraryRate);
+	float winrate = (float)Player::currentPlayer->total_win / (Player::currentPlayer->total_win + Player::currentPlayer->total_lose)*100.0;
+	if (winrate != winrate) winrate = 0;
+	auto winrateBar = Tool::CreateBar((string)CCString::createWithFormat("%.1f", winrate)->getCString() + " %", Color4B(175, 225, 250, 255), Size(150, 4), Color3B(175, 225, 250));
+	((ProgressTimer*)winrateBar->getChildByName("Front Bar"))->setPercentage(winrate);
+	((Label*)winrateBar->getChildByName("Content"))->setPositionY(14);
+	winrateBar->setPosition(Vec2(visibleSize.width*0.7, visibleSize.height*0.325));
+	this->addChild(winrateBar);
 
-	Label* lbl_NewAccuraryRate = Tool::CreateLabel((string)CCString::createWithFormat(">> %.1f", newAccurary)->getCString() + "%");
-	lbl_NewAccuraryRate->setPosition(Vec2(visibleSize.width*0.82, visibleSize.height*0.5));
-	lbl_NewAccuraryRate->setTextColor(newAccurary > oldAccurary ? Color4B::GREEN : Color4B::RED);
-	this->addChild(lbl_NewAccuraryRate);
 
-	auto btn_LobbyScene = Tool::CreateButtonWithoutSprite("btn_LobbyScene", "Back To Lobby");
+	auto btn_LobbyScene = Tool::CreateButtonWithSpirte("btn_LobbyScene", "UI/Lobby/btn_exit.png");
 	btn_LobbyScene->setPosition(Vec2(visibleSize.width*0.5, visibleSize.height*0.2));
 	btn_LobbyScene->addTouchEventListener(CC_CALLBACK_2(ResultScene::btn_Click, this));
 	this->addChild(btn_LobbyScene);
