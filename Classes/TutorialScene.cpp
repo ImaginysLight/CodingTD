@@ -36,12 +36,12 @@ bool TutorialScene::init()
 		this->addChild(lbl_Tutorial);
 	}
 
-	auto sp_Background = Sprite::create("UI/Background/Default Background 1.png");
+	auto sp_Background = Sprite::create("UI/Login/BG.png");
 	sp_Background->setPosition(visibleSize / 2);
 	this->addChild(sp_Background, -1);
 
-	btn_Exit = Tool::CreateButtonWithoutSprite("btn_Exit", " << Back To Lobby");
-	btn_Exit->setPosition(Vec2(visibleSize.width*0.15, visibleSize.height * 0.1));
+	btn_Exit = Tool::CreateButtonWithSpirte("btn_Exit","UI/Rank/btn_back.png");
+	btn_Exit->setPosition(Vec2(visibleSize.width*0.1, visibleSize.height * 0.9));
 	btn_Exit->addTouchEventListener(CC_CALLBACK_2(TutorialScene::btn_Click, this));
 	btn_Exit->runAction(RepeatForever::create(Sequence::create(
 		MoveBy::create(1, Vec2(25, 0)),
@@ -101,11 +101,11 @@ bool TutorialScene::init()
 		lbl->setAnchorPoint(Vec2(0.5, 1));
 		ScrollView_TutorialList->addChild(lbl);
 
-		Sprite* sp = Sprite::create("UI/TutorialScene/background.png");
+		Sprite* sp = Sprite::create("Trophy/Trophy Border.png");
 		vecSprite.push_back(sp);
-		Tool::setNodeSize(sp, 550, 300);
-		sp->setPosition(Vec2(visibleSize.width * (i + 0.5), visibleSize.height*0.8));
-		ScrollView_TutorialList->addChild(sp);
+		Tool::setNodeSize(sp, visibleSize.width*.8, visibleSize.height*.7);
+		sp->setPosition(Vec2(visibleSize.width * (i + 0.5), visibleSize.height*0.625));
+		ScrollView_TutorialList->addChild(sp,-1);
 	}
 
 	ScrollView_TutorialList->setInnerContainerSize(Size(visibleSize.width*labelContent.size(),visibleSize.height));

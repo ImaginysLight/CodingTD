@@ -13,8 +13,6 @@ bool LoginScene::init()
 {
 	visibleSize = Director::getInstance()->getVisibleSize();
 	Audio::audio->playEffect("Audio/The seasons - june (barcarolle).mp3", true);
-	Audio::audio->setBackgroundMusicVolume(0.01f);
-	Audio::audio->setEffectsVolume(0.01f);
 	SetupGUI();
 	
 	//_client = SocketIO::connect("http://127.0.0.1:3000", *this);

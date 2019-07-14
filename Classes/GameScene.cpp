@@ -18,6 +18,7 @@ bool GameScene::init()
 	Audio::audio->stopAllEffects();
 	Audio::audio->stopBackgroundMusic();
 
+
 	visibleSize = Director::getInstance()->getVisibleSize();
 
 	IngameObject::loadIngameObjectStaticVariables();
@@ -610,6 +611,11 @@ bool GameScene::onTouchBegan(Touch* touch, Event* event) {
 	return true;
 }
 void GameScene::onTouchMoved(Touch* touch, Event* event) {
+	//Trong hàm update() lấy vị trí nhân vật xong set camera đi thôi
+	auto nhanvat_xxx = Node::create();
+	Camera::getDefaultCamera()->setPosition(nhanvat_xxx->getPosition());
+
+
 	Vec2 prePosition = Camera::getDefaultCamera()->getPosition();
 	Camera::getDefaultCamera()->setPositionX(Camera::getDefaultCamera()->getPositionX() +
 		(touch->getLocation().x - touch->getPreviousLocation().x));
@@ -921,6 +927,7 @@ void GameScene::UpgradeUnit(string name) {
 					List_BuyableUnit[i].root->runAction(RemoveSelf::create());
 					List_BuyableUnit[i] = Item_BuyableUnit(unitDetails.upgradeName);
 					List_BuyableUnit[i].root->setPosition(oldItem.root->getPosition());
+					List_BuyableUnit[i].oldRootPos = List_BuyableUnit[i].root->getPosition();
 					this->buyingBar->addChild(List_BuyableUnit[i].root);
 					List_BuyableUnit[i].btn_Icon->addTouchEventListener(CC_CALLBACK_2(GameScene::btn_BuyUnit_Click, this));
 					AddDragAndDropItem(List_BuyableUnit[i].root);
@@ -951,7 +958,8 @@ void GameScene::ChangeUpgradeState()
 		Tool::Button_ChangeState(btn_UpgradeKingdom, false, 0);
 		Tool::Button_ChangeState(btn_UpgradeFarm, false, 0);
 		for (int i = 0; i < List_BuyableUnit.size(); i++) {
-			List_BuyableUnit[i].root->runAction(MoveTo::create(0.25, List_BuyableUnit[i].oldRootPos));
+			//List_BuyableUnit[i].root->runAction(MoveBy::create(0.25, Vec2(0, -175)));
+			List_BuyableUnit[i].root->setPosition(List_BuyableUnit[i].oldRootPos);
 		}
 	}
 }

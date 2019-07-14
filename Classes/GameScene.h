@@ -34,10 +34,10 @@ public:
 	void btn_UpgradeArmy_Click(Ref *pSender, cocos2d::ui::Button::Widget::TouchEventType type);
 	//Thông số trong game của người chơi
 	struct IngamePlayer {
-		float gold = 200;
+		float gold = 2000;
 		float energy = 0;
 		float energyCap = 100;
-		int knowledge = 1;
+		int knowledge = 10;
 		float foodLimit = 5;
 		float food = -1;
 		float Gps = 5;
