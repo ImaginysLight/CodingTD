@@ -611,11 +611,6 @@ bool GameScene::onTouchBegan(Touch* touch, Event* event) {
 	return true;
 }
 void GameScene::onTouchMoved(Touch* touch, Event* event) {
-	//Trong hàm update() lấy vị trí nhân vật xong set camera đi thôi
-	auto nhanvat_xxx = Node::create();
-	Camera::getDefaultCamera()->setPosition(nhanvat_xxx->getPosition());
-
-
 	Vec2 prePosition = Camera::getDefaultCamera()->getPosition();
 	Camera::getDefaultCamera()->setPositionX(Camera::getDefaultCamera()->getPositionX() +
 		(touch->getLocation().x - touch->getPreviousLocation().x));

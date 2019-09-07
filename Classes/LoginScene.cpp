@@ -105,6 +105,7 @@ void LoginScene::btn_Click(Ref *pSender, cocos2d::ui::Button::Widget::TouchEvent
 			Tool::Socket_Client->_client->on("Get_Player_Info", CC_CALLBACK_2(LoginScene::onReceiveEvent_GetPlayerInfo, this));
 		}
 		else if (term->getName() == "btn_Close") {
+			Tool::Socket_Client->_client->disconnect();
 			Director::getInstance()->end();
 		}
 	}
